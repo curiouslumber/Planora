@@ -1,0 +1,33 @@
+name: easy_scheduler
+description: "Easy Scheduler"
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  cupertino_icons: ^1.0.8
+  flutter:
+    sdk: flutter
+  flutter_svg: ^2.0.17
+  get: ^4.7.2
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/notification.svg
+    - assets/icons/home-2.svg
+    - assets/icons/home-2-selected.svg
+    - assets/icons/calendar.svg
+    - assets/icons/calendar-selected.svg
+    - assets/icons/chart-2.svg
+    - assets/icons/profile.svg
