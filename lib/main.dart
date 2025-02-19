@@ -1,17 +1,38 @@
 import 'package:easy_scheduler/views/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final lightColorScheme = ColorScheme.fromSeed(
+    seedColor: Color(0xffF0857A),
+    brightness: Brightness.light,
+  );
+
+  final darkColorScheme = ColorScheme.fromSeed(
+    seedColor: Color(0xffF0857A),
+    brightness: Brightness.dark,
+  );
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: lightColorScheme,
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: darkColorScheme,
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
       title: 'Easy Scheduler',
       debugShowCheckedModeBanner: false,
       home: Home(),

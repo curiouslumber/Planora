@@ -30,10 +30,18 @@ class _HomeState extends State<Home> {
                 height: 64,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Color(0xffA9A9A9)),
+                  border: Border.all(
+                    color: context.theme.colorScheme.inverseSurface,
+                  ),
                 ),
               ),
-              SvgPicture.asset('assets/icons/notification.svg'),
+              SvgPicture.asset(
+                'assets/icons/notification.svg',
+                colorFilter: ColorFilter.mode(
+                  context.theme.colorScheme.inverseSurface,
+                  BlendMode.srcIn,
+                ),
+              ),
             ],
           ),
         ),
@@ -46,7 +54,7 @@ class _HomeState extends State<Home> {
                 'Good Morning,',
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
-                  color: Color(0xffA9A9A9),
+                  color: context.theme.colorScheme.inverseSurface,
                   fontSize: 14,
                 ),
               ),
@@ -55,17 +63,17 @@ class _HomeState extends State<Home> {
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xff343434),
+                  color: context.theme.colorScheme.inverseSurface,
                   fontSize: 18,
                 ),
               ),
             ],
           ),
         ],
-        backgroundColor: context.theme.scaffoldBackgroundColor,
+        backgroundColor: context.theme.colorScheme.surface,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +97,7 @@ class _HomeState extends State<Home> {
                         'Excellent! Your today’s plan is almost done',
                         style: TextStyle(
                           fontFamily: GoogleFonts.poppins().fontFamily,
-                          color: Colors.white,
+                          color: context.theme.colorScheme.surface,
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                         ),
@@ -108,14 +116,15 @@ class _HomeState extends State<Home> {
                               strokeWidth: 6,
                               strokeAlign: 8,
                               value: 0.8,
-                              color: Colors.white,
-                              backgroundColor: Colors.white.withOpacity(0.4),
+                              color: context.theme.colorScheme.surface,
+                              backgroundColor: context.theme.colorScheme.surface
+                                  .withOpacity(0.4),
                             ),
                             Text(
                               '82%',
                               style: TextStyle(
                                 fontFamily: GoogleFonts.poppins().fontFamily,
-                                color: Colors.white,
+                                color: context.theme.cardColor,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -133,7 +142,7 @@ class _HomeState extends State<Home> {
                     'Today\'s Schedule',
                     style: TextStyle(
                       fontFamily: GoogleFonts.poppins().fontFamily,
-                      color: Colors.black,
+                      color: context.theme.colorScheme.inverseSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
