@@ -65,7 +65,7 @@ class _HomeState extends State<Home> {
                 'Noel Pinto!',
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   color: context.theme.colorScheme.inverseSurface,
                   fontSize: 18,
                 ),
@@ -102,7 +102,7 @@ class _HomeState extends State<Home> {
                           fontFamily: GoogleFonts.poppins().fontFamily,
                           color: context.theme.colorScheme.surface,
                           fontSize: 18,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w600,
                         ),
                         maxLines: 3,
                       ),
