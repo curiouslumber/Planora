@@ -1,3 +1,4 @@
+import 'package:easy_scheduler/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -18,10 +19,10 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        actionsPadding: EdgeInsets.only(right: 28),
+        actionsPadding: EdgeInsets.only(right: 32),
         leadingWidth: 100,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 28),
+          padding: const EdgeInsets.only(left: 24),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -50,6 +51,7 @@ class _HomeState extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(height: 8),
               Text(
                 'Good Morning,',
                 style: TextStyle(
@@ -58,11 +60,12 @@ class _HomeState extends State<Home> {
                   fontSize: 14,
                 ),
               ),
+              SizedBox(height: 2),
               Text(
                 'Noel Pinto!',
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                   color: context.theme.colorScheme.inverseSurface,
                   fontSize: 18,
                 ),
@@ -73,15 +76,15 @@ class _HomeState extends State<Home> {
         backgroundColor: context.theme.colorScheme.surface,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 40,
+            spacing: 24,
             children: [
               Container(
-                height: 166,
-                width: 319,
+                margin: EdgeInsets.only(bottom: 4),
+                height: context.height * 0.22,
                 padding: EdgeInsets.symmetric(horizontal: 32),
                 decoration: BoxDecoration(
                   color: Color(0xffF0857A),
@@ -137,6 +140,9 @@ class _HomeState extends State<Home> {
                 ),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 24,
                 children: [
                   Text(
                     'Today\'s Schedule',
@@ -147,57 +153,11 @@ class _HomeState extends State<Home> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  TwoColumnRandomGrid(),
                 ],
               ),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          splashFactory: NoSplash.splashFactory,
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: BottomNavigationBar(
-          currentIndex: currentIndex,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Color(0xffF0857A),
-          onTap: (value) {
-            setState(() {
-              currentIndex = value;
-            });
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/home-2.svg'),
-              activeIcon: SvgPicture.asset('assets/icons/home-2-selected.svg'),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/calendar.svg'),
-              activeIcon: SvgPicture.asset(
-                'assets/icons/calendar-selected.svg',
-              ),
-              label: 'Calendar',
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/chart-2.svg'),
-              activeIcon: SvgPicture.asset(
-                'assets/icons/calendar-selected.svg',
-              ),
-              label: 'Activity',
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/profile.svg'),
-              activeIcon: SvgPicture.asset(
-                'assets/icons/calendar-selected.svg',
-              ),
-              label: 'Profile',
-            ),
-          ],
         ),
       ),
     );
