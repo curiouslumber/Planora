@@ -19,7 +19,12 @@ class _LayoutPageState extends State<LayoutPage> {
 
   final List<Widget> _pages = [
     Center(child: Home()),
-    Center(child: Text('Calendar Page', style: TextStyle(fontSize: 24))),
+    Center(
+      child: Text(
+        'Calendar Page',
+        style: TextStyle(fontSize: 24, color: Colors.orange),
+      ),
+    ),
     Center(child: Text('Activity Page', style: TextStyle(fontSize: 24))),
     Center(child: Text('Profile Page', style: TextStyle(fontSize: 24))),
   ];

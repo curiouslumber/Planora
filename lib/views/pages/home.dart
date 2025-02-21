@@ -82,79 +82,87 @@ class _HomeState extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 24,
             children: [
-              Container(
-                margin: EdgeInsets.only(bottom: 4),
-                height: context.height * 0.22,
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                decoration: BoxDecoration(
-                  color: Color(0xffF0857A),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                alignment: Alignment.center,
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Excellent! Your today’s plan is almost done',
-                        style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          color: context.theme.colorScheme.surface,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 4),
+                  height: context.height * 0.22,
+                  padding: EdgeInsets.symmetric(horizontal: 32),
+                  decoration: BoxDecoration(
+                    color: context.theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Excellent! Your today’s plan is almost done',
+                          style: TextStyle(
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            color: context.theme.colorScheme.primary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 3,
                         ),
-                        maxLines: 3,
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        alignment: Alignment.center,
-                        child: Stack(
+                      Expanded(
+                        flex: 1,
+                        child: Container(
                           alignment: Alignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              year2023: false,
-                              strokeWidth: 6,
-                              strokeAlign: 8,
-                              value: 0.8,
-                              color: context.theme.colorScheme.surface,
-                              backgroundColor: context.theme.colorScheme.surface
-                                  .withOpacity(0.4),
-                            ),
-                            Text(
-                              '82%',
-                              style: TextStyle(
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                color: context.theme.cardColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                year2023: false,
+                                strokeWidth: 6,
+                                strokeAlign: 8,
+                                value: 0.8,
+                                color: context.theme.colorScheme.primary,
+                                backgroundColor: context
+                                    .theme
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.4),
                               ),
-                            ),
-                          ],
+                              Text(
+                                '82%',
+                                style: TextStyle(
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  color: context.theme.colorScheme.primary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 24,
-                children: [
-                  Text(
-                    'Today\'s Schedule',
-                    style: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      color: context.theme.colorScheme.inverseSurface,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 24,
+                  children: [
+                    Text(
+                      'Today\'s Schedule',
+                      style: TextStyle(
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        color: context.theme.colorScheme.inverseSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  TwoColumnRandomGrid(),
-                ],
+                    Expanded(flex: 1, child: TwoColumnRandomGrid()),
+                  ],
+                ),
               ),
             ],
           ),
