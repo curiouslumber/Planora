@@ -25,14 +25,14 @@ class Home extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: context.theme.colorScheme.inverseSurface,
+                    color: context.theme.colorScheme.onSurface,
                   ),
                 ),
               ),
               SvgPicture.asset(
                 'assets/icons/notification.svg',
                 colorFilter: ColorFilter.mode(
-                  context.theme.colorScheme.inverseSurface,
+                  context.theme.colorScheme.onSurface,
                   BlendMode.srcIn,
                 ),
               ),
@@ -49,7 +49,7 @@ class Home extends StatelessWidget {
                 'Good Morning,',
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
-                  color: context.theme.colorScheme.secondary,
+                  color: context.theme.colorScheme.onSurface,
                   fontSize: 14,
                 ),
               ),
@@ -59,7 +59,7 @@ class Home extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
                   fontWeight: FontWeight.w700,
-                  color: context.theme.colorScheme.secondary,
+                  color: context.theme.colorScheme.onSurface,
                   fontSize: 18,
                 ),
               ),
@@ -148,7 +148,7 @@ class Home extends StatelessWidget {
                       'Today\'s Schedule',
                       style: TextStyle(
                         fontFamily: GoogleFonts.poppins().fontFamily,
-                        color: context.theme.colorScheme.secondary,
+                        color: context.theme.colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
