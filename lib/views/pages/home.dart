@@ -4,15 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +49,7 @@ class _HomeState extends State<Home> {
                 'Good Morning,',
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
-                  color: context.theme.colorScheme.inverseSurface,
+                  color: context.theme.colorScheme.secondary,
                   fontSize: 14,
                 ),
               ),
@@ -66,7 +59,7 @@ class _HomeState extends State<Home> {
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
                   fontWeight: FontWeight.w700,
-                  color: context.theme.colorScheme.inverseSurface,
+                  color: context.theme.colorScheme.secondary,
                   fontSize: 18,
                 ),
               ),
@@ -88,7 +81,7 @@ class _HomeState extends State<Home> {
                   height: context.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
-                    color: context.theme.colorScheme.primaryContainer,
+                    color: context.theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   alignment: Alignment.center,
@@ -101,7 +94,7 @@ class _HomeState extends State<Home> {
                           'Excellent! Your today’s plan is almost done',
                           style: TextStyle(
                             fontFamily: GoogleFonts.poppins().fontFamily,
-                            color: context.theme.colorScheme.primary,
+                            color: context.theme.colorScheme.onPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -120,18 +113,18 @@ class _HomeState extends State<Home> {
                                 strokeWidth: 6,
                                 strokeAlign: 8,
                                 value: 0.8,
-                                color: context.theme.colorScheme.primary,
+                                color: context.theme.colorScheme.onPrimary,
                                 backgroundColor: context
                                     .theme
                                     .colorScheme
-                                    .primary
+                                    .surface
                                     .withOpacity(0.4),
                               ),
                               Text(
                                 '82%',
                                 style: TextStyle(
                                   fontFamily: GoogleFonts.poppins().fontFamily,
-                                  color: context.theme.colorScheme.primary,
+                                  color: context.theme.colorScheme.onPrimary,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -155,7 +148,7 @@ class _HomeState extends State<Home> {
                       'Today\'s Schedule',
                       style: TextStyle(
                         fontFamily: GoogleFonts.poppins().fontFamily,
-                        color: context.theme.colorScheme.inverseSurface,
+                        color: context.theme.colorScheme.secondary,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),

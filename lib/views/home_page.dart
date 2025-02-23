@@ -1,3 +1,4 @@
+import 'package:easy_scheduler/views/pages/calendar.dart';
 import 'package:easy_scheduler/views/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,13 +19,8 @@ class _LayoutPageState extends State<LayoutPage> {
   bool _isCustomTransitionActive = false;
 
   final List<Widget> _pages = [
-    Center(child: Home()),
-    Center(
-      child: Text(
-        'Calendar Page',
-        style: TextStyle(fontSize: 24, color: Colors.orange),
-      ),
-    ),
+    Center(child: const Home()),
+    Center(child: Calendar()),
     Center(child: Text('Activity Page', style: TextStyle(fontSize: 24))),
     Center(child: Text('Profile Page', style: TextStyle(fontSize: 24))),
   ];

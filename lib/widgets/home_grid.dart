@@ -156,7 +156,9 @@ class TwoColumnRandomGrid extends StatelessWidget {
                   Container(
                     height: col2Item2,
                     decoration: BoxDecoration(
-                      color: context.theme.colorScheme.secondaryFixedDim,
+                      color: context.theme.colorScheme.onSurface.withOpacity(
+                        0.9,
+                      ),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
