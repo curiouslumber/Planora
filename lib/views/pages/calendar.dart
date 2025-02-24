@@ -1,5 +1,5 @@
-import 'package:calendar_view/calendar_view.dart';
 import 'package:easy_scheduler/views/schedule/add_schedule.dart';
+import 'package:easy_scheduler/widgets/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,12 +36,16 @@ class _CalendarState extends State<Calendar> {
         preferredSize: Size.fromHeight(context.height / 2.7),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10.0,
-              vertical: 4.0,
+            padding: const EdgeInsets.only(
+              left: 10.0,
+              right: 10.0,
+              top: 8.0,
+              bottom: 4.0,
             ),
             child: AppBar(
-              backgroundColor: context.theme.colorScheme.primary,
+              backgroundColor: context.theme.colorScheme.primary.withOpacity(
+                0.9,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(33.0)),
               ),
@@ -234,133 +238,12 @@ class _CalendarState extends State<Calendar> {
               flex: 1,
               child: Padding(
                 padding: EdgeInsets.only(top: 16.0),
-                child: DayView(
-                  backgroundColor: context.theme.colorScheme.surface,
-                  initialDay: DateTime.now(),
-                  showVerticalLine: false,
-                  dayTitleBuilder:
-                      (date) => Text(
-                        DateFormat('EEEE, d MMM').format(date),
-                        style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: context.theme.colorScheme.onSurface,
-                        ),
-                      ),
-                  liveTimeIndicatorSettings: LiveTimeIndicatorSettings(
-                    color: context.theme.colorScheme.primary,
-                  ),
-                  timeLineBuilder:
-                      (date) => Container(
-                        alignment: Alignment.center,
-                        child: Text(
-                          DateFormat('HH:mm').format(date),
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontFamily: GoogleFonts.poppins().fontFamily,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: context.theme.colorScheme.onSurface
-                                .withOpacity(0.5),
-                          ),
-                        ),
-                      ),
-                  hourLinePainter:
-                      (
-                        lineColor,
-                        lineHeight,
-                        offset,
-                        minuteHeight,
-                        showVerticalLine,
-                        verticalLineOffset,
-                        lineStyle,
-                        dashWidth,
-                        dashSpaceWidth,
-                        emulateVerticalOffsetBy,
-                        startHour,
-                        endHour,
-                      ) => HourLinePainter(
-                        lineColor: context.theme.colorScheme.onSurface
-                            .withOpacity(0.2),
-                        lineHeight: lineHeight,
-                        offset: offset,
-                        minuteHeight: minuteHeight,
-                        showVerticalLine: showVerticalLine,
-                        verticalLineOffset: verticalLineOffset,
-                      ),
-                  headerStyle: HeaderStyle(
-                    decoration: BoxDecoration(color: Colors.transparent),
-                    titleAlign: TextAlign.left,
-                    leftIconConfig: null,
-                    rightIconConfig: null,
-                    headerTextStyle: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: context.theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
+                child: CalendarView(),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-class HourLinePainter extends CustomPainter {
-  final Color lineColor;
-  final double lineHeight;
-  final double offset;
-  final double minuteHeight;
-  final bool showVerticalLine;
-  final double verticalLineOffset;
-  final Paint linePaint;
-
-  HourLinePainter({
-    required this.lineColor,
-    required this.lineHeight,
-    required this.offset,
-    required this.minuteHeight,
-    required this.showVerticalLine,
-    required this.verticalLineOffset,
-  }) : linePaint =
-           Paint()
-             ..color = lineColor
-             ..strokeWidth = lineHeight
-             ..style = PaintingStyle.stroke;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double startX = 60;
-    final double endX = size.width;
-    final double startY = offset;
-
-    // Draw horizontal hour lines
-    for (double i = startY; i < size.height; i += minuteHeight * 60) {
-      canvas.drawLine(Offset(startX, i), Offset(endX, i), linePaint);
-    }
-
-    // Draw vertical line if enabled
-    if (showVerticalLine) {
-      canvas.drawLine(
-        Offset(verticalLineOffset, 0),
-        Offset(verticalLineOffset, size.height),
-        linePaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(HourLinePainter oldDelegate) {
-    return oldDelegate.lineColor != lineColor ||
-        oldDelegate.lineHeight != lineHeight ||
-        oldDelegate.offset != offset ||
-        oldDelegate.minuteHeight != minuteHeight ||
-        oldDelegate.showVerticalLine != showVerticalLine ||
-        oldDelegate.verticalLineOffset != verticalLineOffset;
   }
 }

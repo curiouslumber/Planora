@@ -81,7 +81,7 @@ class Home extends StatelessWidget {
                   height: context.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
-                    color: context.theme.colorScheme.primary,
+                    color: context.theme.colorScheme.primary.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   alignment: Alignment.center,

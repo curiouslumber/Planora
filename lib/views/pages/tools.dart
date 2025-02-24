@@ -41,7 +41,8 @@ class Tools extends StatelessWidget {
                   color:
                       index == 4
                           ? context.theme.colorScheme.inverseSurface
-                          : context.theme.colorScheme.primary,
+                              .withOpacity(0.9)
+                          : context.theme.colorScheme.primary.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(32.0),
                 ),
                 child: Center(

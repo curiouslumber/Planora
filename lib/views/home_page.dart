@@ -3,6 +3,7 @@ import 'package:easy_scheduler/views/pages/home.dart';
 import 'package:easy_scheduler/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});
@@ -111,38 +112,47 @@ class _LayoutPageState extends State<LayoutPage> {
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Color(0xffF0857A),
-          unselectedItemColor: Colors.grey,
-          onTap: _onBottomNavTap,
-          items: [
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/home-2.svg'),
-              activeIcon: SvgPicture.asset('assets/icons/home-2-selected.svg'),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/calendar.svg'),
-              activeIcon: SvgPicture.asset(
-                'assets/icons/calendar-selected.svg',
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: BottomNavigationBar(
+            elevation: 0,
+            currentIndex: _currentIndex,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Color(0xffF0857A),
+            unselectedItemColor: Colors.grey,
+            onTap: _onBottomNavTap,
+            items: [
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset('assets/icons/home-2.svg'),
+                activeIcon: SvgPicture.asset(
+                  'assets/icons/home-2-selected.svg',
+                ),
+                label: 'Home',
               ),
-              label: 'Calendar',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.toll_outlined),
-              activeIcon: Icon(Icons.toll_outlined),
-              label: 'Activity',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded),
-              activeIcon: Icon(Icons.person_outline_rounded),
-              label: 'Profile',
-            ),
-          ],
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset('assets/icons/calendar.svg'),
+                activeIcon: SvgPicture.asset(
+                  'assets/icons/calendar-selected.svg',
+                ),
+                label: 'Calendar',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.toll_outlined),
+                activeIcon: Icon(Icons.toll_outlined),
+                label: 'Activity',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset('assets/icons/profile.svg'),
+                activeIcon: SvgPicture.asset(
+                  'assets/icons/profile.svg',
+                  color: context.theme.colorScheme.primary,
+                ),
+                label: 'Profile',
+              ),
+            ],
+          ),
         ),
       ),
     );
