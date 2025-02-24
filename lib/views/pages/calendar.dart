@@ -40,7 +40,7 @@ class _CalendarState extends State<Calendar> {
               left: 10.0,
               right: 10.0,
               top: 8.0,
-              bottom: 4.0,
+              bottom: 8.0,
             ),
             child: AppBar(
               backgroundColor: context.theme.colorScheme.primary.withOpacity(
@@ -229,7 +229,7 @@ class _CalendarState extends State<Calendar> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
