@@ -1,4 +1,5 @@
 import 'package:calendar_view/calendar_view.dart';
+import 'package:easy_scheduler/views/schedule/add_schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,7 +36,10 @@ class _CalendarState extends State<Calendar> {
         preferredSize: Size.fromHeight(context.height / 2.7),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 4.0,
+            ),
             child: AppBar(
               backgroundColor: context.theme.colorScheme.primary,
               shape: RoundedRectangleBorder(
@@ -47,7 +51,7 @@ class _CalendarState extends State<Calendar> {
               flexibleSpace: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 24.0), // Adjust this value for top spacing
+                  SizedBox(height: 16.0), // Adjust this value for top spacing
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
@@ -195,17 +199,19 @@ class _CalendarState extends State<Calendar> {
                       ),
                       Expanded(
                         flex: 2,
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: context.theme.colorScheme.onPrimary,
-                            borderRadius: BorderRadius.circular(18.0),
+                        child: MaterialButton(
+                          onPressed: () => Get.to(() => const AddSchedule()),
+                          color: context.theme.colorScheme.onPrimary,
+                          minWidth: context.width,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
+                          elevation: 0,
                           child: Text(
                             'Add Schedule',
                             style: TextStyle(
                               color: context.theme.colorScheme.inverseSurface,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -224,7 +230,6 @@ class _CalendarState extends State<Calendar> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 4.0),
             Expanded(
               flex: 1,
               child: Padding(
