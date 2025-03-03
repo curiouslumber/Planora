@@ -33,3 +33,4 @@ flutter:
     - assets/icons/calendar-selected.svg
     - assets/icons/chart-2.svg
     - assets/icons/profile.svg
+    - assets/shapes/profile_card.svg

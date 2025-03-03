@@ -1,5 +1,6 @@
 import 'package:easy_scheduler/views/pages/calendar.dart';
 import 'package:easy_scheduler/views/pages/home.dart';
+import 'package:easy_scheduler/views/pages/profile.dart';
 import 'package:easy_scheduler/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,12 +21,7 @@ class _LayoutPageState extends State<LayoutPage> {
   // Flag to control whether the custom (direct) animation overlay is active.
   bool _isCustomTransitionActive = false;
 
-  final List<Widget> _pages = [
-    Center(child: const Home()),
-    Center(child: const Calendar()),
-    Center(child: const Tools()),
-    Center(child: Text('Profile Page', style: TextStyle(fontSize: 24))),
-  ];
+  static const List<Widget> _pages = [Home(), Calendar(), Tools(), Profile()];
 
   // Called when a bottom nav item is tapped.
   void _onBottomNavTap(int index) {
