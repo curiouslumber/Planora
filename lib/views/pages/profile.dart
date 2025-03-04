@@ -40,7 +40,7 @@ class Profile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 16.0),
+              SizedBox(height: context.height * 0.0075),
               Stack(
                 alignment: Alignment.topCenter,
                 clipBehavior: Clip.none,
@@ -62,6 +62,7 @@ class Profile extends StatelessWidget {
                       color: context.theme.colorScheme.primary,
                       fit: BoxFit.cover,
                       clipBehavior: Clip.antiAlias,
+                      width: context.width * 0.8,
                     ),
                   ),
                   Positioned(

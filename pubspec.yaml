@@ -10,6 +10,7 @@ environment:
 dependencies:
   calendar_view: ^1.4.0
   cupertino_icons: ^1.0.8
+  date_field: ^6.0.3+1
   flutter:
     sdk: flutter
   flutter_svg: ^2.0.17
@@ -34,3 +35,4 @@ flutter:
     - assets/icons/chart-2.svg
     - assets/icons/profile.svg
     - assets/shapes/profile_card.svg
+    - assets/icons/calendar_add_schedule.svg
