@@ -18,6 +18,7 @@ class Calendar extends StatefulWidget {
 
 class _CalendarState extends State<Calendar> {
   DateTime selectedDate = DateTime.now();
+  bool areEventsFetched = false;
 
   void getEvents() {
     void fetchEvents() async {
@@ -42,6 +43,7 @@ class _CalendarState extends State<Calendar> {
           context,
         ).controller.add(calendarEventData);
       }
+      areEventsFetched = true;
     }
 
     fetchEvents();
@@ -49,7 +51,9 @@ class _CalendarState extends State<Calendar> {
 
   @override
   void initState() {
-    getEvents();
+    if (!areEventsFetched) {
+      getEvents();
+    }
     super.initState();
   }
 
@@ -68,7 +72,7 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
-    getEvents();
+    if (!areEventsFetched) getEvents();
     List<DateTime> fiveDayView = getFiveDayView();
     return Scaffold(
       appBar: PreferredSize(

@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 
 class EventController {
   static EventController get to => Get.find<EventController>();
-  List<EventModel> events = [];
 
   void addEvent(
     String title,
@@ -21,7 +20,6 @@ class EventController {
       startTime: startTime,
       endTime: endTime,
     );
-    events.add(newEvent);
 
     CalendarEventData calendarEventData = CalendarEventData(
       title: title,
