@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:date_field/date_field.dart';
 import 'package:easy_scheduler/controllers/event_controller.dart';
 import 'package:flutter/material.dart';

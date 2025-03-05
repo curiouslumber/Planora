@@ -49,6 +49,7 @@ class _CalendarViewState extends State<CalendarView> {
                 fontFamily: GoogleFonts.poppins().fontFamily,
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
+                // ignore: deprecated_member_use
                 color: context.theme.colorScheme.onSurface.withOpacity(0.5),
               ),
             ),
@@ -68,6 +69,7 @@ class _CalendarViewState extends State<CalendarView> {
             startHour,
             endHour,
           ) => HourLinePainter(
+            // ignore: deprecated_member_use
             lineColor: context.theme.colorScheme.onSurface.withOpacity(0.2),
             lineHeight: lineHeight,
             offset: offset,

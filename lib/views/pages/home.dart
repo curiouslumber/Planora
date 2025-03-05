@@ -81,6 +81,7 @@ class Home extends StatelessWidget {
                   height: context.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
+                    // ignore: deprecated_member_use
                     color: context.theme.colorScheme.primary.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(25),
                   ),
@@ -109,6 +110,7 @@ class Home extends StatelessWidget {
                             alignment: Alignment.center,
                             children: [
                               CircularProgressIndicator(
+                                // ignore: deprecated_member_use
                                 year2023: false,
                                 strokeWidth: 6,
                                 strokeAlign: 8,
@@ -118,6 +120,7 @@ class Home extends StatelessWidget {
                                     .theme
                                     .colorScheme
                                     .surface
+                                    // ignore: deprecated_member_use
                                     .withOpacity(0.4),
                               ),
                               Text(

@@ -58,7 +58,8 @@ class Profile extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: context.theme.colorScheme.onSurface
-                                .withOpacity(0.05),
+                            // ignore: deprecated_member_use
+                            .withOpacity(0.05),
                             blurRadius: 20,
                             spreadRadius: 5,
                             offset: Offset(0, 5),
@@ -67,6 +68,7 @@ class Profile extends StatelessWidget {
                       ),
                       child: SvgPicture.asset(
                         'assets/shapes/profile_card.svg',
+                        // ignore: deprecated_member_use
                         color: context.theme.colorScheme.primary,
                         fit: BoxFit.cover,
                         clipBehavior: Clip.antiAlias,
@@ -80,7 +82,8 @@ class Profile extends StatelessWidget {
                           boxShadow: [
                             BoxShadow(
                               color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.025),
+                              // ignore: deprecated_member_use
+                              .withOpacity(0.025),
                               blurRadius: 20,
                               spreadRadius: 5,
                               offset: Offset(0, 5),
@@ -189,7 +192,8 @@ class Profile extends StatelessWidget {
                                 ),
                                 Container(
                                   color: context.theme.colorScheme.onPrimary
-                                      .withOpacity(0.5),
+                                  // ignore: deprecated_member_use
+                                  .withOpacity(0.5),
                                   width: 1.0,
                                   height: 40.0,
                                 ),
@@ -218,7 +222,8 @@ class Profile extends StatelessWidget {
                                 ),
                                 Container(
                                   color: context.theme.colorScheme.onPrimary
-                                      .withOpacity(0.5),
+                                  // ignore: deprecated_member_use
+                                  .withOpacity(0.5),
                                   width: 1.0,
                                   height: 40.0,
                                 ),
@@ -265,7 +270,8 @@ class Profile extends StatelessWidget {
                             horizontal: 32.0,
                           ),
                           tileColor: context.theme.colorScheme.onSurface
-                              .withOpacity(0.9),
+                          // ignore: deprecated_member_use
+                          .withOpacity(0.9),
                           minTileHeight: context.height * 0.08,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.0),

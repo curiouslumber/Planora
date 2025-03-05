@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:calendar_view/calendar_view.dart';
 import 'package:easy_scheduler/databases/hive_events.dart';
 import 'package:easy_scheduler/views/schedule/add_schedule.dart';
@@ -80,6 +82,7 @@ class _CalendarState extends State<Calendar> {
               bottom: 8.0,
             ),
             child: AppBar(
+              // ignore: deprecated_member_use
               backgroundColor: context.theme.colorScheme.primary.withOpacity(
                 0.9,
               ),
@@ -205,6 +208,7 @@ class _CalendarState extends State<Calendar> {
                                                         .theme
                                                         .colorScheme
                                                         .onPrimary
+                                                        // ignore: deprecated_member_use
                                                         .withOpacity(0.8),
                                           ),
                                         ),
@@ -221,6 +225,7 @@ class _CalendarState extends State<Calendar> {
                                                         .theme
                                                         .colorScheme
                                                         .onPrimary
+                                                        // ignore: deprecated_member_use
                                                         .withOpacity(0.9),
                                             fontWeight: FontWeight.bold,
                                           ),

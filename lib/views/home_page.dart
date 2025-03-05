@@ -143,6 +143,7 @@ class _LayoutPageState extends State<LayoutPage> {
                 icon: SvgPicture.asset('assets/icons/profile.svg'),
                 activeIcon: SvgPicture.asset(
                   'assets/icons/profile.svg',
+                  // ignore: deprecated_member_use
                   color: context.theme.colorScheme.primary,
                 ),
                 label: 'Profile',

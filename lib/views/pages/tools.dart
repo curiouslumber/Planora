@@ -41,7 +41,9 @@ class Tools extends StatelessWidget {
                   color:
                       index == 4
                           ? context.theme.colorScheme.inverseSurface
-                              .withOpacity(0.9)
+                          // ignore: deprecated_member_use
+                          .withOpacity(0.9)
+                          // ignore: deprecated_member_use
                           : context.theme.colorScheme.primary.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(32.0),
                 ),
