@@ -102,52 +102,63 @@ class Profile extends StatelessWidget {
                       child: Container(
                         width: context.width * 0.8,
                         height: context.height * 0.2,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           spacing: 2.0,
                           children: [
-                            Text(
-                              'Noel Pinto',
-                              style: TextStyle(
-                                fontSize: 22.0,
-                                fontWeight: FontWeight.bold,
-                                color: context.theme.colorScheme.onPrimary,
-                              ),
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: [
-                                  WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: Icon(
-                                      Icons.location_on_outlined,
-                                      size: 14.0,
-                                      color:
-                                          context.theme.colorScheme.onPrimary,
-                                    ),
+                            Column(
+                              children: [
+                                Text(
+                                  'Noel Pinto',
+                                  style: TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: context.theme.colorScheme.onPrimary,
                                   ),
-                                  TextSpan(
-                                    text: '\u00A0Mumbai, India',
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      color:
-                                          context.theme.colorScheme.onPrimary,
-                                      fontFamily:
-                                          context
-                                              .theme
-                                              .textTheme
-                                              .bodyMedium!
-                                              .fontFamily,
-                                    ),
+                                ),
+                                RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    children: [
+                                      WidgetSpan(
+                                        alignment: PlaceholderAlignment.middle,
+                                        child: Icon(
+                                          Icons.location_on_outlined,
+                                          size: 12.0,
+                                          color:
+                                              context
+                                                  .theme
+                                                  .colorScheme
+                                                  .onPrimary,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '\u00A0Mumbai, India',
+                                        style: TextStyle(
+                                          fontSize: 12.0,
+                                          color:
+                                              context
+                                                  .theme
+                                                  .colorScheme
+                                                  .onPrimary,
+                                          fontFamily:
+                                              context
+                                                  .theme
+                                                  .textTheme
+                                                  .bodyMedium!
+                                                  .fontFamily,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 14.0),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -160,7 +171,7 @@ class Profile extends StatelessWidget {
                                     Text(
                                       '-',
                                       style: TextStyle(
-                                        fontSize: 24.0,
+                                        fontSize: 18.0,
                                         fontWeight: FontWeight.bold,
                                         color:
                                             context.theme.colorScheme.onPrimary,
@@ -169,7 +180,7 @@ class Profile extends StatelessWidget {
                                     Text(
                                       'Meetings',
                                       style: TextStyle(
-                                        fontSize: 14.0,
+                                        fontSize: 12.0,
                                         color:
                                             context.theme.colorScheme.onPrimary,
                                       ),
@@ -189,7 +200,7 @@ class Profile extends StatelessWidget {
                                     Text(
                                       '-',
                                       style: TextStyle(
-                                        fontSize: 24.0,
+                                        fontSize: 16.0,
                                         fontWeight: FontWeight.bold,
                                         color:
                                             context.theme.colorScheme.onPrimary,
@@ -198,7 +209,7 @@ class Profile extends StatelessWidget {
                                     Text(
                                       'Day Streak',
                                       style: TextStyle(
-                                        fontSize: 14.0,
+                                        fontSize: 12.0,
                                         color:
                                             context.theme.colorScheme.onPrimary,
                                       ),
@@ -218,7 +229,7 @@ class Profile extends StatelessWidget {
                                     Text(
                                       '-',
                                       style: TextStyle(
-                                        fontSize: 24.0,
+                                        fontSize: 16.0,
                                         fontWeight: FontWeight.bold,
                                         color:
                                             context.theme.colorScheme.onPrimary,
@@ -227,7 +238,7 @@ class Profile extends StatelessWidget {
                                     Text(
                                       'Friends',
                                       style: TextStyle(
-                                        fontSize: 14.0,
+                                        fontSize: 12.0,
                                         color:
                                             context.theme.colorScheme.onPrimary,
                                       ),
