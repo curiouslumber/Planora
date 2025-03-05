@@ -1,10 +1,15 @@
 import 'package:calendar_view/calendar_view.dart';
+import 'package:easy_scheduler/models/event_model.dart';
 import 'package:easy_scheduler/views/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(EventModelAdapter());
   runApp(MyApp());
 }
 

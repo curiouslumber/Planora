@@ -113,8 +113,8 @@ class _LayoutPageState extends State<LayoutPage> {
           child: BottomNavigationBar(
             elevation: 0,
             currentIndex: _currentIndex,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
+            selectedFontSize: 12.0,
+            unselectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
             selectedItemColor: Color(0xffF0857A),
             unselectedItemColor: Colors.grey,
@@ -137,7 +137,7 @@ class _LayoutPageState extends State<LayoutPage> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.toll_outlined),
                 activeIcon: Icon(Icons.toll_outlined),
-                label: 'Activity',
+                label: 'Tools',
               ),
               BottomNavigationBarItem(
                 icon: SvgPicture.asset('assets/icons/profile.svg'),

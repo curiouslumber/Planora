@@ -1,3 +1,5 @@
+import 'package:calendar_view/calendar_view.dart';
+import 'package:easy_scheduler/databases/hive_events.dart';
 import 'package:easy_scheduler/views/schedule/add_schedule.dart';
 import 'package:easy_scheduler/widgets/calendar_view.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,40 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   DateTime selectedDate = DateTime.now();
 
+  void getEvents() {
+    void fetchEvents() async {
+      var events = await HiveEvents.getEventsFromHive();
+      for (var event in events) {
+        CalendarEventData calendarEventData = CalendarEventData(
+          title: event.title,
+          date: event.date,
+          startTime: event.startTime,
+          endTime: event.endTime,
+          color: context.theme.colorScheme.primaryFixed,
+          titleStyle: TextStyle(
+            fontSize: 12,
+            color: context.theme.colorScheme.onPrimaryFixed,
+          ),
+          descriptionStyle: TextStyle(
+            fontSize: 12,
+            color: context.theme.colorScheme.onPrimaryFixed,
+          ),
+        );
+        CalendarControllerProvider.of(
+          context,
+        ).controller.add(calendarEventData);
+      }
+    }
+
+    fetchEvents();
+  }
+
+  @override
+  void initState() {
+    getEvents();
+    super.initState();
+  }
+
   List<DateTime> getFiveDayView() {
     return List.generate(
       5,
@@ -30,6 +66,7 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
+    getEvents();
     List<DateTime> fiveDayView = getFiveDayView();
     return Scaffold(
       appBar: PreferredSize(

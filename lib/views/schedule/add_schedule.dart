@@ -1,4 +1,5 @@
 import 'package:date_field/date_field.dart';
+import 'package:easy_scheduler/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,15 @@ import 'package:intl/intl.dart';
 
 class AddSchedule extends StatelessWidget {
   const AddSchedule({super.key});
+
+  static final eventController = Get.put(EventController());
+
+  static final TextEditingController _titleController = TextEditingController();
+  static final TextEditingController _dateController = TextEditingController();
+  static final TextEditingController _startTimeController =
+      TextEditingController();
+  static final TextEditingController _endTimeController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +104,7 @@ class AddSchedule extends StatelessWidget {
                       ),
                     ),
                     TextFormField(
+                      controller: _titleController,
                       cursorColor: context.theme.colorScheme.onSurface
                           .withOpacity(0.7),
                       style: TextStyle(
@@ -148,6 +159,13 @@ class AddSchedule extends StatelessWidget {
                         highlightColor: Colors.transparent,
                       ),
                       child: DateTimeFormField(
+                        onChanged: (newValue) {
+                          if (newValue == null) {
+                            _dateController.text = "";
+                            return;
+                          }
+                          _dateController.text = newValue.toIso8601String();
+                        },
                         mode: DateTimeFieldPickerMode.date,
                         hideDefaultSuffixIcon: true,
                         decoration: InputDecoration(
@@ -182,18 +200,12 @@ class AddSchedule extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        firstDate: DateTime.now().add(const Duration(days: 10)),
-                        lastDate: DateTime.now().add(const Duration(days: 40)),
                         style: TextStyle(
                           fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
                         ),
                         dateFormat: DateFormat("EEEE, d MMMM yyyy"),
-                        initialPickerDateTime: DateTime.now().add(
-                          const Duration(days: 20),
-                        ),
-                        onChanged: (DateTime? value) {},
                       ),
                     ),
                   ],
@@ -222,6 +234,13 @@ class AddSchedule extends StatelessWidget {
                         highlightColor: Colors.transparent,
                       ),
                       child: DateTimeFormField(
+                        onChanged: (value) {
+                          if (value == null) {
+                            _startTimeController.text = "";
+                            return;
+                          }
+                          _startTimeController.text = value.toIso8601String();
+                        },
                         mode: DateTimeFieldPickerMode.time,
                         hideDefaultSuffixIcon: true,
                         decoration: InputDecoration(
@@ -256,12 +275,6 @@ class AddSchedule extends StatelessWidget {
                           color: context.theme.colorScheme.onSurface,
                         ),
                         dateFormat: DateFormat("HH.mm - hh.mm a"),
-                        firstDate: DateTime.now().add(const Duration(days: 10)),
-                        lastDate: DateTime.now().add(const Duration(days: 40)),
-                        initialPickerDateTime: DateTime.now().add(
-                          const Duration(days: 20),
-                        ),
-                        onChanged: (DateTime? value) {},
                       ),
                     ),
                   ],
@@ -290,6 +303,19 @@ class AddSchedule extends StatelessWidget {
                         highlightColor: Colors.transparent,
                       ),
                       child: DateTimeFormField(
+                        initialPickerDateTime:
+                            _startTimeController.text.isNotEmpty
+                                ? (_dateController.text.isEmpty
+                                    ? DateTime.now()
+                                    : DateTime.parse(_dateController.text))
+                                : DateTime.now(),
+                        onChanged: (newValue) {
+                          if (newValue == null) {
+                            _endTimeController.text = "";
+                            return;
+                          }
+                          _endTimeController.text = newValue.toIso8601String();
+                        },
                         mode: DateTimeFieldPickerMode.time,
                         hideDefaultSuffixIcon: true,
                         style: TextStyle(
@@ -324,12 +350,6 @@ class AddSchedule extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        firstDate: DateTime.now().add(const Duration(days: 10)),
-                        lastDate: DateTime.now().add(const Duration(days: 40)),
-                        initialPickerDateTime: DateTime.now().add(
-                          const Duration(days: 20),
-                        ),
-                        onChanged: (DateTime? value) {},
                       ),
                     ),
                   ],
@@ -337,7 +357,22 @@ class AddSchedule extends StatelessWidget {
               ],
             ),
             MaterialButton(
-              onPressed: () => Get.back(),
+              onPressed: () {
+                if (_dateController.text.isEmpty ||
+                    _titleController.text.isEmpty ||
+                    _startTimeController.text.isEmpty ||
+                    _endTimeController.text.isEmpty) {
+                  return;
+                }
+                eventController.addEvent(
+                  _titleController.text,
+                  DateTime.parse(_dateController.text),
+                  DateTime.parse(_startTimeController.text),
+                  DateTime.parse(_endTimeController.text),
+                  context,
+                );
+                Get.back();
+              },
               height: 64.0,
               color: context.theme.colorScheme.onSurface.withOpacity(0.9),
               minWidth: context.width,
