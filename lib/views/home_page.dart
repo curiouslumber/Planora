@@ -3,8 +3,8 @@ import 'package:easy_scheduler/views/pages/home.dart';
 import 'package:easy_scheduler/views/pages/profile.dart';
 import 'package:easy_scheduler/views/pages/tools.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:ionicons/ionicons.dart';
 
 class LayoutPage extends StatefulWidget {
   const LayoutPage({super.key});
@@ -113,39 +113,34 @@ class _LayoutPageState extends State<LayoutPage> {
           child: BottomNavigationBar(
             elevation: 0,
             currentIndex: _currentIndex,
+            iconSize: 20.0,
             selectedFontSize: 12.0,
             unselectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: Color(0xffF0857A),
-            unselectedItemColor: Colors.grey,
+            selectedItemColor: context.theme.colorScheme.primary,
+            unselectedItemColor: context.theme.colorScheme.onSurface.withAlpha(
+              100,
+            ),
             onTap: _onBottomNavTap,
             items: [
               BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/home-2.svg'),
-                activeIcon: SvgPicture.asset(
-                  'assets/icons/home-2-selected.svg',
-                ),
+                icon: Icon(Ionicons.home_outline),
+                activeIcon: Icon(Ionicons.home),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/calendar.svg'),
-                activeIcon: SvgPicture.asset(
-                  'assets/icons/calendar-selected.svg',
-                ),
+                icon: Icon(Ionicons.today_outline),
+                activeIcon: Icon(Ionicons.today),
                 label: 'Calendar',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.toll_outlined),
-                activeIcon: Icon(Icons.toll_outlined),
+                icon: Icon(Ionicons.file_tray_outline),
+                activeIcon: Icon(Ionicons.file_tray),
                 label: 'Tools',
               ),
               BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/profile.svg'),
-                activeIcon: SvgPicture.asset(
-                  'assets/icons/profile.svg',
-                  // ignore: deprecated_member_use
-                  color: context.theme.colorScheme.primary,
-                ),
+                icon: Icon(Ionicons.person_outline),
+                activeIcon: Icon(Ionicons.person),
                 label: 'Profile',
               ),
             ],

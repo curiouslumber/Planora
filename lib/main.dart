@@ -17,14 +17,14 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final lightColorScheme = ColorScheme.fromSeed(
-    seedColor: Color(0xffEE786B),
+    seedColor: Colors.green,
     brightness: Brightness.light,
-  ).copyWith(primary: Color(0xffEE786B));
+  ).copyWith(primary: Colors.green);
 
   final darkColorScheme = ColorScheme.fromSeed(
-    seedColor: Color(0xffEE786B),
+    seedColor: Colors.green,
     brightness: Brightness.dark,
-  ).copyWith(primary: Color(0xffEE786B));
+  ).copyWith(primary: Colors.green);
 
   @override
   Widget build(BuildContext context) {

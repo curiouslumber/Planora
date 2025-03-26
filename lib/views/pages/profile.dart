@@ -262,7 +262,6 @@ class Profile extends StatelessWidget {
                   child: ListView.separated(
                     padding: EdgeInsets.symmetric(horizontal: 8.0),
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       if (index == 3) {
                         return ListTile(
@@ -292,7 +291,7 @@ class Profile extends StatelessWidget {
 
                       return ListTile(
                         contentPadding: EdgeInsets.symmetric(horizontal: 32.0),
-                        tileColor: context.theme.colorScheme.primaryContainer,
+                        tileColor: context.theme.colorScheme.secondaryContainer,
                         minTileHeight: context.height * 0.08,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
@@ -301,12 +300,13 @@ class Profile extends StatelessWidget {
                           options[index],
                           style: TextStyle(
                             fontSize: 16.0,
-                            color: context.theme.colorScheme.onPrimaryContainer,
+                            color:
+                                context.theme.colorScheme.onSecondaryContainer,
                           ),
                         ),
                         trailing: Icon(
                           icons[index],
-                          color: context.theme.colorScheme.onPrimaryContainer,
+                          color: context.theme.colorScheme.onSecondaryContainer,
                         ),
                       );
                     },
