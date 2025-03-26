@@ -1,4 +1,4 @@
-package com.example.easy_scheduler
+package com.example.planora
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,7 +1,7 @@
-import 'package:easy_scheduler/views/pages/calendar.dart';
-import 'package:easy_scheduler/views/pages/home.dart';
-import 'package:easy_scheduler/views/pages/profile.dart';
-import 'package:easy_scheduler/views/pages/tools.dart';
+import 'package:planora/views/pages/calendar.dart';
+import 'package:planora/views/pages/home.dart';
+import 'package:planora/views/pages/profile.dart';
+import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';

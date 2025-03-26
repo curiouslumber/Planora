@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:date_field/date_field.dart';
-import 'package:easy_scheduler/controllers/event_controller.dart';
+import 'package:planora/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';

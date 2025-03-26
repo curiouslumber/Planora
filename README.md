@@ -1,4 +1,4 @@
-# easy_scheduler
+# planora
 
 A new Flutter project.
 

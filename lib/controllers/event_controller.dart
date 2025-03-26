@@ -1,6 +1,6 @@
 import 'package:calendar_view/calendar_view.dart';
-import 'package:easy_scheduler/databases/hive_events.dart';
-import 'package:easy_scheduler/models/event_model.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

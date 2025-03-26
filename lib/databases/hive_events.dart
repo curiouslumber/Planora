@@ -1,4 +1,4 @@
-import 'package:easy_scheduler/models/event_model.dart';
+import 'package:planora/models/event_model.dart';
 import 'package:hive/hive.dart';
 
 class HiveEvents {

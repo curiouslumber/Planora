@@ -1,5 +1,5 @@
-name: easy_scheduler
-description: "Easy Scheduler"
+name: planora
+description: "Planora is a simple and easy to use planner app for Android and iOS."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
