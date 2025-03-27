@@ -1,3 +1,4 @@
+import 'package:ionicons/ionicons.dart';
 import 'package:planora/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,12 +30,9 @@ class Home extends StatelessWidget {
                   ),
                 ),
               ),
-              SvgPicture.asset(
-                'assets/icons/notification.svg',
-                colorFilter: ColorFilter.mode(
-                  context.theme.colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
+              Icon(
+                Ionicons.notifications_outline,
+                color: context.theme.colorScheme.onSurface,
               ),
             ],
           ),

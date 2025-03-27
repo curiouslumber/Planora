@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:date_field/date_field.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:planora/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -177,9 +178,7 @@ class AddSchedule extends StatelessWidget {
                               top: 8.0,
                               bottom: 8.0,
                             ),
-                            child: SvgPicture.asset(
-                              'assets/icons/calendar_add_schedule.svg',
-                            ),
+                            child: Icon(Ionicons.calendar_outline),
                           ),
                           suffixIconColor: context.theme.colorScheme.onSurface
                               .withOpacity(0.5),
@@ -248,7 +247,7 @@ class AddSchedule extends StatelessWidget {
                         decoration: InputDecoration(
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 24.0),
-                            child: Icon(Icons.access_time_outlined),
+                            child: Icon(Ionicons.time_outline),
                           ),
                           suffixIconColor: context.theme.colorScheme.onSurface
                               .withOpacity(0.5),
@@ -329,7 +328,7 @@ class AddSchedule extends StatelessWidget {
                         decoration: InputDecoration(
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 24.0),
-                            child: Icon(Icons.access_time_outlined),
+                            child: Icon(Ionicons.time_outline),
                           ),
                           suffixIconColor: context.theme.colorScheme.onSurface
                               .withOpacity(0.5),
