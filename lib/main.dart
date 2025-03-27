@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           colorScheme: darkColorScheme,
           textTheme: GoogleFonts.poppinsTextTheme(),
         ),
-        title: 'Easy Scheduler',
+        title: 'Planora',
         debugShowCheckedModeBanner: false,
         home: LayoutPage(),
       ),
