@@ -192,7 +192,8 @@ class _CalendarState extends State<Calendar> {
                                                 : context
                                                     .theme
                                                     .colorScheme
-                                                    .inversePrimary,
+                                                    .onPrimary
+                                                    .withOpacity(0.8),
                                       ),
                                     ),
                                     child: Column(
