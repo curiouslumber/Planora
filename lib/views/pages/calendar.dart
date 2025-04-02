@@ -192,6 +192,7 @@ class _CalendarState extends State<Calendar> {
                                                     .theme
                                                     .colorScheme
                                                     .onPrimary
+                                                    // ignore: deprecated_member_use
                                                     .withOpacity(0.8),
                                       ),
                                     ),

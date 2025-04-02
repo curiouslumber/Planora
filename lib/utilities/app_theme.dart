@@ -76,7 +76,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: Color(0xff3b4c42),
         brightness: Brightness.dark,
-      ).copyWith(primary: Color(0xff3b4c42)),
+      ).copyWith(primary: Color(0xff3b4c42), onPrimary: Color(0xffF2F0EF)),
       useMaterial3: true,
     );
   }

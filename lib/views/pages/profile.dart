@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:planora/utilities/font_weights.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -120,7 +121,7 @@ class Profile extends StatelessWidget {
                                   'Noel Pinto',
                                   style: TextStyle(
                                     fontSize: 24.0,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeights.semiBold,
                                     color: context.theme.colorScheme.onPrimary,
                                   ),
                                 ),
@@ -278,6 +279,7 @@ class Profile extends StatelessWidget {
                           title: Text(
                             'Logout',
                             style: TextStyle(
+                              fontWeight: FontWeights.regular,
                               fontSize: 16.0,
                               color: context.theme.colorScheme.surfaceContainer,
                             ),
@@ -300,6 +302,7 @@ class Profile extends StatelessWidget {
                           options[index],
                           style: TextStyle(
                             fontSize: 16.0,
+                            fontWeight: FontWeights.regular,
                             color:
                                 context.theme.colorScheme.onSecondaryContainer,
                           ),
