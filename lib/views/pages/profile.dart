@@ -93,10 +93,11 @@ class Profile extends StatelessWidget {
                         ),
                         child: CircleAvatar(
                           radius: 38,
-                          backgroundColor: context.theme.colorScheme.onPrimary,
+                          backgroundColor:
+                              context.theme.colorScheme.surfaceContainer,
                           child: Icon(
                             Icons.person,
-                            color: context.theme.colorScheme.primary,
+                            color: context.theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -269,7 +270,7 @@ class Profile extends StatelessWidget {
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 32.0,
                           ),
-                          tileColor: context.theme.colorScheme.onSurface
+                          tileColor: context.theme.colorScheme.onSurfaceVariant
                           // ignore: deprecated_member_use
                           .withOpacity(0.9),
                           minTileHeight: context.height * 0.08,
@@ -279,7 +280,7 @@ class Profile extends StatelessWidget {
                           title: Text(
                             'Logout',
                             style: TextStyle(
-                              fontWeight: FontWeights.regular,
+                              fontWeight: FontWeights.medium,
                               fontSize: 16.0,
                               color: context.theme.colorScheme.surfaceContainer,
                             ),
@@ -293,7 +294,7 @@ class Profile extends StatelessWidget {
 
                       return ListTile(
                         contentPadding: EdgeInsets.symmetric(horizontal: 32.0),
-                        tileColor: context.theme.colorScheme.secondaryContainer,
+                        tileColor: context.theme.colorScheme.primary,
                         minTileHeight: context.height * 0.08,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
@@ -302,14 +303,13 @@ class Profile extends StatelessWidget {
                           options[index],
                           style: TextStyle(
                             fontSize: 16.0,
-                            fontWeight: FontWeights.regular,
-                            color:
-                                context.theme.colorScheme.onSecondaryContainer,
+                            fontWeight: FontWeights.medium,
+                            color: context.theme.colorScheme.onPrimary,
                           ),
                         ),
                         trailing: Icon(
                           icons[index],
-                          color: context.theme.colorScheme.onSecondaryContainer,
+                          color: context.theme.colorScheme.onPrimary,
                         ),
                       );
                     },

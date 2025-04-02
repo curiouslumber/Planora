@@ -182,7 +182,6 @@ class _CalendarState extends State<Calendar> {
                                                   .theme
                                                   .colorScheme
                                                   .surface
-                                                  .withAlpha(180)
                                               : null,
                                       borderRadius: BorderRadius.circular(18.0),
                                       border: Border.all(
@@ -192,9 +191,7 @@ class _CalendarState extends State<Calendar> {
                                                 : context
                                                     .theme
                                                     .colorScheme
-                                                    .onPrimary
-                                                    // ignore: deprecated_member_use
-                                                    .withOpacity(0.8),
+                                                    .onPrimary,
                                       ),
                                     ),
                                     child: Column(
@@ -253,20 +250,19 @@ class _CalendarState extends State<Calendar> {
                         flex: 2,
                         child: MaterialButton(
                           onPressed: () => Get.to(() => const AddSchedule()),
-                          color: context.theme.colorScheme.secondary,
+                          color: context.theme.colorScheme.surface,
                           minWidth: context.width,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                             side: BorderSide(
-                              color: context.theme.colorScheme.onPrimary
-                                  .withOpacity(0.5),
+                              color: context.theme.colorScheme.surfaceContainer,
                             ),
                           ),
                           elevation: 0,
                           child: Text(
                             'Add Schedule',
                             style: TextStyle(
-                              color: context.theme.colorScheme.onSecondary,
+                              color: context.theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

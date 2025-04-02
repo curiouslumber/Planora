@@ -40,11 +40,8 @@ class Tools extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       index == 4
-                          ? context.theme.colorScheme.inverseSurface
-                          // ignore: deprecated_member_use
-                          .withOpacity(0.9)
-                          // ignore: deprecated_member_use
-                          : context.theme.colorScheme.primary.withOpacity(0.9),
+                          ? context.theme.colorScheme.surfaceContainer
+                          : context.theme.colorScheme.primary,
                   borderRadius: BorderRadius.circular(32.0),
                 ),
                 child: Center(
@@ -78,14 +75,19 @@ class Tools extends StatelessWidget {
                               Text(
                                 'Add',
                                 style: TextStyle(
-                                  color: context.theme.colorScheme.onPrimary,
+                                  color:
+                                      context
+                                          .theme
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Icon(
                                 Icons.add,
-                                color: context.theme.colorScheme.onPrimary,
+                                color:
+                                    context.theme.colorScheme.onSurfaceVariant,
                                 size: 20.0,
                                 weight: 2.0,
                               ),
