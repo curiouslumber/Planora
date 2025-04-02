@@ -1,7 +1,6 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class CalendarView extends StatefulWidget {
@@ -28,7 +27,6 @@ class _CalendarViewState extends State<CalendarView> {
             child: Text(
               DateFormat('EEEE, d MMM').format(date),
               style: TextStyle(
-                fontFamily: GoogleFonts.poppins().fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: context.theme.colorScheme.onSurface,
@@ -46,7 +44,6 @@ class _CalendarViewState extends State<CalendarView> {
               DateFormat('HH.mm').format(date),
               textAlign: TextAlign.start,
               style: TextStyle(
-                fontFamily: GoogleFonts.poppins().fontFamily,
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 // ignore: deprecated_member_use
@@ -83,7 +80,6 @@ class _CalendarViewState extends State<CalendarView> {
         leftIconConfig: null,
         rightIconConfig: null,
         headerTextStyle: TextStyle(
-          fontFamily: GoogleFonts.poppins().fontFamily,
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: context.theme.colorScheme.onSurface,

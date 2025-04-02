@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planora/utilities/font_weights.dart';
 
 class AppTheme {
   static const String fontFamily = 'Poppins';
@@ -6,33 +7,54 @@ class AppTheme {
   static final TextTheme _textTheme = const TextTheme(
     displayLarge: TextStyle(
       fontFamily: fontFamily,
-      fontWeight: FontWeight.w900,
+      fontWeight: FontWeights.black,
     ),
     displayMedium: TextStyle(
       fontFamily: fontFamily,
-      fontWeight: FontWeight.w800,
+      fontWeight: FontWeights.extraBold,
     ),
     displaySmall: TextStyle(
       fontFamily: fontFamily,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeights.bold,
     ),
     headlineMedium: TextStyle(
       fontFamily: fontFamily,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeights.semiBold,
     ),
     headlineSmall: TextStyle(
       fontFamily: fontFamily,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeights.medium,
     ),
-    titleLarge: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w400),
-    titleMedium: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w300),
-    titleSmall: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w200),
-    bodyLarge: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w100),
-    bodyMedium: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w400),
-    bodySmall: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w300),
-    labelLarge: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w500),
-    labelMedium: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w400),
-    labelSmall: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.w300),
+    titleLarge: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.regular,
+    ),
+    titleMedium: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.light,
+    ),
+    titleSmall: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.extraLight,
+    ),
+    bodyLarge: TextStyle(fontFamily: fontFamily, fontWeight: FontWeights.thin),
+    bodyMedium: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.regular,
+    ),
+    bodySmall: TextStyle(fontFamily: fontFamily, fontWeight: FontWeights.light),
+    labelLarge: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.medium,
+    ),
+    labelMedium: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.regular,
+    ),
+    labelSmall: TextStyle(
+      fontFamily: fontFamily,
+      fontWeight: FontWeights.light,
+    ),
   );
 
   static ThemeData get lightTheme {

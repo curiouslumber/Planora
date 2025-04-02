@@ -1,4 +1,5 @@
 import 'package:ionicons/ionicons.dart';
+import 'package:planora/utilities/font_weights.dart';
 import 'package:planora/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -44,9 +45,9 @@ class Home extends StatelessWidget {
               Text(
                 'Good Morning,',
                 style: TextStyle(
-                  fontFamily: context.theme.textTheme.headlineLarge!.fontFamily,
                   color: context.theme.colorScheme.onSurface,
                   fontSize: 14,
+                  fontWeight: FontWeights.regular,
                 ),
               ),
               SizedBox(height: 2),
@@ -54,7 +55,7 @@ class Home extends StatelessWidget {
                 'Noel Pinto!',
                 style: TextStyle(
                   fontFamily: context.theme.textTheme.headlineLarge!.fontFamily,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeights.semiBold,
                   color: context.theme.colorScheme.onSurface,
                   fontSize: 18,
                 ),
@@ -90,15 +91,9 @@ class Home extends StatelessWidget {
                         child: Text(
                           'Excellent! Your today’s plan is almost done',
                           style: TextStyle(
-                            fontFamily:
-                                context
-                                    .theme
-                                    .textTheme
-                                    .headlineMedium!
-                                    .fontFamily,
                             color: context.theme.colorScheme.onPrimary,
                             fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeights.medium,
                           ),
                           maxLines: 3,
                         ),
@@ -127,15 +122,9 @@ class Home extends StatelessWidget {
                               Text(
                                 '82%',
                                 style: TextStyle(
-                                  fontFamily:
-                                      context
-                                          .theme
-                                          .textTheme
-                                          .headlineMedium!
-                                          .fontFamily,
                                   color: context.theme.colorScheme.onPrimary,
                                   fontSize: 18,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeights.semiBold,
                                 ),
                               ),
                             ],
@@ -156,11 +145,9 @@ class Home extends StatelessWidget {
                     Text(
                       'Today\'s Schedule',
                       style: TextStyle(
-                        fontFamily:
-                            context.theme.textTheme.bodyLarge!.fontFamily,
                         color: context.theme.colorScheme.onSurface,
                         fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeights.semiBold,
                       ),
                     ),
                     Expanded(flex: 1, child: TwoColumnRandomGrid()),

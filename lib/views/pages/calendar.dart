@@ -6,7 +6,6 @@ import 'package:planora/views/schedule/add_schedule.dart';
 import 'package:planora/widgets/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class Calendar extends StatefulWidget {
@@ -116,7 +115,7 @@ class _CalendarState extends State<Calendar> {
                         ),
                         Text(
                           DateFormat('MMMM').format(selectedDate),
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
                             fontSize: 18,
                             color: context.theme.colorScheme.onPrimary,
                             fontWeight: FontWeight.w600,

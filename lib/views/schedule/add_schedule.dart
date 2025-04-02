@@ -4,7 +4,6 @@ import 'package:ionicons/ionicons.dart';
 import 'package:planora/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class AddSchedule extends StatelessWidget {
@@ -57,7 +56,6 @@ class AddSchedule extends StatelessWidget {
               Text(
                 'Be Productive',
                 style: TextStyle(
-                  fontFamily: GoogleFonts.poppins().fontFamily,
                   color: context.theme.colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 14,
                 ),
@@ -66,7 +64,6 @@ class AddSchedule extends StatelessWidget {
               Text(
                 'Add Schedule',
                 style: TextStyle(
-                  fontFamily: GoogleFonts.poppins().fontFamily,
                   fontWeight: FontWeight.w700,
                   color: context.theme.colorScheme.onSurface,
                   fontSize: 18,
@@ -96,7 +93,6 @@ class AddSchedule extends StatelessWidget {
                       child: Text(
                         'Title',
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: context.theme.colorScheme.onSurface
@@ -109,7 +105,6 @@ class AddSchedule extends StatelessWidget {
                       cursorColor: context.theme.colorScheme.onSurface
                           .withOpacity(0.7),
                       style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
                         fontSize: 14,
                         color: context.theme.colorScheme.onSurface,
                       ),
@@ -146,7 +141,6 @@ class AddSchedule extends StatelessWidget {
                       child: Text(
                         'Date',
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: context.theme.colorScheme.onSurface
@@ -200,7 +194,6 @@ class AddSchedule extends StatelessWidget {
                           ),
                         ),
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
                         ),
@@ -219,7 +212,6 @@ class AddSchedule extends StatelessWidget {
                       child: Text(
                         'Start Time',
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: context.theme.colorScheme.onSurface
@@ -269,7 +261,6 @@ class AddSchedule extends StatelessWidget {
                           ),
                         ),
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
                         ),
@@ -288,7 +279,6 @@ class AddSchedule extends StatelessWidget {
                       child: Text(
                         'End Time',
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: context.theme.colorScheme.onSurface
@@ -318,7 +308,6 @@ class AddSchedule extends StatelessWidget {
                         mode: DateTimeFieldPickerMode.time,
                         hideDefaultSuffixIcon: true,
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
                         ),
