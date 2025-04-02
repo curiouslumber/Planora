@@ -64,6 +64,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               color: context.theme.colorScheme.secondary,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -73,6 +79,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               color: context.theme.colorScheme.secondary,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                         ],
@@ -97,6 +109,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               color: context.theme.colorScheme.secondary,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -106,6 +124,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               color: context.theme.colorScheme.secondary,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                         ],
@@ -137,6 +161,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               color: context.theme.colorScheme.secondary,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -146,6 +176,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               color: context.theme.colorScheme.secondary,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                         ],
@@ -173,6 +209,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               color: context.theme.colorScheme.surface,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -182,6 +224,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10,
                               color: context.theme.colorScheme.surface,
+                              fontFamily:
+                                  context
+                                      .theme
+                                      .textTheme
+                                      .bodyMedium!
+                                      .fontFamily,
                             ),
                           ),
                         ],

@@ -2,7 +2,6 @@ import 'package:ionicons/ionicons.dart';
 import 'package:planora/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -45,7 +44,7 @@ class Home extends StatelessWidget {
               Text(
                 'Good Morning,',
                 style: TextStyle(
-                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontFamily: context.theme.textTheme.headlineLarge!.fontFamily,
                   color: context.theme.colorScheme.onSurface,
                   fontSize: 14,
                 ),
@@ -54,7 +53,7 @@ class Home extends StatelessWidget {
               Text(
                 'Noel Pinto!',
                 style: TextStyle(
-                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontFamily: context.theme.textTheme.headlineLarge!.fontFamily,
                   fontWeight: FontWeight.w700,
                   color: context.theme.colorScheme.onSurface,
                   fontSize: 18,
@@ -91,10 +90,15 @@ class Home extends StatelessWidget {
                         child: Text(
                           'Excellent! Your today’s plan is almost done',
                           style: TextStyle(
-                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            fontFamily:
+                                context
+                                    .theme
+                                    .textTheme
+                                    .headlineMedium!
+                                    .fontFamily,
                             color: context.theme.colorScheme.onPrimary,
                             fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                           ),
                           maxLines: 3,
                         ),
@@ -123,10 +127,15 @@ class Home extends StatelessWidget {
                               Text(
                                 '82%',
                                 style: TextStyle(
-                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontFamily:
+                                      context
+                                          .theme
+                                          .textTheme
+                                          .headlineMedium!
+                                          .fontFamily,
                                   color: context.theme.colorScheme.onPrimary,
                                   fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -147,7 +156,8 @@ class Home extends StatelessWidget {
                     Text(
                       'Today\'s Schedule',
                       style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontFamily:
+                            context.theme.textTheme.bodyLarge!.fontFamily,
                         color: context.theme.colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
