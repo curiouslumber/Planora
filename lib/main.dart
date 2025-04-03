@@ -1,4 +1,3 @@
-import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -18,15 +17,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CalendarControllerProvider(
-      controller: EventController(),
-      child: GetMaterialApp(
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        title: 'Planora',
-        debugShowCheckedModeBanner: false,
-        home: LayoutPage(),
-      ),
+    return GetMaterialApp(
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      title: 'Planora',
+      debugShowCheckedModeBanner: false,
+      home: LayoutPage(),
     );
   }
 }

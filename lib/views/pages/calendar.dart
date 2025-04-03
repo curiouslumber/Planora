@@ -1,7 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'package:calendar_view/calendar_view.dart';
-import 'package:planora/databases/hive_events.dart';
 import 'package:planora/views/schedule/add_schedule.dart';
 import 'package:planora/widgets/calendar_view.dart';
 import 'package:flutter/material.dart';
@@ -20,30 +16,7 @@ class _CalendarState extends State<Calendar> {
   bool areEventsFetched = false;
 
   void getEvents() {
-    void fetchEvents() async {
-      var events = await HiveEvents.getEventsFromHive();
-      for (var event in events) {
-        CalendarEventData calendarEventData = CalendarEventData(
-          title: event.title,
-          date: event.date,
-          startTime: event.startTime,
-          endTime: event.endTime,
-          color: context.theme.colorScheme.primaryFixed,
-          titleStyle: TextStyle(
-            fontSize: 12,
-            color: context.theme.colorScheme.onPrimaryFixed,
-          ),
-          descriptionStyle: TextStyle(
-            fontSize: 12,
-            color: context.theme.colorScheme.onPrimaryFixed,
-          ),
-        );
-        CalendarControllerProvider.of(
-          context,
-        ).controller.add(calendarEventData);
-      }
-      areEventsFetched = true;
-    }
+    void fetchEvents() async {}
 
     fetchEvents();
   }
@@ -249,7 +222,8 @@ class _CalendarState extends State<Calendar> {
                       Expanded(
                         flex: 2,
                         child: MaterialButton(
-                          onPressed: () => Get.to(() => const AddSchedule()),
+                          onPressed:
+                              () => Get.to(() => const AddSchedule(date: "")),
                           color: context.theme.colorScheme.surface,
                           minWidth: context.width,
                           shape: RoundedRectangleBorder(
@@ -286,7 +260,7 @@ class _CalendarState extends State<Calendar> {
               flex: 1,
               child: Padding(
                 padding: EdgeInsets.only(top: 16.0),
-                child: CalendarView(),
+                child: CalendarViewWidget(),
               ),
             ),
           ],

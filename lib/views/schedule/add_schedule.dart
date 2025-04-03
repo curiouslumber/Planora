@@ -5,9 +5,10 @@ import 'package:planora/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:planora/utilities/font_weights.dart';
 
 class AddSchedule extends StatelessWidget {
-  const AddSchedule({super.key});
+  const AddSchedule({super.key, required String date});
 
   static final eventController = Get.put(EventController());
 
@@ -106,7 +107,8 @@ class AddSchedule extends StatelessWidget {
                           .withOpacity(0.7),
                       style: TextStyle(
                         fontSize: 14,
-                        color: context.theme.colorScheme.onSurface,
+                        color: context.theme.colorScheme.primary,
+                        fontWeight: FontWeights.regular,
                       ),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
@@ -196,6 +198,7 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
+                          fontWeight: FontWeights.regular,
                         ),
                         dateFormat: DateFormat("EEEE, d MMMM yyyy"),
                       ),
@@ -263,6 +266,7 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
+                          fontWeight: FontWeights.regular,
                         ),
                         dateFormat: DateFormat("HH.mm - hh.mm a"),
                       ),
@@ -310,6 +314,7 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           color: context.theme.colorScheme.onSurface,
+                          fontWeight: FontWeights.regular,
                         ),
                         dateFormat: DateFormat("HH.mm - hh.mm a"),
                         decoration: InputDecoration(
@@ -346,19 +351,6 @@ class AddSchedule extends StatelessWidget {
             ),
             MaterialButton(
               onPressed: () {
-                if (_dateController.text.isEmpty ||
-                    _titleController.text.isEmpty ||
-                    _startTimeController.text.isEmpty ||
-                    _endTimeController.text.isEmpty) {
-                  return;
-                }
-                eventController.addEvent(
-                  _titleController.text,
-                  DateTime.parse(_dateController.text),
-                  DateTime.parse(_startTimeController.text),
-                  DateTime.parse(_endTimeController.text),
-                  context,
-                );
                 Get.back();
               },
               height: 64.0,
