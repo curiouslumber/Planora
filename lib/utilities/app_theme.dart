@@ -3,6 +3,10 @@ import 'package:planora/utilities/font_weights.dart';
 
 class AppTheme {
   static const String fontFamily = 'Poppins';
+  static const Color _seedColor = Color(0xff3b4c42);
+  static const Color _seedColorDark = Color(
+    0xff4a5d52,
+  ); // Slightly lighter for dark mode
 
   static final TextTheme _textTheme = const TextTheme(
     displayLarge: TextStyle(
@@ -58,50 +62,56 @@ class AppTheme {
   );
 
   static ThemeData get lightTheme {
+    final baseScheme = ColorScheme.fromSeed(
+      seedColor: _seedColor,
+      brightness: Brightness.light,
+    );
+
     return ThemeData(
       fontFamily: fontFamily,
       textTheme: _textTheme,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xff3b4c42),
-        brightness: Brightness.light,
-      ).copyWith(
-        primary: Color(0xff3b4c42),
-        onPrimary: Color(0xffF2F0EF),
-        secondary: Color(0xff5d7d6e),
-        onSecondary: Color(0xffF2F0EF),
-        tertiary: Color(0xffC4B8A5),
-        onTertiary: Color(0xff2A2E28),
-        surface: Color(0xffF8F5F2),
-        onSurface: Color(0xff2A2E28),
-        surfaceContainer: Color(0xffE3E8E5),
-        error: Color(0xffB71C1C),
-        onError: Color(0xffFFFFFF),
-        outline: Color(0xff85958c),
+      colorScheme: baseScheme.copyWith(
+        primary: _seedColor,
+        onPrimary: const Color(0xffF2F0EF),
+        secondary: const Color(0xff5d7d6e),
+        onSecondary: const Color(0xffF2F0EF),
+        tertiary: const Color(0xffC4B8A5),
+        onTertiary: const Color(0xff2A2E28),
+        surface: const Color(0xffF8F5F2),
+        onSurface: const Color(0xff2A2E28),
+        surfaceContainer: const Color(0xffD8E0DD), // More distinct from surface
+        error: const Color(0xffB71C1C),
+        onError: const Color(0xffFFFFFF),
+        outline: const Color(0xff85958c),
       ),
       useMaterial3: true,
     );
   }
 
   static ThemeData get darkTheme {
+    final baseScheme = ColorScheme.fromSeed(
+      seedColor: _seedColorDark,
+      brightness: Brightness.dark,
+    );
+
     return ThemeData(
       fontFamily: fontFamily,
       textTheme: _textTheme,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xff3b4c42),
-        brightness: Brightness.dark,
-      ).copyWith(
-        primary: Color(0xff3b4c42),
-        onPrimary: Color(0xffF2F0EF),
-        secondary: Color(0xff5d8272),
-        onSecondary: Color(0xffe8f4ee),
-        tertiary: Color(0xff9aada4),
-        onTertiary: Color(0xff121a17),
-        surface: Color(0xff121a17),
-        onSurface: Color(0xffF2F0EF),
-        surfaceContainer: Color(0xff2a3a34),
-        error: Color(0xffCF6679),
-        onError: Color(0xffF2F0EF),
-        outline: Color(0xff5a6d64),
+      colorScheme: baseScheme.copyWith(
+        primary: _seedColorDark,
+        onPrimary: const Color(0xffF2F0EF),
+        secondary: const Color(
+          0xff6d9382,
+        ), // Slightly brighter for better visibility
+        onSecondary: const Color(0xffe8f4ee),
+        tertiary: const Color(0xff9aada4),
+        onTertiary: const Color(0xff121a17),
+        surface: const Color(0xff121a17),
+        onSurface: const Color(0xffF2F0EF),
+        surfaceContainer: const Color(0xff1e2a24), // More distinct from surface
+        error: const Color(0xffCF6679),
+        onError: const Color(0xffF2F0EF),
+        outline: const Color(0xff5a6d64),
       ),
       useMaterial3: true,
     );

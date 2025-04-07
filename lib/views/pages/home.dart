@@ -78,7 +78,7 @@ class Home extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withAlpha(230),
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   alignment: Alignment.center,
@@ -88,7 +88,7 @@ class Home extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          'Excellent! Your today’s plan is almost done',
+                          'Excellent! Your today\'s plan is almost done',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 18,
@@ -113,7 +113,7 @@ class Home extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 backgroundColor: Theme.of(
                                   context,
-                                ).colorScheme.surface.withAlpha(230),
+                                ).colorScheme.surface.withAlpha(102),
                               ),
                               Text(
                                 '82%',

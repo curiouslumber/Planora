@@ -58,7 +58,7 @@ class Profile extends StatelessWidget {
                           BoxShadow(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withAlpha(30),
+                            ).colorScheme.onSurface.withAlpha(13),
                             blurRadius: 20,
                             spreadRadius: 5,
                             offset: Offset(0, 5),
@@ -84,7 +84,7 @@ class Profile extends StatelessWidget {
                             BoxShadow(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withAlpha(30),
+                              ).colorScheme.onSurface.withAlpha(6),
                               blurRadius: 20,
                               spreadRadius: 5,
                               offset: Offset(0, 5),
@@ -198,7 +198,7 @@ class Profile extends StatelessWidget {
                                 Container(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onPrimary.withAlpha(30),
+                                  ).colorScheme.onPrimary.withAlpha(128),
                                   width: 1.0,
                                   height: 40.0,
                                 ),
@@ -232,7 +232,7 @@ class Profile extends StatelessWidget {
                                 Container(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onPrimary.withAlpha(30),
+                                  ).colorScheme.onPrimary.withAlpha(128),
                                   width: 1.0,
                                   height: 40.0,
                                 ),
@@ -281,9 +281,8 @@ class Profile extends StatelessWidget {
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 32.0,
                           ),
-                          tileColor: Theme.of(
-                            context,
-                          ).colorScheme.onSurfaceVariant.withAlpha(230),
+                          tileColor:
+                              Theme.of(context).colorScheme.onSurfaceVariant,
                           minTileHeight:
                               MediaQuery.of(context).size.height * 0.08,
                           shape: RoundedRectangleBorder(
