@@ -56,9 +56,9 @@ class Profile extends StatelessWidget {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context).colorScheme.onSurface
-                            // ignore: deprecated_member_use
-                            .withOpacity(0.05),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withAlpha(30),
                             blurRadius: 20,
                             spreadRadius: 5,
                             offset: Offset(0, 5),
@@ -67,8 +67,10 @@ class Profile extends StatelessWidget {
                       ),
                       child: SvgPicture.asset(
                         'assets/shapes/profile_card.svg',
-                        // ignore: deprecated_member_use
-                        color: Theme.of(context).colorScheme.primary,
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.primary,
+                          BlendMode.srcIn,
+                        ),
                         fit: BoxFit.cover,
                         clipBehavior: Clip.antiAlias,
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -80,9 +82,9 @@ class Profile extends StatelessWidget {
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Theme.of(context).colorScheme.onSurface
-                              // ignore: deprecated_member_use
-                              .withOpacity(0.025),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withAlpha(30),
                               blurRadius: 20,
                               spreadRadius: 5,
                               offset: Offset(0, 5),
@@ -194,9 +196,9 @@ class Profile extends StatelessWidget {
                                   ],
                                 ),
                                 Container(
-                                  color: Theme.of(context).colorScheme.onPrimary
-                                  // ignore: deprecated_member_use
-                                  .withOpacity(0.5),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withAlpha(30),
                                   width: 1.0,
                                   height: 40.0,
                                 ),
@@ -228,9 +230,9 @@ class Profile extends StatelessWidget {
                                   ],
                                 ),
                                 Container(
-                                  color: Theme.of(context).colorScheme.onPrimary
-                                  // ignore: deprecated_member_use
-                                  .withOpacity(0.5),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withAlpha(30),
                                   width: 1.0,
                                   height: 40.0,
                                 ),
@@ -281,9 +283,7 @@ class Profile extends StatelessWidget {
                           ),
                           tileColor: Theme.of(
                             context,
-                          ).colorScheme.onSurfaceVariant
-                          // ignore: deprecated_member_use
-                          .withOpacity(0.9),
+                          ).colorScheme.onSurfaceVariant.withAlpha(230),
                           minTileHeight:
                               MediaQuery.of(context).size.height * 0.08,
                           shape: RoundedRectangleBorder(

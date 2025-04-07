@@ -78,9 +78,7 @@ class Home extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.9),
+                    color: Theme.of(context).colorScheme.primary.withAlpha(230),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   alignment: Alignment.center,
@@ -115,9 +113,7 @@ class Home extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 backgroundColor: Theme.of(
                                   context,
-                                ).colorScheme.surface
-                                // ignore: deprecated_member_use
-                                .withOpacity(0.4),
+                                ).colorScheme.surface.withAlpha(230),
                               ),
                               Text(
                                 '82%',

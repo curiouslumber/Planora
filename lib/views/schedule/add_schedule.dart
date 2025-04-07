@@ -1,4 +1,3 @@
-// ignore_for_file: deprecated_member_use
 import 'package:date_field/date_field.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:flutter/material.dart';
@@ -53,9 +52,7 @@ class AddSchedule extends StatelessWidget {
               Text(
                 'Be Productive',
                 style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(230),
                   fontSize: 14,
                 ),
               ),
@@ -96,7 +93,7 @@ class AddSchedule extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                         ),
                       ),
                     ),
@@ -104,7 +101,7 @@ class AddSchedule extends StatelessWidget {
                       controller: _titleController,
                       cursorColor: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.7),
+                      ).colorScheme.onSurface.withAlpha(230),
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.primary,
@@ -119,7 +116,7 @@ class AddSchedule extends StatelessWidget {
                           borderSide: BorderSide(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.5),
+                            ).colorScheme.onSurface.withAlpha(230),
                           ),
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -127,7 +124,7 @@ class AddSchedule extends StatelessWidget {
                           borderSide: BorderSide(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.5),
+                            ).colorScheme.onSurface.withAlpha(230),
                           ),
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -149,7 +146,7 @@ class AddSchedule extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                         ),
                       ),
                     ),
@@ -179,7 +176,7 @@ class AddSchedule extends StatelessWidget {
                           ),
                           suffixIconColor: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
                             vertical: 24.0,
@@ -188,7 +185,7 @@ class AddSchedule extends StatelessWidget {
                             borderSide: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
+                              ).colorScheme.onSurface.withAlpha(230),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -196,7 +193,7 @@ class AddSchedule extends StatelessWidget {
                             borderSide: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
+                              ).colorScheme.onSurface.withAlpha(230),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -225,7 +222,7 @@ class AddSchedule extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                         ),
                       ),
                     ),
@@ -251,7 +248,7 @@ class AddSchedule extends StatelessWidget {
                           ),
                           suffixIconColor: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
                             vertical: 24.0,
@@ -260,7 +257,7 @@ class AddSchedule extends StatelessWidget {
                             borderSide: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
+                              ).colorScheme.onSurface.withAlpha(230),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -268,7 +265,7 @@ class AddSchedule extends StatelessWidget {
                             borderSide: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
+                              ).colorScheme.onSurface.withAlpha(230),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -297,7 +294,7 @@ class AddSchedule extends StatelessWidget {
                           fontWeight: FontWeight.normal,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                         ),
                       ),
                     ),
@@ -335,7 +332,7 @@ class AddSchedule extends StatelessWidget {
                           ),
                           suffixIconColor: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.5),
+                          ).colorScheme.onSurface.withAlpha(230),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
                             vertical: 24.0,
@@ -344,7 +341,7 @@ class AddSchedule extends StatelessWidget {
                             borderSide: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
+                              ).colorScheme.onSurface.withAlpha(230),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -352,7 +349,7 @@ class AddSchedule extends StatelessWidget {
                             borderSide: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
+                              ).colorScheme.onSurface.withAlpha(230),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -368,7 +365,7 @@ class AddSchedule extends StatelessWidget {
                 Navigator.pop(context);
               },
               height: 64.0,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(230),
               minWidth: MediaQuery.of(context).size.width,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),

@@ -59,12 +59,11 @@ class _CalendarState extends State<Calendar> {
               bottom: 8.0,
             ),
             child: AppBar(
-              // ignore: deprecated_member_use
               backgroundColor: Theme.of(
                 context,
-              ).colorScheme.primary.withOpacity(0.9),
+              ).colorScheme.primary.withAlpha(230),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(33.0)),
+                borderRadius: BorderRadius.circular(20),
               ),
               centerTitle: true,
               titleSpacing: 0, // Ensures proper spacing

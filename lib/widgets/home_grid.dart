@@ -179,10 +179,9 @@ class TwoColumnRandomGrid extends StatelessWidget {
                   Container(
                     height: col2Item2,
                     decoration: BoxDecoration(
-                      // ignore: deprecated_member_use
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.9),
+                      ).colorScheme.onSurface.withAlpha(230),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
