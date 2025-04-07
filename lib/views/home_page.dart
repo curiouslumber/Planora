@@ -3,7 +3,6 @@ import 'package:planora/views/pages/home.dart';
 import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 class LayoutPage extends StatefulWidget {
@@ -117,10 +116,10 @@ class _LayoutPageState extends State<LayoutPage> {
             selectedFontSize: 12.0,
             unselectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: context.theme.colorScheme.primary,
-            unselectedItemColor: context.theme.colorScheme.onSurface.withAlpha(
-              100,
-            ),
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            unselectedItemColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha(100),
             onTap: _onBottomNavTap,
             items: [
               BottomNavigationBarItem(

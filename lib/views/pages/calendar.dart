@@ -1,7 +1,6 @@
 import 'package:planora/views/schedule/add_schedule.dart';
 import 'package:planora/widgets/calendar_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class Calendar extends StatefulWidget {
@@ -48,7 +47,9 @@ class _CalendarState extends State<Calendar> {
     List<DateTime> fiveDayView = getFiveDayView();
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(context.height / 2.7),
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height / 2.7,
+        ),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(
@@ -59,9 +60,9 @@ class _CalendarState extends State<Calendar> {
             ),
             child: AppBar(
               // ignore: deprecated_member_use
-              backgroundColor: context.theme.colorScheme.primary.withOpacity(
-                0.9,
-              ),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.9),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(33.0)),
               ),
@@ -83,14 +84,14 @@ class _CalendarState extends State<Calendar> {
                           icon: Icon(
                             Icons.arrow_back_ios_rounded,
                             size: 20,
-                            color: context.theme.colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         Text(
                           DateFormat('MMMM').format(selectedDate),
                           style: TextStyle(
                             fontSize: 18,
-                            color: context.theme.colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -100,7 +101,7 @@ class _CalendarState extends State<Calendar> {
                           icon: Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 20,
-                            color: context.theme.colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                       ],
@@ -109,7 +110,7 @@ class _CalendarState extends State<Calendar> {
                 ],
               ),
               bottom: Tab(
-                height: context.height / 3.5,
+                height: MediaQuery.of(context).size.height / 3.5,
                 child: Padding(
                   padding: EdgeInsets.only(
                     left: 16.0,
@@ -151,20 +152,18 @@ class _CalendarState extends State<Calendar> {
                                     decoration: BoxDecoration(
                                       color:
                                           isToday
-                                              ? context
-                                                  .theme
-                                                  .colorScheme
-                                                  .surface
+                                              ? Theme.of(
+                                                context,
+                                              ).colorScheme.surface
                                               : null,
                                       borderRadius: BorderRadius.circular(18.0),
                                       border: Border.all(
                                         color:
                                             isToday
                                                 ? Colors.transparent
-                                                : context
-                                                    .theme
-                                                    .colorScheme
-                                                    .onPrimary,
+                                                : Theme.of(
+                                                  context,
+                                                ).colorScheme.onPrimary,
                                       ),
                                     ),
                                     child: Column(
@@ -176,16 +175,12 @@ class _CalendarState extends State<Calendar> {
                                           style: TextStyle(
                                             color:
                                                 isToday
-                                                    ? context
-                                                        .theme
-                                                        .colorScheme
-                                                        .onSurface
-                                                    : context
-                                                        .theme
-                                                        .colorScheme
-                                                        .onPrimary
-                                                        // ignore: deprecated_member_use
-                                                        .withOpacity(0.8),
+                                                    ? Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface
+                                                    : Theme.of(
+                                                      context,
+                                                    ).colorScheme.onPrimary,
                                           ),
                                         ),
                                         Text(
@@ -193,16 +188,12 @@ class _CalendarState extends State<Calendar> {
                                           style: TextStyle(
                                             color:
                                                 isToday
-                                                    ? context
-                                                        .theme
-                                                        .colorScheme
-                                                        .onSurface
-                                                    : context
-                                                        .theme
-                                                        .colorScheme
-                                                        .onPrimary
-                                                        // ignore: deprecated_member_use
-                                                        .withOpacity(0.9),
+                                                    ? Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface
+                                                    : Theme.of(
+                                                      context,
+                                                    ).colorScheme.onPrimary,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -223,20 +214,28 @@ class _CalendarState extends State<Calendar> {
                         flex: 2,
                         child: MaterialButton(
                           onPressed:
-                              () => Get.to(() => const AddSchedule(date: "")),
-                          color: context.theme.colorScheme.surface,
-                          minWidth: context.width,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddSchedule(date: ""),
+                                ),
+                              ),
+                          color: Theme.of(context).colorScheme.surface,
+                          minWidth: MediaQuery.of(context).size.width,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                             side: BorderSide(
-                              color: context.theme.colorScheme.surfaceContainer,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainer,
                             ),
                           ),
                           elevation: 0,
                           child: Text(
                             'Add Schedule',
                             style: TextStyle(
-                              color: context.theme.colorScheme.onSurface,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

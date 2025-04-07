@@ -1,16 +1,12 @@
 // ignore_for_file: deprecated_member_use
 import 'package:date_field/date_field.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:planora/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:planora/utilities/font_weights.dart';
 
 class AddSchedule extends StatelessWidget {
   const AddSchedule({super.key, required String date});
-
-  static final eventController = Get.put(EventController());
 
   static final TextEditingController _titleController = TextEditingController();
   static final TextEditingController _dateController = TextEditingController();
@@ -37,12 +33,12 @@ class AddSchedule extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: context.theme.colorScheme.onSurface,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
               IconButton(
-                onPressed: () => Get.back(),
+                onPressed: () => Navigator.pop(context),
                 icon: Icon(Icons.arrow_back_ios_new_rounded, size: 20),
               ),
             ],
@@ -57,7 +53,9 @@ class AddSchedule extends StatelessWidget {
               Text(
                 'Be Productive',
                 style: TextStyle(
-                  color: context.theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 14,
                 ),
               ),
@@ -66,14 +64,14 @@ class AddSchedule extends StatelessWidget {
                 'Add Schedule',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: context.theme.colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                 ),
               ),
             ],
           ),
         ],
-        backgroundColor: context.theme.colorScheme.surface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -96,18 +94,20 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
-                          color: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                     ),
                     TextFormField(
                       controller: _titleController,
-                      cursorColor: context.theme.colorScheme.onSurface
-                          .withOpacity(0.7),
+                      cursorColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
                       style: TextStyle(
                         fontSize: 14,
-                        color: context.theme.colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeights.regular,
                       ),
                       decoration: InputDecoration(
@@ -117,15 +117,17 @@ class AddSchedule extends StatelessWidget {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: context.theme.colorScheme.onSurface
-                                .withOpacity(0.5),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.5),
                           ),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: context.theme.colorScheme.onSurface
-                                .withOpacity(0.5),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.5),
                           ),
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -145,8 +147,9 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
-                          color: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -174,30 +177,33 @@ class AddSchedule extends StatelessWidget {
                             ),
                             child: Icon(Ionicons.calendar_outline),
                           ),
-                          suffixIconColor: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          suffixIconColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
                             vertical: 24.0,
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
                         style: TextStyle(
                           fontSize: 14,
-                          color: context.theme.colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeights.regular,
                         ),
                         dateFormat: DateFormat("EEEE, d MMMM yyyy"),
@@ -217,8 +223,9 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
-                          color: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -242,30 +249,33 @@ class AddSchedule extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 24.0),
                             child: Icon(Ionicons.time_outline),
                           ),
-                          suffixIconColor: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          suffixIconColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
                             vertical: 24.0,
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
                         style: TextStyle(
                           fontSize: 14,
-                          color: context.theme.colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeights.regular,
                         ),
                         dateFormat: DateFormat("HH.mm - hh.mm a"),
@@ -285,8 +295,9 @@ class AddSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
-                          color: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -313,7 +324,7 @@ class AddSchedule extends StatelessWidget {
                         hideDefaultSuffixIcon: true,
                         style: TextStyle(
                           fontSize: 14,
-                          color: context.theme.colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeights.regular,
                         ),
                         dateFormat: DateFormat("HH.mm - hh.mm a"),
@@ -322,23 +333,26 @@ class AddSchedule extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 24.0),
                             child: Icon(Ionicons.time_outline),
                           ),
-                          suffixIconColor: context.theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          suffixIconColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.5),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
                             vertical: 24.0,
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: context.theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -351,18 +365,18 @@ class AddSchedule extends StatelessWidget {
             ),
             MaterialButton(
               onPressed: () {
-                Get.back();
+                Navigator.pop(context);
               },
               height: 64.0,
-              color: context.theme.colorScheme.onSurface.withOpacity(0.9),
-              minWidth: context.width,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
+              minWidth: MediaQuery.of(context).size.width,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: Text(
                 'Add Schedule',
                 style: TextStyle(
-                  color: context.theme.colorScheme.surface,
+                  color: Theme.of(context).colorScheme.surface,
                   fontWeight: FontWeight.bold,
                 ),
               ),
