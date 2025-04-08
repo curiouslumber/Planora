@@ -1,23 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:planora/utilities/shared_preferences_manager.dart';
 import 'theme_event.dart';
 import 'theme_state.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
-  static const String _themeKey = 'theme_mode';
-  late SharedPreferences _prefs;
-
+  // Constructor
   ThemeBloc() : super(const ThemeState()) {
     on<ThemeChanged>(_onThemeChanged);
     on<ThemeToggled>(_onThemeToggled);
     _loadThemeMode();
   }
 
+  // Load the theme mode from the SharedPreferences
   Future<void> _loadThemeMode() async {
-    _prefs = await SharedPreferences.getInstance();
-    final String? themeModeString = _prefs.getString(_themeKey);
+    final prefs = await SharedPreferencesManager.instance;
+    final String? themeModeString = prefs.getThemeMode();
     if (themeModeString != null) {
       final themeMode = ThemeMode.values.firstWhere(
         (mode) => mode.toString() == themeModeString,
@@ -27,11 +26,17 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     }
   }
 
-  void _onThemeChanged(ThemeChanged event, Emitter<ThemeState> emit) {
+  // Handle the ThemeChanged event
+  Future<void> _onThemeChanged(
+    ThemeChanged event,
+    Emitter<ThemeState> emit,
+  ) async {
     emit(state.copyWith(themeMode: event.themeMode));
-    _prefs.setString(_themeKey, event.themeMode.toString());
+    final prefs = await SharedPreferencesManager.instance;
+    await prefs.setThemeMode(event.themeMode.toString());
   }
 
+  // Handle the ThemeToggled event
   void _onThemeToggled(ThemeToggled event, Emitter<ThemeState> emit) {
     final newThemeMode =
         state.themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
