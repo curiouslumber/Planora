@@ -34,9 +34,8 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
       builder: (context, state) {
         // Sync controller's display date with state
         if (_controller.displayDate != state.selectedDate) {
-          _controller.displayDate = state.selectedDate.subtract(
-            Duration(minutes: 90),
-          );
+          _controller.displayDate = state.selectedDate;
+          _controller.selectedDate = state.selectedDate;
         }
 
         return SfCalendar(
@@ -58,8 +57,13 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
           dataSource: EventsDataSource(<Event>[]),
           onTap: (CalendarTapDetails details) {
             if (details.date != null) {
+              final selectedDate = DateTime(
+                details.date!.year,
+                details.date!.month,
+                details.date!.day,
+              );
               context.read<CalendarBloc>().add(
-                UpdateSelectedDate(details.date!),
+                UpdateSelectedDate(selectedDate),
               );
             }
           },
