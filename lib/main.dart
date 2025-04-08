@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planora/blocs/theme/theme_bloc.dart';
@@ -21,6 +22,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, state) {
+        // Set system navigation bar color based on theme
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            systemNavigationBarColor:
+                state.themeMode == ThemeMode.dark
+                    ? AppTheme.darkTheme.colorScheme.surface
+                    : AppTheme.lightTheme.colorScheme.surface,
+            systemNavigationBarIconBrightness:
+                state.themeMode == ThemeMode.dark
+                    ? Brightness.light
+                    : Brightness.dark,
+            systemNavigationBarDividerColor: Colors.transparent,
+          ),
+        );
+
         return MaterialApp(
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
