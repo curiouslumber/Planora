@@ -1,3 +1,4 @@
+import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -21,13 +22,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, state) {
-        return MaterialApp(
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: state.themeMode,
-          title: 'Planora',
-          debugShowCheckedModeBanner: false,
-          home: LayoutPage(),
+        return CalendarControllerProvider(
+          controller: EventController(),
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: state.themeMode,
+            title: 'Planora',
+            debugShowCheckedModeBanner: false,
+            home: LayoutPage(),
+          ),
         );
       },
     );
