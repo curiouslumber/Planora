@@ -1,12 +1,51 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planora/utilities/font_weights.dart';
 
-class TwoColumnRandomGrid extends StatelessWidget {
-  final Random random = Random();
+class TwoColumnRandomGrid extends StatefulWidget {
+  const TwoColumnRandomGrid({super.key});
+
+  @override
+  State<TwoColumnRandomGrid> createState() => _TwoColumnRandomGridState();
+}
+
+class _TwoColumnRandomGridState extends State<TwoColumnRandomGrid> {
   final double minHeight = 100; // Minimum height for each block
 
-  TwoColumnRandomGrid({super.key});
+  late double r1;
+  late double r2;
+  final String hiveBoxName = 'grid_settings';
+  final String r1Key = 'grid_r1';
+  final String r2Key = 'grid_r2';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrGenerateRandomValues();
+  }
+
+  Future<void> _loadOrGenerateRandomValues() async {
+    final box = await Hive.openBox(hiveBoxName);
+
+    // If we don't have stored values, generate new ones
+    if (!box.containsKey(r1Key) || !box.containsKey(r2Key)) {
+      final random = Random();
+      r1 = random.nextDouble();
+      r2 = random.nextDouble();
+
+      // Store the values
+      await box.put(r1Key, r1);
+      await box.put(r2Key, r2);
+    } else {
+      // Use the stored values
+      r1 = box.get(r1Key);
+      r2 = box.get(r2Key);
+    }
+
+    // Force a rebuild with the loaded values
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +64,14 @@ class TwoColumnRandomGrid extends StatelessWidget {
           'Not enough height to allocate the minimum height for both blocks.',
         );
 
-        // Extra height available to distribute randomly.
+        // Extra height available to distribute based on stored random values.
         final double extra = availableHeight - requiredMin;
 
-        // For Column 1: generate a random split.
-        final double r1 = random.nextDouble();
+        // For Column 1: use the stored random split.
         final double col1Item1 = minHeight + r1 * extra;
         final double col1Item2 = minHeight + (1 - r1) * extra;
 
-        // For Column 2: generate a random split.
-        final double r2 = random.nextDouble();
+        // For Column 2: use the stored random split.
         final double col2Item1 = minHeight + r2 * extra;
         final double col2Item2 = minHeight + (1 - r2) * extra;
 
