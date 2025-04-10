@@ -13,8 +13,11 @@ class TwoColumnRandomGrid extends StatefulWidget {
 class _TwoColumnRandomGridState extends State<TwoColumnRandomGrid> {
   final double minHeight = 100; // Minimum height for each block
 
-  late double r1;
-  late double r2;
+  // Initialize with default values
+  double r1 = 0.5; // Default to equal split
+  double r2 = 0.5; // Default to equal split
+  bool isLoading = true;
+
   final String hiveBoxName = 'grid_settings';
   final String r1Key = 'grid_r1';
   final String r2Key = 'grid_r2';
@@ -26,29 +29,42 @@ class _TwoColumnRandomGridState extends State<TwoColumnRandomGrid> {
   }
 
   Future<void> _loadOrGenerateRandomValues() async {
-    final box = await Hive.openBox(hiveBoxName);
+    try {
+      final box = await Hive.openBox(hiveBoxName);
 
-    // If we don't have stored values, generate new ones
-    if (!box.containsKey(r1Key) || !box.containsKey(r2Key)) {
-      final random = Random();
-      r1 = random.nextDouble();
-      r2 = random.nextDouble();
+      // If we don't have stored values, generate new ones
+      if (!box.containsKey(r1Key) || !box.containsKey(r2Key)) {
+        final random = Random();
+        r1 = random.nextDouble();
+        r2 = random.nextDouble();
 
-      // Store the values
-      await box.put(r1Key, r1);
-      await box.put(r2Key, r2);
-    } else {
-      // Use the stored values
-      r1 = box.get(r1Key);
-      r2 = box.get(r2Key);
+        // Store the values
+        await box.put(r1Key, r1);
+        await box.put(r2Key, r2);
+      } else {
+        // Use the stored values
+        r1 = box.get(r1Key);
+        r2 = box.get(r2Key);
+      }
+    } catch (e) {
+      // If there's an error, keep using the default values
+      debugPrint('Error loading grid values: $e');
+    } finally {
+      // Update loading state and rebuild
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
-
-    // Force a rebuild with the loaded values
-    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // Use the parent's maximum height
@@ -93,7 +109,6 @@ class _TwoColumnRandomGridState extends State<TwoColumnRandomGrid> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        // Note: For spacing between children inside Column, you can wrap them in a Column with a SizedBox
                         children: [
                           Text(
                             "Meeting\nPreparation",
