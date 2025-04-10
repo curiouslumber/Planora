@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:planora/di/service_locator.dart';
-import 'package:planora/blocs/theme/theme_bloc.dart';
-import 'package:planora/blocs/theme/theme_state.dart';
-import 'package:planora/utilities/app_theme.dart';
-import 'package:planora/views/home_page.dart';
+import 'package:planora/core/di/service_locator.dart';
+import 'package:planora/core/utilities/app_theme.dart';
+import 'package:planora/presentation/blocs/theme/theme_bloc.dart';
+import 'package:planora/presentation/blocs/theme/theme_state.dart';
+import 'package:planora/presentation/layout/layout_page.dart';
 
 void main() async {
-  // Initialize dependency injection
-  await setupDependencies();
+  try {
+    // Initialize dependencies
+    await setupDependencies();
 
-  // Run the app
-  runApp(BlocProvider(create: (context) => ThemeBloc(), child: const MyApp()));
+    runApp(
+      BlocProvider(create: (context) => ThemeBloc(), child: const MyApp()),
+    );
+  } catch (e) {
+    debugPrint('Error initializing app: $e');
+    // Show error UI if initialization fails
+    runApp(
+      MaterialApp(
+        home: Scaffold(body: Center(child: Text('Error initializing app: $e'))),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -43,7 +54,7 @@ class MyApp extends StatelessWidget {
           themeMode: state.themeMode,
           title: 'Planora',
           debugShowCheckedModeBanner: false,
-          home: LayoutPage(),
+          home: const LayoutPage(),
         );
       },
     );

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:planora/blocs/calendar/calendar_bloc.dart';
-import 'package:planora/blocs/calendar/calendar_event.dart';
-import 'package:planora/blocs/calendar/calendar_state.dart';
-import 'package:planora/views/schedule/add_schedule.dart';
-import 'package:planora/widgets/calendar_view.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_bloc.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_event.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_state.dart';
+import 'package:planora/presentation/pages/schedule/add_schedule.dart';
+import 'package:planora/presentation/widgets/calendar/calendar_view.dart';
 
 class Calendar extends StatelessWidget {
   const Calendar({super.key});

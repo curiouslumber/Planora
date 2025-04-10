@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:planora/data/models/event_model.dart';
-import 'package:planora/services/database_service.dart';
+import 'package:planora/domain/services/database_service.dart';
 import 'package:intl/intl.dart';
-import 'package:planora/di/service_locator.dart';
+import 'package:planora/core/di/service_locator.dart';
 
 /// A data source for calendar events that extends [CalendarDataSource].
 /// This class provides the necessary implementations for displaying events

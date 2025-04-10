@@ -2,9 +2,9 @@ import 'package:date_field/date_field.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:planora/di/service_locator.dart';
-import 'package:planora/services/database_service.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/core/di/service_locator.dart';
+import 'package:planora/domain/services/database_service.dart';
+import 'package:planora/core/utilities/font_weights.dart';
 
 class AddSchedule extends StatefulWidget {
   final String date;

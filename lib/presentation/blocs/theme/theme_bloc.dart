@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:planora/utilities/shared_preferences_manager.dart';
+import 'package:planora/core/utilities/shared_preferences_manager.dart';
 import 'theme_event.dart';
 import 'theme_state.dart';
 

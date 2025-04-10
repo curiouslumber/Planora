@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:planora/blocs/theme/theme_bloc.dart';
-import 'package:planora/blocs/theme/theme_event.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/presentation/blocs/theme/theme_bloc.dart';
+import 'package:planora/presentation/blocs/theme/theme_event.dart';
+import 'package:planora/core/utilities/font_weights.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});

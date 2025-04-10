@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/core/utilities/font_weights.dart';
 
 class TwoColumnRandomGrid extends StatefulWidget {
   const TwoColumnRandomGrid({super.key});

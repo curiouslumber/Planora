@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:planora/blocs/calendar/calendar_event.dart';
-import 'package:planora/blocs/calendar/calendar_state.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_event.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_state.dart';
 
 class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   CalendarBloc() : super(CalendarState(selectedDate: DateTime.now())) {

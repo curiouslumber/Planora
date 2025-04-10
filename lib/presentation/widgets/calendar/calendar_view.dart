@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:planora/blocs/calendar/calendar_bloc.dart';
-import 'package:planora/blocs/calendar/calendar_event.dart';
-import 'package:planora/blocs/calendar/calendar_state.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_bloc.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_event.dart';
+import 'package:planora/presentation/blocs/calendar/calendar_state.dart';
 import 'package:planora/data/events_data_source.dart';
-import 'package:planora/utilities/font_weights.dart';
-import 'package:planora/views/schedule/add_schedule.dart';
+import 'package:planora/core/utilities/font_weights.dart';
+import 'package:planora/presentation/pages/schedule/add_schedule.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarViewWidget extends StatefulWidget {
@@ -74,7 +74,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
         (failure) {
           if (mounted) {
             setState(() {
-              _errorMessage = failure.message;
+              _errorMessage = failure.toString();
               _isLoading = false;
             });
           }

@@ -1,6 +1,6 @@
 import 'package:ionicons/ionicons.dart';
-import 'package:planora/utilities/font_weights.dart';
-import 'package:planora/widgets/home_grid.dart';
+import 'package:planora/presentation/widgets/home/home_grid.dart';
+import 'package:planora/core/utilities/font_weights.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
