@@ -3,10 +3,8 @@ import 'package:planora/utilities/font_weights.dart';
 
 class AppTheme {
   static const String fontFamily = 'Poppins';
-  static const Color _seedColor = Color(0xff3b4c42);
-  static const Color _seedColorDark = Color(
-    0xff4a5d52,
-  ); // Slightly lighter for dark mode
+  static const Color _seedColor = Color(0xff3b4c42); // Verdant Green
+  static const Color _seedColorDark = Color(0xff2d3e33); // Moss Green
 
   static final TextTheme _textTheme = const TextTheme(
     displayLarge: TextStyle(
@@ -71,18 +69,25 @@ class AppTheme {
       fontFamily: fontFamily,
       textTheme: _textTheme,
       colorScheme: baseScheme.copyWith(
-        primary: _seedColor,
-        onPrimary: const Color(0xffF2F0EF),
-        secondary: const Color(0xff5d7d6e),
-        onSecondary: const Color(0xffF2F0EF),
-        tertiary: const Color(0xffC4B8A5),
-        onTertiary: const Color(0xff2A2E28),
-        surface: const Color(0xffF8F5F2),
-        onSurface: const Color(0xff2A2E28),
-        surfaceContainer: const Color(0xffD8E0DD), // More distinct from surface
-        error: const Color(0xffB71C1C),
-        onError: const Color(0xffFFFFFF),
-        outline: const Color(0xff85958c),
+        primary: Color(0xff3b4c42), // Verdant Green
+        onPrimary: Color(0xfff0f1eb), // Off-White Mist
+        secondary: Color(0xffa0b49d), // Sage Green
+        onSecondary: Color(0xff1F2D25), // Charcoal
+        tertiary: Color(0xffd8d7c7), // Clay Beige
+        onTertiary: Color(0xff2b2b2b), // Charcoal
+        surface: Color(0xfff0f1eb), // Off-White Mist
+        onSurface: Color(0xff2b2b2b), // Charcoal
+        surfaceContainer: Color(
+          0xffe7ede8,
+        ), // A lighter neutral tone for contrast
+        error: Color(0xffB71C1C),
+        onError: Color(0xffffffff),
+        outline: Color(0xffb4b8b1), // Ash Grey
+        shadow: Color(0x143b4c42), // Subtle shadow with primary tint
+        secondaryContainer: Color(0xff7e9d83), // Sky Sage (Accent)
+        onSecondaryContainer: Color(0xff2b2b2b),
+        surfaceContainerHighest: Color(0xfff0f1eb),
+        onSurfaceVariant: Color(0xff2b2b2b),
       ),
       useMaterial3: true,
     );
@@ -98,20 +103,23 @@ class AppTheme {
       fontFamily: fontFamily,
       textTheme: _textTheme,
       colorScheme: baseScheme.copyWith(
-        primary: _seedColorDark,
-        onPrimary: const Color(0xffF2F0EF),
-        secondary: const Color(
-          0xff6d9382,
-        ), // Slightly brighter for better visibility
-        onSecondary: const Color(0xffe8f4ee),
-        tertiary: const Color(0xff9aada4),
-        onTertiary: const Color(0xff121a17),
-        surface: const Color(0xff121a17),
-        onSurface: const Color(0xffF2F0EF),
-        surfaceContainer: const Color(0xff1e2a24), // More distinct from surface
-        error: const Color(0xffCF6679),
-        onError: const Color(0xffF2F0EF),
-        outline: const Color(0xff5a6d64),
+        primary: Color(0xff2d3e33), // Moss Green
+        onPrimary: Color(0xfff0f1eb), // Off-White Mist
+        secondary: Color(0xff7e9d83), // Sky Sage (Accent)
+        onSecondary: Color(0xffe8f4ee), // Soft tint of Off-White
+        tertiary: Color(0xffa0b49d), // Sage Green
+        onTertiary: Color(0xfff0f1eb),
+        surface: Color(0xff121a17), // Deep background
+        onSurface: Color(0xfff0f1eb), // Off-White Mist
+        surfaceContainer: Color(0xff1e2a24),
+        error: Color(0xffcf6679),
+        onError: Color(0xfff0f1eb),
+        outline: Color(0xff5a6d64), // Muted outline
+        shadow: Color(0x143b4c42),
+        secondaryContainer: Color(0xffa9d676), // Evergreen (Success)
+        onSecondaryContainer: Color(0xff2d3e33),
+        surfaceContainerHighest: Color(0xff121a17),
+        onSurfaceVariant: Color(0xfff0f1eb),
       ),
       useMaterial3: true,
     );

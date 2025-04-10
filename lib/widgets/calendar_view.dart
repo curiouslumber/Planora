@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:planora/blocs/calendar/calendar_bloc.dart';
 import 'package:planora/blocs/calendar/calendar_event.dart';
 import 'package:planora/blocs/calendar/calendar_state.dart';
 import 'package:planora/data/events_data_source.dart';
+import 'package:planora/views/schedule/add_schedule.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class CalendarViewWidget extends StatefulWidget {
@@ -53,7 +55,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
           allowViewNavigation: false,
           showCurrentTimeIndicator: true,
           headerDateFormat: "EEE, d MMM yyyy",
-          cellBorderColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+          cellBorderColor: Theme.of(context).colorScheme.primary,
           dataSource: EventsDataSource(<Event>[]),
           onTap: (CalendarTapDetails details) {
             if (details.date != null) {
@@ -64,6 +66,18 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
               );
               context.read<CalendarBloc>().add(
                 UpdateSelectedDate(selectedDate),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => AddSchedule(
+                        date:
+                            DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(selectedDate).toString(),
+                      ),
+                ),
               );
             }
           },

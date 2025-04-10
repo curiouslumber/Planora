@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:planora/utilities/font_weights.dart';
 
 class TwoColumnRandomGrid extends StatelessWidget {
   final Random random = Random();
@@ -48,7 +49,7 @@ class TwoColumnRandomGrid extends StatelessWidget {
                   Container(
                     height: col1Item1,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
@@ -62,11 +63,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -75,11 +77,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 10,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                         ],
@@ -90,7 +93,7 @@ class TwoColumnRandomGrid extends StatelessWidget {
                   Container(
                     height: col1Item2,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
@@ -103,11 +106,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -116,11 +120,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 10,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                         ],
@@ -138,7 +143,7 @@ class TwoColumnRandomGrid extends StatelessWidget {
                   Container(
                     height: col2Item1,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
@@ -151,11 +156,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -164,11 +170,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 10,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                         ],
@@ -179,9 +186,7 @@ class TwoColumnRandomGrid extends StatelessWidget {
                   Container(
                     height: col2Item2,
                     decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withAlpha(230),
+                      color: Theme.of(context).colorScheme.secondary,
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Center(
@@ -194,11 +199,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.surface,
+                              color: Theme.of(context).colorScheme.onSecondary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -207,11 +213,12 @@ class TwoColumnRandomGrid extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 10,
-                              color: Theme.of(context).colorScheme.surface,
+                              color: Theme.of(context).colorScheme.onSecondary,
                               fontFamily:
                                   Theme.of(
                                     context,
                                   ).textTheme.bodyMedium!.fontFamily,
+                              fontWeight: FontWeights.medium,
                             ),
                           ),
                         ],
