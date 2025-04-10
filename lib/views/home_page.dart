@@ -116,7 +116,9 @@ class _LayoutPageState extends State<LayoutPage> {
             selectedFontSize: 12.0,
             unselectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
+            selectedItemColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha(180),
             unselectedItemColor: Theme.of(
               context,
             ).colorScheme.onSurface.withAlpha(100),

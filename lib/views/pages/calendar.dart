@@ -172,9 +172,10 @@ class CalendarView extends StatelessWidget {
                                                   color:
                                                       isSelected
                                                           ? Colors.transparent
-                                                          : Theme.of(
-                                                            context,
-                                                          ).colorScheme.surface,
+                                                          : Theme.of(context)
+                                                              .colorScheme
+                                                              .onSurface
+                                                              .withAlpha(180),
                                                 ),
                                               ),
                                               child: Column(
@@ -243,6 +244,9 @@ class CalendarView extends StatelessWidget {
                                                 date: DateFormat(
                                                   'yyyy-MM-dd',
                                                 ).format(state.selectedDate),
+                                                startTime: DateFormat(
+                                                  'HH:mm',
+                                                ).format(DateTime.now()),
                                               ),
                                         ),
                                       ),

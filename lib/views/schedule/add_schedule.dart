@@ -2,17 +2,191 @@ import 'package:date_field/date_field.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:planora/di/service_locator.dart';
+import 'package:planora/services/database_service.dart';
 import 'package:planora/utilities/font_weights.dart';
 
-class AddSchedule extends StatelessWidget {
-  const AddSchedule({super.key, required String date});
+class AddSchedule extends StatefulWidget {
+  final String date;
+  final String? startTime;
 
-  static final TextEditingController _titleController = TextEditingController();
-  static final TextEditingController _dateController = TextEditingController();
-  static final TextEditingController _startTimeController =
-      TextEditingController();
-  static final TextEditingController _endTimeController =
-      TextEditingController();
+  const AddSchedule({super.key, required this.date, this.startTime});
+
+  @override
+  State<AddSchedule> createState() => _AddScheduleState();
+}
+
+class _AddScheduleState extends State<AddSchedule> {
+  final TextEditingController _titleController = TextEditingController();
+  late final TextEditingController _dateController;
+  late final TextEditingController _startTimeController;
+  late final TextEditingController _endTimeController;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the date controller with the passed date
+    _dateController = TextEditingController(text: widget.date);
+
+    // Initialize time controllers
+    if (widget.startTime != null) {
+      final startDateTime = _parseTimeToDateTime(
+        widget.date,
+        widget.startTime!,
+      );
+      _startTimeController = TextEditingController(
+        text: startDateTime.toIso8601String(),
+      );
+
+      // Set end time 1 hour ahead of start time
+      final endDateTime = startDateTime.add(const Duration(hours: 1));
+      _endTimeController = TextEditingController(
+        text: endDateTime.toIso8601String(),
+      );
+    } else {
+      _startTimeController = TextEditingController();
+      _endTimeController = TextEditingController();
+    }
+  }
+
+  // Helper method to parse time string to DateTime
+  DateTime _parseTimeToDateTime(String dateStr, String timeStr) {
+    final date = DateTime.parse(dateStr);
+    final timeParts = timeStr.split(':');
+
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      int.parse(timeParts[0]),
+      int.parse(timeParts[1]),
+    );
+  }
+
+  // Save the event to the database
+  Future<void> _saveEvent() async {
+    // Validate inputs
+    if (_titleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a title'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_dateController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a date'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_startTimeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a start time'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_endTimeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an end time'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      // Format the date string (yyyy-MM-dd)
+      final date = DateTime.parse(_dateController.text);
+      final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
+      // Format the time strings (HH:mm)
+      final startTime = DateTime.parse(_startTimeController.text);
+      final formattedStartTime = DateFormat('HH:mm').format(startTime);
+
+      final endTime = DateTime.parse(_endTimeController.text);
+      final formattedEndTime = DateFormat('HH:mm').format(endTime);
+
+      // Get database service instance from dependency injection
+      final dbService = getIt<DatabaseService>();
+
+      // Save the event
+      final result = await dbService.addEvent(
+        title: _titleController.text,
+        date: formattedDate,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime,
+      );
+
+      // Handle the result
+      result.fold(
+        (failure) {
+          // Show error message
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error: ${failure.message}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            setState(() {
+              _isSaving = false;
+            });
+          }
+        },
+        (event) {
+          // Show success message
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Event added successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.pop(context, true); // Return true to indicate success
+          }
+        },
+      );
+    } catch (e) {
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error adding event: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _dateController.dispose();
+    _startTimeController.dispose();
+    _endTimeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +278,7 @@ class AddSchedule extends StatelessWidget {
                       ).colorScheme.onSurface.withAlpha(230),
                       style: TextStyle(
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeights.regular,
                       ),
                       decoration: InputDecoration(
@@ -156,6 +330,10 @@ class AddSchedule extends StatelessWidget {
                         highlightColor: Colors.transparent,
                       ),
                       child: DateTimeFormField(
+                        initialValue:
+                            widget.date.isNotEmpty
+                                ? DateTime.parse(widget.date)
+                                : null,
                         onChanged: (newValue) {
                           if (newValue == null) {
                             _dateController.text = "";
@@ -238,7 +416,15 @@ class AddSchedule extends StatelessWidget {
                             return;
                           }
                           _startTimeController.text = value.toIso8601String();
+
+                          // Update end time to be 1 hour ahead when start time changes
+                          final endTime = value.add(const Duration(hours: 1));
+                          _endTimeController.text = endTime.toIso8601String();
                         },
+                        initialValue:
+                            _startTimeController.text.isNotEmpty
+                                ? DateTime.parse(_startTimeController.text)
+                                : null,
                         mode: DateTimeFieldPickerMode.time,
                         hideDefaultSuffixIcon: true,
                         decoration: InputDecoration(
@@ -304,12 +490,10 @@ class AddSchedule extends StatelessWidget {
                         highlightColor: Colors.transparent,
                       ),
                       child: DateTimeFormField(
-                        initialPickerDateTime:
-                            _startTimeController.text.isNotEmpty
-                                ? (_dateController.text.isEmpty
-                                    ? DateTime.now()
-                                    : DateTime.parse(_dateController.text))
-                                : DateTime.now(),
+                        initialValue:
+                            _endTimeController.text.isNotEmpty
+                                ? DateTime.parse(_endTimeController.text)
+                                : null,
                         onChanged: (newValue) {
                           if (newValue == null) {
                             _endTimeController.text = "";
@@ -319,12 +503,6 @@ class AddSchedule extends StatelessWidget {
                         },
                         mode: DateTimeFieldPickerMode.time,
                         hideDefaultSuffixIcon: true,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeights.regular,
-                        ),
-                        dateFormat: DateFormat("HH.mm - hh.mm a"),
                         decoration: InputDecoration(
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 24.0),
@@ -354,6 +532,12 @@ class AddSchedule extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeights.regular,
+                        ),
+                        dateFormat: DateFormat("HH.mm - hh.mm a"),
                       ),
                     ),
                   ],
@@ -361,22 +545,23 @@ class AddSchedule extends StatelessWidget {
               ],
             ),
             MaterialButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: _isSaving ? null : _saveEvent,
               height: 64.0,
               color: Theme.of(context).colorScheme.onSurface.withAlpha(230),
               minWidth: MediaQuery.of(context).size.width,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              child: Text(
-                'Add Schedule',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.surface,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child:
+                  _isSaving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                        'Add Schedule',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.surface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
             ),
           ],
         ),
