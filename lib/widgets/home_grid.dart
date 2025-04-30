@@ -4,7 +4,7 @@ import 'package:get/get_utils/get_utils.dart';
 
 class TwoColumnRandomGrid extends StatelessWidget {
   final Random random = Random();
-  final double minHeight = 100; // Minimum height for each block
+  final double minHeight = 80; // Minimum height for each block
 
   TwoColumnRandomGrid({super.key});
 

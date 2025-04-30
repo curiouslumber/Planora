@@ -8,6 +8,7 @@ environment:
   sdk: ^3.7.0
 
 dependencies:
+  bloc: ^9.0.0
   build_runner: ^2.4.15
   cupertino_icons: ^1.0.8
   date_field: ^6.0.3+1
@@ -22,6 +23,7 @@ dependencies:
   hive_generator: ^2.0.1
   intl: ^0.20.2
   ionicons: ^0.2.2
+  meta: ^1.16.0
   path_provider: ^2.1.5
   syncfusion_flutter_calendar: ^29.1.35
 
