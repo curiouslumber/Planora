@@ -1,5 +1,8 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/views/pages/calendar.dart';
 import 'package:planora/views/pages/home.dart';
+import 'package:planora/views/pages/login.dart';
 import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +24,30 @@ class _LayoutPageState extends State<LayoutPage> {
   // Flag to control whether the custom (direct) animation overlay is active.
   bool _isCustomTransitionActive = false;
 
-  static const List<Widget> _pages = [Home(), Calendar(), Tools(), Profile()];
+  static final List<Widget> _pages = [
+    Home(),
+    Calendar(),
+    Tools(),
+    BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthError) {
+          final msg = state.message;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(msg)));
+        }
+      },
+      builder: (context, state) {
+        if (state is AuthLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is Authenticated) {
+          return Profile(user: state.user);
+        } else {
+          return Login();
+        }
+      },
+    ),
+  ];
 
   // Called when a bottom nav item is tapped.
   void _onBottomNavTap(int index) {

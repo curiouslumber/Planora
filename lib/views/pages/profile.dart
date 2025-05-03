@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/utilities/font_weights.dart';
 
 class Profile extends StatelessWidget {
-  const Profile({super.key});
+  final User user;
+  const Profile({super.key, required this.user});
 
   static const List<String> options = ['Account', 'Settings', 'Help'];
 
@@ -119,7 +123,7 @@ class Profile extends StatelessWidget {
                             Column(
                               children: [
                                 Text(
-                                  'Noel Pinto',
+                                  user.displayName ?? 'User Name',
                                   style: TextStyle(
                                     fontSize: 24.0,
                                     fontWeight: FontWeights.semiBold,
@@ -143,7 +147,7 @@ class Profile extends StatelessWidget {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: '\u00A0Mumbai, India',
+                                        text: '\u00A0${user.email}',
                                         style: TextStyle(
                                           fontSize: 12.0,
                                           color:
@@ -267,6 +271,10 @@ class Profile extends StatelessWidget {
                     itemBuilder: (context, index) {
                       if (index == 3) {
                         return ListTile(
+                          onTap:
+                              () => context.read<AuthBloc>().add(
+                                GoogleSignOutRequested(),
+                              ),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 32.0,
                           ),
