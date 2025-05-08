@@ -27,6 +27,7 @@ dependencies:
   ionicons: ^0.2.2
   meta: ^1.16.0
   path_provider: ^2.1.5
+  shared_preferences: ^2.5.3
   syncfusion_flutter_calendar: ^29.1.35
 
 dev_dependencies:

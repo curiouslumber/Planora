@@ -32,7 +32,7 @@ class _LoginState extends State<Login> {
         if (state is Authenticated) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LayoutPage()),
+            MaterialPageRoute(builder: (context) => HomeScreen()),
           );
         } else if (state is AuthLoading) {
           showDialog(

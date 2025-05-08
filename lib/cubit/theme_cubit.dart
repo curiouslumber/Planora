@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:planora/databases/shared_preferences_helper.dart';
 import 'package:planora/utilities/app_theme.dart';
 
 part 'theme_state.dart';
@@ -10,32 +11,22 @@ class ThemeCubit extends Cubit<ThemeState> {
   }
 
   void _initTheme() async {
-    final isDarkMode = await _isDarkMode();
-    if (isDarkMode) {
-      emit(ThemeState.darkTheme());
-    } else {
-      emit(ThemeState.lightTheme());
-    }
+    // Check if the user has a saved theme in SharedPreferences
+    final savedTheme = await SharedPreferencesHelper.getTheme();
+    emit(
+      savedTheme == AppTheme.lightTheme
+          ? ThemeState.lightTheme()
+          : ThemeState.darkTheme(),
+    );
   }
 
-  Future<bool> _isDarkMode() async {
-    final platformBrightness =
-        WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    return platformBrightness == Brightness.dark;
-  }
-
-  void changeToLightTheme() {
-    emit(ThemeState.lightTheme());
-  }
-
-  void changeToDarkTheme() {
-    emit(ThemeState.darkTheme());
-  }
-
-  void toggleTheme() {
+  // Method to toggle between light and dark themes
+  void toggleTheme() async {
     if (state.theme == AppTheme.lightTheme) {
+      await SharedPreferencesHelper.saveTheme(AppTheme.darkTheme);
       emit(ThemeState.darkTheme());
     } else {
+      await SharedPreferencesHelper.saveTheme(AppTheme.lightTheme);
       emit(ThemeState.lightTheme());
     }
   }

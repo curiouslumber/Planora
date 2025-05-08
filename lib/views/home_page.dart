@@ -9,14 +9,14 @@ import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
-class LayoutPage extends StatefulWidget {
-  const LayoutPage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<LayoutPage> createState() => _LayoutPageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _LayoutPageState extends State<LayoutPage> {
+class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   int _previousIndex = 0;
   final PageController _pageController = PageController();
