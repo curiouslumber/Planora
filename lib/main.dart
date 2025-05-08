@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/utilities/app_theme.dart';
 import 'package:planora/views/home_page.dart';
@@ -18,12 +20,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      title: 'Planora',
-      debugShowCheckedModeBanner: false,
-      home: LayoutPage(),
+    return BlocProvider<ThemeCubit>(
+      create: (context) => ThemeCubit(),
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            theme: state.theme,
+            title: 'Planora',
+            debugShowCheckedModeBanner: false,
+            home: LayoutPage(),
+          );
+        },
+      ),
     );
   }
 }
