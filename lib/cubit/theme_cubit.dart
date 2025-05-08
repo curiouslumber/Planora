@@ -6,7 +6,8 @@ import 'package:planora/utilities/app_theme.dart';
 part 'theme_state.dart';
 
 class ThemeCubit extends Cubit<ThemeState> {
-  ThemeCubit() : super(ThemeState.systemTheme()) {
+  ThemeCubit({ThemeData? initialTheme})
+    : super(ThemeState.systemTheme(initialTheme)) {
     _initTheme();
   }
 

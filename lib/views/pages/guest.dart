@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/repository/auth_repository.dart';
+import 'package:planora/utilities/app_theme.dart';
 import 'package:planora/utilities/font_weights.dart';
 import 'package:planora/views/pages/help.dart';
 import 'package:planora/views/pages/login.dart';
@@ -62,9 +63,10 @@ class Guest extends StatelessWidget {
                     child: IconButton(
                       onPressed: () => context.read<ThemeCubit>().toggleTheme(),
                       icon: Icon(
-                        // !context.isDarkMode?_outlined
-                        // :
-                        Icons.dark_mode_outlined,
+                        context.read<ThemeCubit>().state.theme ==
+                                AppTheme.lightTheme
+                            ? Icons.light_mode_outlined
+                            : Icons.dark_mode_outlined,
                       ),
                     ),
                   ),

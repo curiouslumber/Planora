@@ -1,14 +1,11 @@
 part of 'theme_cubit.dart';
 
 class ThemeState {
-  final ThemeData theme;
+  final ThemeData? theme;
 
-  ThemeState.systemTheme()
-    : theme =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-                  Brightness.dark
-              ? AppTheme.darkTheme
-              : AppTheme.lightTheme;
+  ThemeState(this.theme);
+
+  ThemeState.systemTheme(initialTheme) : theme = initialTheme;
 
   ThemeState.lightTheme() : theme = AppTheme.lightTheme;
 

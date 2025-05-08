@@ -78,9 +78,9 @@ class Home extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
-                    // ignore: deprecated_member_use
                     color: Theme.of(
                       context,
+                      // ignore: deprecated_member_use
                     ).colorScheme.primary.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(25),
                   ),

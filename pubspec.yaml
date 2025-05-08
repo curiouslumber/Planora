@@ -39,16 +39,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icons/notification.svg
-    - assets/icons/home-2.svg
-    - assets/icons/home-2-selected.svg
-    - assets/icons/calendar.svg
-    - assets/icons/calendar-selected.svg
-    - assets/icons/chart-2.svg
-    - assets/icons/profile.svg
-    - assets/shapes/profile_card.svg
-    - assets/icons/calendar_add_schedule.svg
+    - assets/icons/
     - assets/fonts/Poppins/
+    - assets/images/
 
   fonts:
     - family: Poppins

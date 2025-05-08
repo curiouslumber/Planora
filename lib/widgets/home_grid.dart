@@ -182,6 +182,7 @@ class TwoColumnRandomGrid extends StatelessWidget {
                       // ignore: deprecated_member_use
                       color: Theme.of(
                         context,
+                        // ignore: deprecated_member_use
                       ).colorScheme.onSurface.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(25),
                     ),

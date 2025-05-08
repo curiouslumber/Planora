@@ -59,9 +59,9 @@ class _CalendarState extends State<Calendar> {
               bottom: 8.0,
             ),
             child: AppBar(
-              // ignore: deprecated_member_use
               backgroundColor: Theme.of(
                 context,
+                // ignore: deprecated_member_use
               ).colorScheme.primary.withOpacity(0.9),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(33.0)),
