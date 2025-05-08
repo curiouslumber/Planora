@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:planora/repository/auth_repository.dart';
 
@@ -15,6 +16,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
     on<GoogleSignOutRequested>(_onGoogleSignOutRequested);
     on<GoogleSignInCheckRequested>(_onGoogleSignInCheckRequested);
+    on<EmailSignInRequested>(_onEmailSignInRequested);
+    on<EmailSignUpRequested>(_onEmailSignUpRequested);
+    on<EmailSignOutRequested>(_onEmailSignOutRequested);
 
     // Optionally, check if already signed in at startup
     add(GoogleSignInCheckRequested());
@@ -61,6 +65,62 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(Authenticated(user));
     } else {
       emit(Unauthenticated());
+    }
+  }
+
+  // Event handlers
+  Future<void> _onEmailSignInRequested(
+    EmailSignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final user = await _authRepository.signInWithEmail(
+        event.email,
+        event.password,
+      );
+      if (user != null) {
+        emit(Authenticated(user));
+      } else {
+        emit(Unauthenticated());
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  // Event handlers
+  Future<void> _onEmailSignUpRequested(
+    EmailSignUpRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final user = await _authRepository.createUserWithEmailAndPassword(
+        event.email,
+        event.password,
+      );
+      if (user != null) {
+        emit(Authenticated(user));
+      } else {
+        emit(Unauthenticated());
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  // Event handlers
+  Future<void> _onEmailSignOutRequested(
+    EmailSignOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await _authRepository.signOut();
+      emit(Unauthenticated());
+    } catch (e) {
+      emit(AuthError(e.toString()));
     }
   }
 }

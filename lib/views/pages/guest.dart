@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:planora/bloc/auth_bloc.dart';
+import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/utilities/font_weights.dart';
 import 'package:planora/views/pages/login.dart';
 import 'package:planora/views/pages/register.dart';
@@ -15,9 +18,21 @@ class Guest extends StatelessWidget {
     Icons.help_outline_outlined,
   ];
 
-  static const List<Widget> pages = [
-    Register(),
-    Login(),
+  static List<Widget> pages = [
+    RepositoryProvider(
+      create: (context) => AuthRepository(),
+      child: BlocProvider(
+        create: (context) => AuthBloc(context.read<AuthRepository>()),
+        child: Register(),
+      ),
+    ),
+    RepositoryProvider(
+      create: (context) => AuthRepository(),
+      child: BlocProvider(
+        create: (context) => AuthBloc(context.read<AuthRepository>()),
+        child: Login(),
+      ),
+    ),
     // Help(),
   ];
 

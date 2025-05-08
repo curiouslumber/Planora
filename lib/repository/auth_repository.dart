@@ -38,7 +38,7 @@ class AuthRepository {
     }
   }
 
-  // Signs out from both Firebase and Google
+  //Universal Sign-Out method
   Future<void> signOut() async {
     try {
       await _firebaseAuth.signOut();
@@ -52,4 +52,39 @@ class AuthRepository {
 
   // Returns the currently signed-in [User] or null if not signed-in
   User? get currentUser => _firebaseAuth.currentUser;
+
+  // Create a new user with email and password
+  Future<User?> createUserWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final userCred = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCred.user;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during Email Sign-Up: $e');
+      }
+      return null;
+    }
+  }
+
+  // Sign In with Email and Password
+  Future<User?> signInWithEmail(String email, String password) async {
+    try {
+      final userCred = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCred.user;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during Email Sign-In: $e');
+      }
+      return null;
+    }
+  }
 }
