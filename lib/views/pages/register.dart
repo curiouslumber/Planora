@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/utilities/font_weights.dart';
 import 'package:planora/views/pages/login.dart';
 
@@ -331,7 +333,10 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed:
+                              () => context.read<AuthBloc>().add(
+                                GoogleSignInRequested(),
+                              ),
                           icon: Icon(Ionicons.logo_google),
                           style: IconButton.styleFrom(
                             backgroundColor:
