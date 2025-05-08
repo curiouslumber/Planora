@@ -13,8 +13,13 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   @override
   Widget build(BuildContext context) {
     return SfCalendar(
+      headerStyle: CalendarHeaderStyle(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+      ),
+      cellEndPadding: 8.0,
       view: CalendarView.day,
-      initialDisplayDate: DateTime.now(),
+      initialDisplayDate: DateTime.now().subtract(Duration(minutes: 15)),
+      selectionDecoration: BoxDecoration(color: Colors.transparent),
       showNavigationArrow: true,
       showDatePickerButton: true,
       initialSelectedDate: DateTime.now(),
@@ -25,13 +30,13 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
       headerDateFormat: "EEE, d MMM yyyy",
       cellBorderColor: Theme.of(context).colorScheme.primary.withAlpha(100),
       dataSource: EventsDataSource(<Event>[
-        Event(
-          'Meeting',
-          DateTime.now(),
-          DateTime.now().add(Duration(minutes: 60)),
-          Theme.of(context).colorScheme.secondary,
-          false,
-        ),
+        // Event(
+        //   'Meeting',
+        //   DateTime.now(),
+        //   DateTime.now().add(Duration(minutes: 60)),
+        //   Theme.of(context).colorScheme.secondary,
+        //   false,
+        // ),
       ]),
     );
   }

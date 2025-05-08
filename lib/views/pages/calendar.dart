@@ -258,15 +258,7 @@ class _CalendarState extends State<Calendar> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: CalendarViewWidget(),
-              ),
-            ),
-          ],
+          children: [Expanded(flex: 1, child: CalendarViewWidget())],
         ),
       ),
     );
