@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/views/pages/help.dart';
 import 'package:planora/views/pages/login.dart';
 import 'package:planora/views/pages/register.dart';
 
@@ -33,7 +34,7 @@ class Guest extends StatelessWidget {
         child: Login(),
       ),
     ),
-    // Help(),
+    Help(),
   ];
 
   @override
