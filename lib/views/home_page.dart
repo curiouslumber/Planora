@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/views/pages/calendar.dart';
 import 'package:planora/views/pages/home.dart';
-import 'package:planora/views/pages/login.dart';
+import 'package:planora/views/pages/guest.dart';
 import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +42,7 @@ class _LayoutPageState extends State<LayoutPage> {
         } else if (state is Authenticated) {
           return Profile(user: state.user);
         } else {
-          return Login();
+          return Guest();
         }
       },
     ),
