@@ -19,7 +19,6 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_svg: ^2.0.17
-  get: ^4.7.2
   google_sign_in: ^6.3.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/utilities/font_weights.dart';
 
@@ -42,14 +41,14 @@ class Profile extends StatelessWidget {
                     child: IconButton(
                       onPressed:
                           () => {
-                            Get.changeThemeMode(
-                              Get.isDarkMode ? ThemeMode.light : ThemeMode.dark,
-                            ),
+                            // Theme.of(context).brightness == Brightness.dark
+                            //     ? context.read<ThemeCubit>().setLightMode()
+                            //     : context.read<ThemeCubit>().setDarkMode(),
                           },
                       icon: Icon(
-                        !context.isDarkMode
-                            ? Icons.light_mode_outlined
-                            : Icons.dark_mode_outlined,
+                        // !context.isDarkMode?_outlined
+                        // :
+                        Icons.dark_mode_outlined,
                       ),
                     ),
                   ),
@@ -62,7 +61,7 @@ class Profile extends StatelessWidget {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: context.theme.colorScheme.onSurface
+                            color: Theme.of(context).colorScheme.onSurface
                             // ignore: deprecated_member_use
                             .withOpacity(0.05),
                             blurRadius: 20,
@@ -74,10 +73,10 @@ class Profile extends StatelessWidget {
                       child: SvgPicture.asset(
                         'assets/shapes/profile_card.svg',
                         // ignore: deprecated_member_use
-                        color: context.theme.colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         fit: BoxFit.cover,
                         clipBehavior: Clip.antiAlias,
-                        width: context.width * 0.85,
+                        width: MediaQuery.of(context).size.width * 0.85,
                       ),
                     ),
                     Positioned(
@@ -86,7 +85,7 @@ class Profile extends StatelessWidget {
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: context.theme.colorScheme.onSurface
+                              color: Theme.of(context).colorScheme.onSurface
                               // ignore: deprecated_member_use
                               .withOpacity(0.025),
                               blurRadius: 20,
@@ -98,10 +97,11 @@ class Profile extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 38,
                           backgroundColor:
-                              context.theme.colorScheme.surfaceContainer,
+                              Theme.of(context).colorScheme.surfaceContainer,
                           child: Icon(
                             Icons.person,
-                            color: context.theme.colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -109,8 +109,8 @@ class Profile extends StatelessWidget {
                     Positioned(
                       bottom: 0,
                       child: Container(
-                        width: context.width * 0.8,
-                        height: context.height * 0.2,
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: MediaQuery.of(context).size.height * 0.2,
                         alignment: Alignment.center,
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         decoration: BoxDecoration(
@@ -127,7 +127,8 @@ class Profile extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 24.0,
                                     fontWeight: FontWeights.semiBold,
-                                    color: context.theme.colorScheme.onPrimary,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
                                   ),
                                 ),
                                 RichText(
@@ -140,10 +141,9 @@ class Profile extends StatelessWidget {
                                           Icons.location_on_outlined,
                                           size: 12.0,
                                           color:
-                                              context
-                                                  .theme
-                                                  .colorScheme
-                                                  .onPrimary,
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary,
                                         ),
                                       ),
                                       TextSpan(
@@ -151,13 +151,11 @@ class Profile extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 12.0,
                                           color:
-                                              context
-                                                  .theme
-                                                  .colorScheme
-                                                  .onPrimary,
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary,
                                           fontFamily:
-                                              context
-                                                  .theme
+                                              Theme.of(context)
                                                   .textTheme
                                                   .bodyMedium!
                                                   .fontFamily,
@@ -183,7 +181,9 @@ class Profile extends StatelessWidget {
                                         fontSize: 18.0,
                                         fontWeight: FontWeight.bold,
                                         color:
-                                            context.theme.colorScheme.onPrimary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                       ),
                                     ),
                                     Text(
@@ -191,13 +191,15 @@ class Profile extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 12.0,
                                         color:
-                                            context.theme.colorScheme.onPrimary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                       ),
                                     ),
                                   ],
                                 ),
                                 Container(
-                                  color: context.theme.colorScheme.onPrimary
+                                  color: Theme.of(context).colorScheme.onPrimary
                                   // ignore: deprecated_member_use
                                   .withOpacity(0.5),
                                   width: 1.0,
@@ -213,7 +215,9 @@ class Profile extends StatelessWidget {
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.bold,
                                         color:
-                                            context.theme.colorScheme.onPrimary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                       ),
                                     ),
                                     Text(
@@ -221,13 +225,15 @@ class Profile extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 12.0,
                                         color:
-                                            context.theme.colorScheme.onPrimary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                       ),
                                     ),
                                   ],
                                 ),
                                 Container(
-                                  color: context.theme.colorScheme.onPrimary
+                                  color: Theme.of(context).colorScheme.onPrimary
                                   // ignore: deprecated_member_use
                                   .withOpacity(0.5),
                                   width: 1.0,
@@ -243,7 +249,9 @@ class Profile extends StatelessWidget {
                                         fontSize: 16.0,
                                         fontWeight: FontWeight.bold,
                                         color:
-                                            context.theme.colorScheme.onPrimary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                       ),
                                     ),
                                     Text(
@@ -251,7 +259,9 @@ class Profile extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 12.0,
                                         color:
-                                            context.theme.colorScheme.onPrimary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                       ),
                                     ),
                                   ],
@@ -278,10 +288,13 @@ class Profile extends StatelessWidget {
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 32.0,
                           ),
-                          tileColor: context.theme.colorScheme.onSurfaceVariant
+                          tileColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant
                           // ignore: deprecated_member_use
                           .withOpacity(0.9),
-                          minTileHeight: context.height * 0.08,
+                          minTileHeight:
+                              MediaQuery.of(context).size.height * 0.08,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.0),
                           ),
@@ -290,20 +303,25 @@ class Profile extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeights.medium,
                               fontSize: 16.0,
-                              color: context.theme.colorScheme.surfaceContainer,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainer,
                             ),
                           ),
                           trailing: Icon(
                             Icons.logout,
-                            color: context.theme.colorScheme.surfaceContainer,
+                            color:
+                                Theme.of(context).colorScheme.surfaceContainer,
                           ),
                         );
                       }
 
                       return ListTile(
                         contentPadding: EdgeInsets.symmetric(horizontal: 32.0),
-                        tileColor: context.theme.colorScheme.primary,
-                        minTileHeight: context.height * 0.08,
+                        tileColor: Theme.of(context).colorScheme.primary,
+                        minTileHeight:
+                            MediaQuery.of(context).size.height * 0.08,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
@@ -312,12 +330,12 @@ class Profile extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.medium,
-                            color: context.theme.colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         trailing: Icon(
                           icons[index],
-                          color: context.theme.colorScheme.onPrimary,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       );
                     },

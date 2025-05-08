@@ -2,7 +2,6 @@ import 'package:ionicons/ionicons.dart';
 import 'package:planora/utilities/font_weights.dart';
 import 'package:planora/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -25,13 +24,13 @@ class Home extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: context.theme.colorScheme.onSurface,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
               Icon(
                 Ionicons.notifications_outline,
-                color: context.theme.colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ],
           ),
@@ -45,7 +44,7 @@ class Home extends StatelessWidget {
               Text(
                 'Good Morning,',
                 style: TextStyle(
-                  color: context.theme.colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeights.regular,
                 ),
@@ -54,16 +53,17 @@ class Home extends StatelessWidget {
               Text(
                 'Noel Pinto!',
                 style: TextStyle(
-                  fontFamily: context.theme.textTheme.headlineLarge!.fontFamily,
+                  fontFamily:
+                      Theme.of(context).textTheme.headlineLarge!.fontFamily,
                   fontWeight: FontWeights.semiBold,
-                  color: context.theme.colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                 ),
               ),
             ],
           ),
         ],
-        backgroundColor: context.theme.colorScheme.surface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -75,11 +75,13 @@ class Home extends StatelessWidget {
               Expanded(
                 child: Container(
                   margin: EdgeInsets.only(bottom: 4),
-                  height: context.height * 0.22,
+                  height: MediaQuery.of(context).size.height * 0.22,
                   padding: EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
                     // ignore: deprecated_member_use
-                    color: context.theme.colorScheme.primary.withOpacity(0.9),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   alignment: Alignment.center,
@@ -91,7 +93,7 @@ class Home extends StatelessWidget {
                         child: Text(
                           'Excellent! Your today’s plan is almost done',
                           style: TextStyle(
-                            color: context.theme.colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 18,
                             fontWeight: FontWeights.medium,
                           ),
@@ -111,18 +113,18 @@ class Home extends StatelessWidget {
                                 strokeWidth: 6,
                                 strokeAlign: 8,
                                 value: 0.8,
-                                color: context.theme.colorScheme.onPrimary,
-                                backgroundColor: context
-                                    .theme
-                                    .colorScheme
-                                    .surface
-                                    // ignore: deprecated_member_use
-                                    .withOpacity(0.4),
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.surface
+                                // ignore: deprecated_member_use
+                                .withOpacity(0.4),
                               ),
                               Text(
                                 '82%',
                                 style: TextStyle(
-                                  color: context.theme.colorScheme.onPrimary,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   fontSize: 18,
                                   fontWeight: FontWeights.semiBold,
                                 ),
@@ -145,7 +147,7 @@ class Home extends StatelessWidget {
                     Text(
                       'Today\'s Schedule',
                       style: TextStyle(
-                        color: context.theme.colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeights.semiBold,
                       ),

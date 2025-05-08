@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_utils/get_utils.dart';
 
 class Tools extends StatelessWidget {
   const Tools({super.key});
@@ -40,8 +39,8 @@ class Tools extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       index == 4
-                          ? context.theme.colorScheme.surfaceContainer
-                          : context.theme.colorScheme.primary,
+                          ? Theme.of(context).colorScheme.surfaceContainer
+                          : Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(32.0),
                 ),
                 child: Center(
@@ -54,13 +53,14 @@ class Tools extends StatelessWidget {
                             children: [
                               Icon(
                                 toolsIcons[index],
-                                color: context.theme.colorScheme.onPrimary,
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 size: 40.0,
                               ),
                               Text(
                                 toolsText[index],
                                 style: TextStyle(
-                                  color: context.theme.colorScheme.onPrimary,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -76,10 +76,9 @@ class Tools extends StatelessWidget {
                                 'Add',
                                 style: TextStyle(
                                   color:
-                                      context
-                                          .theme
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -87,7 +86,9 @@ class Tools extends StatelessWidget {
                               Icon(
                                 Icons.add,
                                 color:
-                                    context.theme.colorScheme.onSurfaceVariant,
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                 size: 20.0,
                                 weight: 2.0,
                               ),
