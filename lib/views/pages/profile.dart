@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
+import 'package:planora/utils/app_theme.dart';
 import 'package:planora/utils/font_weights.dart';
 
 class Profile extends StatelessWidget {
@@ -42,9 +43,10 @@ class Profile extends StatelessWidget {
                     child: IconButton(
                       onPressed: () => context.read<ThemeCubit>().toggleTheme(),
                       icon: Icon(
-                        // !context.isDarkMode?_outlined
-                        // :
-                        Icons.dark_mode_outlined,
+                        context.read<ThemeCubit>().state.theme ==
+                                AppTheme.lightTheme
+                            ? Icons.light_mode_outlined
+                            : Icons.dark_mode_outlined,
                       ),
                     ),
                   ),

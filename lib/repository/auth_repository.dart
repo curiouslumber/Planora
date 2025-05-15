@@ -1,13 +1,27 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:planora/apis/models/auth/login_request.dart';
+import 'package:planora/apis/models/auth/login_response.dart';
+import 'package:planora/apis/services/auth_service.dart';
+import 'package:planora/services/firebase/firebase_auth_service.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  final FirebaseAuthService _firebaseAuthService;
+  final AuthService _authService;
 
-  AuthRepository({FirebaseAuth? firebaseAuth, GoogleSignIn? googleSignIn})
+  AuthRepository({
+    FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+    FirebaseAuthService? firebaseAuthService,
+    AuthService? authService,
+  })
     : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _firebaseAuthService =
+           firebaseAuthService ?? FirebaseAuthService.instance,
+       _authService = firebaseAuthService ?? AuthService.instance,
       _googleSignIn = googleSignIn ?? GoogleSignIn();
 
   // Triggers Google Sign-In flow and returns the signed-in [User].
@@ -75,11 +89,21 @@ class AuthRepository {
   // Sign In with Email and Password
   Future<User?> signInWithEmail(String email, String password) async {
     try {
-      final userCred = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+      LoginRequest loginObj = LoginRequest(email: email, password: password);
+      // Login Api Call
+      LoginResponse? apiRes = await _authService.login(loginObj);
+      if (!apiRes.status) {
+        return null;
+      }
+
+      // If success then Firebase Login
+      final userCred = await _firebaseAuthService.signInFirebaseWithEmail(
+        loginObj.email,
+        loginObj.password
       );
-      return userCred.user;
+  
+      // Return user credential on succesful login
+      return userCred;
     } catch (e) {
       if (kDebugMode) {
         print('Error during Email Sign-In: $e');

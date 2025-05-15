@@ -5,6 +5,8 @@ import 'package:planora/apis/models/auth/login_response.dart';
 import 'package:planora/constants/api_endpoints.dart';
 
 class AuthService {
+  static var instance;
+
   Future<LoginResponse> login(LoginRequest request) async {
     try {
       final response = await ApiClient.dio.post(
