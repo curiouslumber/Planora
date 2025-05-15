@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/utils/font_weights.dart';
 
 class Profile extends StatelessWidget {
   final User user;

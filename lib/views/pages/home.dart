@@ -1,5 +1,7 @@
 import 'package:ionicons/ionicons.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/apis/models/auth/login_request.dart';
+import 'package:planora/apis/services/auth_service.dart';
+import 'package:planora/utils/font_weights.dart';
 import 'package:planora/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
 
@@ -15,24 +17,34 @@ class Home extends StatelessWidget {
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 24),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.onSurface,
+          child: GestureDetector(
+            onTap: () async {
+              AuthService authService = AuthService();
+              LoginRequest login = LoginRequest(
+                email: "np47@gmail.com",
+                password: "123456",
+              );
+              await authService.login(login);
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 ),
-              ),
-              Icon(
-                Ionicons.notifications_outline,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ],
+                Icon(
+                  Ionicons.notifications_outline,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ],
+            ),
           ),
         ),
         actions: [

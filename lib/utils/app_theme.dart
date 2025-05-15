@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/utils/font_weights.dart';
 
 class AppTheme {
   static const String fontFamily = 'Poppins';

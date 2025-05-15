@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/bloc/auth_bloc.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/home_page.dart';
 import 'package:planora/views/pages/register.dart';
 

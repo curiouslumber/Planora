@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planora/utilities/app_theme.dart';
+import 'package:planora/utils/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {

@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
-import 'package:planora/utilities/app_theme.dart';
+import 'package:planora/utils/app_theme.dart';
 
 part 'theme_state.dart';
 

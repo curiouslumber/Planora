@@ -3,7 +3,7 @@ import 'package:date_field/date_field.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:planora/utilities/font_weights.dart';
+import 'package:planora/utils/font_weights.dart';
 
 class AddSchedule extends StatelessWidget {
   const AddSchedule({super.key, required String date});

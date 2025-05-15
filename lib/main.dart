@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
@@ -9,6 +10,7 @@ import 'package:planora/views/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   await Firebase.initializeApp();
   await Hive.initFlutter();
   final initialTheme = await SharedPreferencesHelper.getTheme();
