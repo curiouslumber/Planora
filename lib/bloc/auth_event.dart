@@ -17,10 +17,12 @@ class GoogleSignInCheckRequested extends AuthEvent {}
 
 // User tapped "Create Account with Email and Password"
 class EmailSignUpRequested extends AuthEvent {
+  final String name;
   final String email;
   final String password;
+  final String loginType;
 
-  EmailSignUpRequested(this.email, this.password);
+  EmailSignUpRequested(this.name, this.email, this.password, this.loginType);
 
   @override
   List<Object?> get props => [email, password];

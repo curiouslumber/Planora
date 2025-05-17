@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:planora/apis/models/auth/login_request.dart';
 import 'package:planora/apis/models/auth/login_response.dart';
+import 'package:planora/apis/models/auth/register_request.dart';
+import 'package:planora/apis/models/auth/register_response.dart';
 import 'package:planora/apis/services/auth_service.dart';
 import 'package:planora/services/firebase/firebase_auth_service.dart';
 
@@ -39,8 +41,8 @@ class AuthRepository {
 
       // If success then Firebase Login
       final userCred = await _firebaseAuthService.signInFirebaseWithEmail(
-        loginObj.email,
-        loginObj.password
+        email,
+        password
       );
   
       // Return user credential on succesful login
@@ -53,9 +55,42 @@ class AuthRepository {
     }
   }
 
-  Future<User?> createUserWithEmailAndPassword(String email, String password) {
-    // Register API Call here
-    return _firebaseAuthService.createUserWithEmailAndPassword(email, password);
+  Future<User?> createUserWithEmailAndPassword(
+    String name,
+    String email,
+    String password,
+    String loginType,
+  ) async {
+    RegisterRequest registerObj = RegisterRequest(
+      name: name,
+      email: email,
+      password: password,
+      loginType: loginType,
+    );
+
+    // Register API Call
+    RegisterResponse? apiRes = await _authService.register(registerObj);
+    if (!apiRes.status) {
+      return null;
+    }
+
+    // If success, then create user in firebase
+    final userCred = await _firebaseAuthService.createUserWithEmailAndPassword(
+      email,
+      password,
+    );
+    if (userCred == null) {
+      return null;
+    }
+
+    // After success hit the login flow to login the user
+    final loginCred = await signInWithEmail(email, password);
+    if (loginCred == null) {
+      return null;
+    }
+
+    // Return user credential for login
+    return loginCred;
   }
 
   Future<void> signOut() {

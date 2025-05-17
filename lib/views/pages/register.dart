@@ -298,8 +298,10 @@ class _RegisterState extends State<Register> {
                         onPressed:
                             () => context.read<AuthBloc>().add(
                               EmailSignUpRequested(
+                                _nameController.text,
                                 _emailController.text,
                                 _passwordController.text,
+                                "EMAIL_PASSWORD"
                               ),
                             ),
                         style: ElevatedButton.styleFrom(

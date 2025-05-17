@@ -97,8 +97,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final user = await _authRepository.createUserWithEmailAndPassword(
+        event.name,
         event.email,
         event.password,
+        event.loginType
       );
       if (user != null) {
         emit(Authenticated(user));
