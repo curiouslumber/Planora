@@ -1,12 +1,12 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:planora/apis/models/auth/login_request.dart';
-import 'package:planora/apis/services/auth_service.dart';
 import 'package:planora/utils/font_weights.dart';
-import 'package:planora/widgets/home_grid.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
+
+  static const cardRadius = 10.0;
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +18,7 @@ class Home extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.only(left: 24),
           child: GestureDetector(
-            onTap: () async {
-              AuthService authService = AuthService();
-              LoginRequest login = LoginRequest(
-                email: "np47@gmail.com",
-                password: "123456",
-              );
-              await authService.login(login);
-            },
+            onTap: () {},
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -164,7 +157,75 @@ class Home extends StatelessWidget {
                         fontWeight: FontWeights.semiBold,
                       ),
                     ),
-                    Expanded(flex: 1, child: TwoColumnRandomGrid()),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 100.0,
+                      child: DottedBorder(
+                        options: RoundedRectDottedBorderOptions(
+                          radius: Radius.circular(8.0),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withAlpha(180),
+                          padding: EdgeInsets.all(16.0),
+                          stackFit: StackFit.expand,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 8.0,
+                          children: [
+                            Icon(
+                              Icons.add,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withAlpha(180),
+                            ),
+                            Text(
+                              "Create Event or Schedule a Meeting",
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withAlpha(180),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Expanded(flex: 1, child: TwoColumnRandomGrid()),
+                    Text(
+                      'Recent Activity',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeights.semiBold,
+                      ),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60.0,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'None to show here...',
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withAlpha(180),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Made with ❤️\nby Noel Pinto',
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withAlpha(180),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
