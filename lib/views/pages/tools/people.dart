@@ -22,7 +22,7 @@ class People extends StatelessWidget {
       appBar: AppBar(title: Text("People")),
       body: Center(
         child: ListView.separated(
-          padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 16.0),
+          padding: EdgeInsets.only(left: 12.0, right: 12.0, top: 16.0),
           separatorBuilder:
               (context, index) => Divider(color: Colors.transparent),
           itemCount: 3,

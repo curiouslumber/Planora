@@ -42,10 +42,13 @@ class Tools extends StatelessWidget {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap:
-                    () => Navigator.push(
+                    () =>
+                        index != 4
+                            ? Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => toolPages[index]),
-                    ),
+                            )
+                            : null,
                 child: Container(
                   decoration: BoxDecoration(
                     color:
