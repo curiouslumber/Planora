@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:planora/widgets/expanded_notes_overlay.dart';
+import 'package:planora/models/notes_model.dart';
+import 'package:planora/databases/hive_events.dart';
 
 class Notes extends StatefulWidget {
   const Notes({super.key});
@@ -11,6 +14,8 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
   int? expandedIndex;
   late AnimationController _controller;
   late Animation<double> _animation;
+  List<NotesModel> notes = [];
+  final Map<int, TextEditingController> _controllers = {};
 
   @override
   void initState() {
@@ -21,6 +26,32 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 350),
     );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _loadNotes();
+  }
+
+  Future<void> _loadNotes() async {
+    final loadedNotes = await HiveEvents.getNotesFromHive();
+    setState(() {
+      notes = loadedNotes;
+      for (int i = 0; i < notes.length; i++) {
+        _controllers[i] = TextEditingController(text: notes[i].content);
+      }
+    });
+  }
+
+  Future<void> _saveNote(int index) async {
+    final note = notes[index];
+    final updated = NotesModel(
+      id: note.id,
+      title: note.title,
+      content: _controllers[index]?.text ?? '',
+      createdAt: note.createdAt,
+      updatedAt: DateTime.now(),
+      color: note.color,
+    );
+    notes[index] = updated;
+    await HiveEvents.addNotesToHive(updated);
+    setState(() {});
   }
 
   // Handle expanding a note tile
@@ -69,7 +100,7 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
               Center(
                 child: GridView.builder(
                   key: gridKey,
-                  itemCount: 4,
+                  itemCount: notes.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
                     mainAxisSpacing: spacing,
@@ -89,7 +120,16 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             alignment: Alignment.center,
-                            child: Text(index.toString()),
+                            child: Text(
+                              notes[index].title.isNotEmpty
+                                  ? notes[index].title
+                                  : 'Note ${index + 1}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ),
@@ -99,128 +139,21 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
               ),
               // Overlay for expanded note
               if (expandedIndex != null)
-                AnimatedBuilder(
+                ExpandedNoteOverlay(
                   animation: _animation,
-                  builder: (context, child) {
-                    // Calculate row and col for expandedIndex
-                    final row = expandedIndex! ~/ crossAxisCount;
-                    final col = expandedIndex! % crossAxisCount;
-                    final startTop = padding + row * (tileHeight + spacing);
-                    final startLeft = padding + col * (tileWidth + spacing);
-                    final startRight =
-                        constraints.maxWidth - startLeft - tileWidth;
-                    final startBottom =
-                        constraints.maxHeight - startTop - tileHeight;
-                    // End positions
-                    final endTop = 24.0;
-                    final endLeft = 24.0;
-                    final endRight = 24.0;
-                    final endBottom = 24.0 + kBottomNavigationBarHeight;
-                    // Interpolate
-                    final top =
-                        startTop + (endTop - startTop) * _animation.value;
-                    final left =
-                        startLeft + (endLeft - startLeft) * _animation.value;
-                    final right =
-                        startRight + (endRight - startRight) * _animation.value;
-                    final bottom =
-                        startBottom +
-                        (endBottom - startBottom) * _animation.value;
-                    final borderRadius = 8.0 + (16.0 - 8.0) * _animation.value;
-                    final boxShadowBlur = 0.0 + 16.0 * _animation.value;
-                    final paddingAnim = 12.0 + (24.0 - 12.0) * _animation.value;
-                    return Positioned(
-                      top: top,
-                      left: left,
-                      right: right,
-                      bottom: bottom,
-                      child: Opacity(
-                        opacity: _animation.value,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: AnimatedContainer(
-                            duration:
-                                Duration
-                                    .zero, // controlled by AnimationController
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(borderRadius),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: boxShadowBlur,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(paddingAnim),
-                            child: Stack(
-                              children: [
-                                // Close button in the top right
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.close,
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
-                                    ),
-                                    onPressed: _close,
-                                  ),
-                                ),
-                                // Note content
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Note title
-                                    Text(
-                                      'Note ${expandedIndex!}',
-                                      style: TextStyle(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onPrimary,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    // Editable note text field
-                                    Expanded(
-                                      child: TextField(
-                                        maxLines: null,
-                                        style: TextStyle(
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onPrimary,
-                                          fontSize: 18,
-                                        ),
-                                        decoration: InputDecoration(
-                                          hintText: 'Write your note here...',
-                                          hintStyle: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary
-                                                .withOpacity(0.6),
-                                          ),
-                                          border: InputBorder.none,
-                                        ),
-                                        autofocus: true,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
+                  expandedIndex: expandedIndex!,
+                  crossAxisCount: crossAxisCount,
+                  spacing: spacing,
+                  padding: padding,
+                  tileWidth: tileWidth,
+                  tileHeight: tileHeight,
+                  constraints: constraints,
+                  onClose: () async {
+                    await _saveNote(expandedIndex!);
+                    _close();
                   },
+                  note: notes[expandedIndex!],
+                  controller: _controllers[expandedIndex!]!,
                 ),
             ],
           );
@@ -233,8 +166,18 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
           borderRadius: BorderRadius.circular(16.0),
           side: BorderSide(color: Theme.of(context).colorScheme.secondary),
         ),
-        onPressed: () {
-          // Add your action here
+        onPressed: () async {
+          // Add a new note
+          final newNote = NotesModel(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            title: 'New Note',
+            content: '',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            color: '0xFF4CAF50',
+          );
+          await HiveEvents.addNotesToHive(newNote);
+          await _loadNotes();
         },
         child: const Icon(Icons.add),
       ),
