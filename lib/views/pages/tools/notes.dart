@@ -9,6 +9,7 @@ class Notes extends StatelessWidget {
       appBar: AppBar(title: Text("Notes")),
       body: Center(
         child: GridView.builder(
+          itemCount: 4,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisSpacing: 16.0,
@@ -23,7 +24,12 @@ class Notes extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.0)
                   ),
                   alignment: Alignment.center,
-                  child: Text(index.toString()),
+                  child: Text(
+                    index.toString(),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
                 ),
               ),
         ),

@@ -35,11 +35,25 @@ class People extends StatelessWidget {
                 tileColor: Theme.of(context).colorScheme.primary,
                 title: Text(
                   templateNames[index],
-                  style: TextStyle(fontWeight: FontWeights.regular),
+                  style: TextStyle(
+                    fontWeight: FontWeights.regular,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
                 // subtitle: Text("Country: USA"),
-                trailing: IconButton(onPressed: () {}, icon: Icon(Icons.add)),
-                subtitle: Text("Last Active on: ${lastActiveDate[index]}"),
+                trailing: IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.add,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                subtitle: Text(
+                  "Last Active on: ${lastActiveDate[index]}",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
                 visualDensity: VisualDensity.comfortable,
                 titleAlignment: ListTileTitleAlignment.center,
               ),
