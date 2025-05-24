@@ -20,12 +20,22 @@ class Notes extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(8.0)
                   ),
                   alignment: Alignment.center,
                   child: Text(index.toString()),
                 ),
               ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(
+          side: BorderSide(color: Theme.of(context).colorScheme.secondary),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        child: Icon(Icons.add),
+        onPressed: () => {},
       ),
     );
   }

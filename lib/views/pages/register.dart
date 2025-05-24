@@ -70,7 +70,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeights.bold,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
@@ -93,7 +93,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           TextField(
@@ -103,7 +103,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             decoration: InputDecoration(
                               hintText: 'Enter your name',
@@ -112,7 +112,7 @@ class _RegisterState extends State<Register> {
                                 fontWeight: FontWeights.regular,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withAlpha(100),
+                                ).colorScheme.onSurface.withAlpha(100),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 16.0,
@@ -123,7 +123,7 @@ class _RegisterState extends State<Register> {
                                 borderSide: BorderSide(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withAlpha(100),
+                                  ).colorScheme.primary
                                 ),
                               ),
                             ),
@@ -140,7 +140,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           TextField(
@@ -151,7 +151,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
@@ -161,7 +161,7 @@ class _RegisterState extends State<Register> {
                                 fontWeight: FontWeights.regular,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withAlpha(100),
+                                ).colorScheme.onSurface.withAlpha(100),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 16.0,
@@ -172,7 +172,7 @@ class _RegisterState extends State<Register> {
                                 borderSide: BorderSide(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withAlpha(100),
+                                  ).colorScheme.primary,
                                 ),
                               ),
                             ),
@@ -189,7 +189,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Stack(
@@ -202,7 +202,8 @@ class _RegisterState extends State<Register> {
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeights.regular,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'Enter your password',
@@ -211,7 +212,7 @@ class _RegisterState extends State<Register> {
                                     fontWeight: FontWeights.regular,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.primary.withAlpha(100),
+                                    ).colorScheme.onSurface.withAlpha(100),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 16.0,
@@ -222,7 +223,7 @@ class _RegisterState extends State<Register> {
                                     borderSide: BorderSide(
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.primary.withAlpha(100),
+                                      ).colorScheme.primary,
                                     ),
                                   ),
                                 ),
@@ -241,7 +242,7 @@ class _RegisterState extends State<Register> {
                                         ? Icons.visibility_off
                                         : Icons.visibility,
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -267,7 +268,7 @@ class _RegisterState extends State<Register> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeights.regular,
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                                 TextSpan(
@@ -276,7 +277,7 @@ class _RegisterState extends State<Register> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeights.regular,
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.onSurface,
                                     decoration: TextDecoration.underline,
                                   ),
                                   recognizer:
@@ -415,7 +416,7 @@ class _RegisterState extends State<Register> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         TextSpan(
@@ -423,7 +424,7 @@ class _RegisterState extends State<Register> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             decoration: TextDecoration.underline,
                           ),
                           recognizer:

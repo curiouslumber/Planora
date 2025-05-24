@@ -56,7 +56,7 @@ class _LoginState extends State<Login> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 16.0,
+                    spacing: 24.0,
                     children: [
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -68,7 +68,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeights.bold,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
@@ -77,6 +77,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -91,7 +92,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           TextField(
@@ -102,7 +103,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
@@ -112,7 +113,7 @@ class _LoginState extends State<Login> {
                                 fontWeight: FontWeights.regular,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withAlpha(100),
+                                ).colorScheme.onSurface.withAlpha(100),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 16.0,
@@ -123,7 +124,7 @@ class _LoginState extends State<Login> {
                                 borderSide: BorderSide(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withAlpha(100),
+                                  ).colorScheme.primary,
                                 ),
                               ),
                             ),
@@ -131,75 +132,87 @@ class _LoginState extends State<Login> {
                         ],
                       ),
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 8.0,
                         children: [
-                          Text(
-                            'Password',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          Stack(
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 8.0,
                             children: [
-                              TextField(
-                                controller: _passwordController,
-                                keyboardType: TextInputType.visiblePassword,
-                                textInputAction: TextInputAction.done,
-                                obscureText: _obscurePassword,
+                              Text(
+                                'Password',
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeights.regular,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Enter your password',
-                                  hintStyle: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeights.regular,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withAlpha(100),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
-                                    horizontal: 24.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(32.0),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withAlpha(100),
-                                    ),
-                                  ),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
-                              Positioned(
-                                right: 16.0,
-                                top: 16.0,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
-                                  child: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                              Stack(
+                                children: [
+                                  TextField(
+                                    controller: _passwordController,
+                                    keyboardType: TextInputType.visiblePassword,
+                                    textInputAction: TextInputAction.done,
+                                    obscureText: _obscurePassword,
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeights.regular,
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter your password',
+                                      hintStyle: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeights.regular,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface.withAlpha(100),
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 16.0,
+                                            horizontal: 24.0,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          32.0,
+                                        ),
+                                        borderSide: BorderSide(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  Positioned(
+                                    right: 16.0,
+                                    top: 16.0,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                      child: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -211,10 +224,13 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ),
+                          ),
+                        ],
                       ),
                       ElevatedButton(
                         onPressed:
@@ -251,7 +267,7 @@ class _LoginState extends State<Login> {
                         children: [
                           Expanded(
                             child: Divider(
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.0,
                               thickness: 1.0,
                             ),
@@ -265,13 +281,13 @@ class _LoginState extends State<Login> {
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeights.regular,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
                           Expanded(
                             child: Divider(
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.0,
                               thickness: 1.0,
                             ),
@@ -340,7 +356,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           TextSpan(
@@ -348,7 +364,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeights.regular,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.onSurface,
                               decoration: TextDecoration.underline,
                             ),
                             recognizer:
