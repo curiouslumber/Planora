@@ -14,7 +14,7 @@ class _NotesState extends State<Notes> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(selectedIndex == null ? "Notes" : 'note_$selectedIndex'),
+        title: Text("Notes"),
         actionsPadding: EdgeInsets.only(right: 24.0),
         actions: [
           if (selectedIndex != null)
