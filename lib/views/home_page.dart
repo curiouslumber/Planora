@@ -95,10 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: BlocProvider(
         create: (context) => AuthBloc(context.read<AuthRepository>()),
         child: Scaffold(
-          // Use a Stack to overlay the custom transition animation when needed.
           body: Stack(
             children: [
-              // The PageView supports swipe gestures.
               PageView(
                 controller: _pageController,
                 onPageChanged: (index) {
@@ -108,8 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 children: _pages,
               ),
-              // When a non-adjacent bottom nav tap occurs,
-              // overlay an AnimatedSwitcher that directly transitions between pages.
               if (_isCustomTransitionActive)
                 AnimatedSwitcher(
                   duration: Duration(milliseconds: 300),
@@ -125,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: child,
                     );
                   },
-                  // Use a key based on _currentIndex to trigger the switch.
                   child: Container(
                     key: ValueKey<int>(_currentIndex),
                     child: _pages[_currentIndex],
