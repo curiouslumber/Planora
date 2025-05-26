@@ -21,6 +21,23 @@ class HiveEvents {
     await box.add(note);
   }
 
+  static Future<bool> updateNoteToHive(
+    String title,
+    String text,
+    int index,
+  ) async {
+    var box = await Hive.openBox<NotesModel>(notesBox);
+    NotesModel? note = box.get(index);
+    if (note == null) return false;
+    NotesModel? newNote = NotesModel(
+      title: title,
+      text: text,
+      createdAt: note.createdAt,
+    );
+    await box.putAt(index, newNote);
+    return true;
+  }
+
   static Future<List<NotesModel>> getNotesFromHive() async {
     var box = await Hive.openBox<NotesModel>(notesBox);
     return box.values.toList();
