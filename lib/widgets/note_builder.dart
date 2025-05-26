@@ -9,8 +9,8 @@ class NoteBuilder extends StatelessWidget {
   });
 
   final int? selectedIndex;
-  final TextEditingController? titleController;
-  final TextEditingController? textController;
+  final TextEditingController titleController;
+  final TextEditingController textController;
 
   @override
   Widget build(BuildContext context) {

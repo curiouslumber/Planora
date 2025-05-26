@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/widgets/note_builder.dart';
+
+enum NoteMode { none, editing, creating }
 
 class Notes extends StatefulWidget {
   const Notes({super.key});
@@ -11,8 +14,8 @@ class Notes extends StatefulWidget {
 }
 
 class _NotesState extends State<Notes> {
+  NoteMode mode = NoteMode.none;
   int? selectedIndex;
-  bool newNote = false;
   List<NotesModel> notes = [];
   late TextEditingController titleController;
   late TextEditingController textController;
@@ -44,56 +47,91 @@ class _NotesState extends State<Notes> {
       titleController.text = notes[index].title;
       textController.text = notes[index].text;
       selectedIndex = index;
-      newNote = false;
+      mode = NoteMode.editing;
     } else {
       titleController.clear();
       textController.clear();
       selectedIndex = null;
-      newNote = true;
+      mode = NoteMode.creating;
     }
     setState(() {});
   }
 
   Future<void> saveOrUpdateNote() async {
-    if (newNote) {
-      if (titleController.text.isEmpty && textController.text.isEmpty) return;
+    if (mode == NoteMode.none) {
+      setState(() {
+        selectedIndex = null;
+      });
+      return;
+    }
+
+    final title = titleController.text.trim();
+    final text = textController.text.trim();
+
+    if (mode == NoteMode.creating) {
+      if (title.isEmpty && text.isEmpty) {
+        setState(() {
+          selectedIndex = null;
+          mode = NoteMode.none;
+        });
+        return;
+      }
       final note = NotesModel(
-        title:
-            titleController.text.isEmpty ? "Title here" : titleController.text,
-        text: textController.text,
+        title: title.isEmpty ? "Title here" : title,
+        text: text,
         createdAt: DateTime.now(),
       );
       await HiveEvents.addNoteToHive(note);
-    } else if (selectedIndex != null) {
+    } else if (mode == NoteMode.editing && selectedIndex != null) {
       final oldNote = notes[selectedIndex!];
-      if (oldNote.title != titleController.text ||
-          oldNote.text != textController.text) {
-        await HiveEvents.updateNoteToHive(
-          titleController.text,
-          textController.text,
-          selectedIndex!,
+      if (oldNote.title != title || oldNote.text != text) {
+        NotesModel newNote = NotesModel(
+          title: title,
+          text: text,
+          createdAt: notes[selectedIndex!].createdAt,
         );
+        await HiveEvents.updateNoteToHive(newNote, selectedIndex!);
       }
     }
+
     notes = await HiveEvents.getNotesFromHive();
     setState(() {
       selectedIndex = null;
-      newNote = false;
+      mode = NoteMode.none;
+    });
+  }
+
+  Future<void> deleteNote() async {
+    if (selectedIndex != null) {
+      await HiveEvents.deleteNoteFromHive(selectedIndex!);
+      notes = await HiveEvents.getNotesFromHive();
+    }
+    setState(() {
+      selectedIndex = null;
+      mode = NoteMode.none;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEditingOrCreating =
+        mode == NoteMode.editing || mode == NoteMode.creating;
     return Scaffold(
       appBar: AppBar(
         title: Text("Notes"),
         actionsPadding: EdgeInsets.only(right: 24.0),
         actions: [
-          if (selectedIndex != null || newNote)
+          if (isEditingOrCreating) ...[
+            if (mode == NoteMode.editing)
+              IconButton(
+                icon: Icon(CupertinoIcons.delete),
+                onPressed: deleteNote,
+              ),
             IconButton(
               icon: Icon(Icons.close),
               onPressed: saveOrUpdateNote,
             ),
+          ]
         ],
       ),
       body: Stack(
@@ -107,7 +145,8 @@ class _NotesState extends State<Notes> {
               crossAxisSpacing: 16.0,
             ),
             itemBuilder: (context, index) {
-              final isSelected = selectedIndex == index;
+              final isSelected =
+                  mode == NoteMode.editing && selectedIndex == index;
               return GestureDetector(
                 onTap: () => openNote(index: index),
                 child:
@@ -179,7 +218,7 @@ class _NotesState extends State<Notes> {
               );
             },
           ),
-          if (selectedIndex != null || newNote)
+          if (isEditingOrCreating)
             Positioned.fill(
               child: SafeArea(
                 child: Padding(
@@ -198,7 +237,7 @@ class _NotesState extends State<Notes> {
         ],
       ),
       floatingActionButton:
-          selectedIndex == null
+          mode == NoteMode.none
               ? FloatingActionButton(
                 shape: CircleBorder(
                   side: BorderSide(
