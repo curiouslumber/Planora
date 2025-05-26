@@ -137,7 +137,11 @@ class _NotesState extends State<Notes> {
       }
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${selectedNoteIndices.length} note/s deleted')),
+        SnackBar(
+          content: Text(
+            '${selectedNoteIndices.length} ${selectedNoteIndices.length > 1 ? 'notes' : 'note'} deleted',
+          ),
+        ),
       );
       selectedNoteIndices.clear();
       setState(() {});
