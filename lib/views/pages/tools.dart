@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/calendar_tool.dart';
+import 'package:planora/views/pages/tools/events.dart';
 import 'package:planora/views/pages/tools/meetings.dart';
 import 'package:planora/views/pages/tools/notes.dart';
 import 'package:planora/views/pages/tools/people.dart';
@@ -9,14 +10,15 @@ class Tools extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toolsText = ['Notes', 'People', 'Meetings', 'Calendar'];
+    final toolsText = ['Notes', 'People', 'Meetings', 'Calendar', 'Events'];
     final toolsIcons = [
       Icons.sticky_note_2_outlined,
       Icons.people,
       Icons.meeting_room,
-      Icons.calendar_month,
+      Icons.calendar_today,
+      Icons.event,
     ];
-    final toolPages = [Notes(), People(), Meetings(), CalendarTool()];
+    final toolPages = [Notes(), People(), Meetings(), CalendarTool(), Events()];
 
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +34,7 @@ class Tools extends StatelessWidget {
               (constraints.maxWidth - 48) / 2; // Adjust for padding and spacing
           return GridView.builder(
             padding: const EdgeInsets.all(24.0),
-            itemCount: 5,
+            itemCount: 6,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: itemSize,
               crossAxisSpacing: 24,
@@ -49,14 +51,14 @@ class Tools extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color:
-                        index == 4
+                        index == 5
                             ? Theme.of(context).colorScheme.surfaceContainer
                             : Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(32.0),
                   ),
                   child: Center(
                     child:
-                        index != 4
+                        index != 5
                             ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,

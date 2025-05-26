@@ -161,7 +161,7 @@ class _NotesState extends State<Notes> {
           if (selectedNoteIndices.isNotEmpty) ...[
             IconButton(
               icon: Icon(CupertinoIcons.delete),
-              onPressed: () => confirmDeleteNotes(context, deleteNotes),
+              onPressed: () => confirmationDialog(context, deleteNotes, 'Delete Notes', 'Are you sure you want to delete the selected notes?', 'Delete'),
             ),
           ],
           if (isEditingOrCreating) ...[

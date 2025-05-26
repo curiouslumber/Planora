@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/models/meetings_model.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/views/home_page.dart';
 
@@ -17,6 +18,7 @@ void main() async {
   final initialTheme = await SharedPreferencesHelper.getTheme();
   Hive.registerAdapter(EventModelAdapter());
   Hive.registerAdapter(NotesModelAdapter());
+  Hive.registerAdapter(MeetingsModelAdapter());
   runApp(MyApp(initialTheme: initialTheme));
 }
 

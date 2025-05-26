@@ -2,9 +2,12 @@ import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Future<void> confirmDeleteNotes(
+Future<void> confirmationDialog(
   BuildContext context,
-  Future<void> Function() deleteNotes,
+  Future<void> Function() action,
+  String title,
+  String content,
+  String confirmText,
 ) async {
   final confirmed =
       await (Platform.isIOS
@@ -12,9 +15,9 @@ Future<void> confirmDeleteNotes(
             context: context,
             builder:
                 (context) => CupertinoAlertDialog(
-                  title: Text('Delete Notes'),
+                  title: Text(title),
                   content: Text(
-                    'Are you sure you want to delete the selected notes?',
+                    content,
                   ),
                   actions: [
                     CupertinoDialogAction(
@@ -24,7 +27,7 @@ Future<void> confirmDeleteNotes(
                     CupertinoDialogAction(
                       isDestructiveAction: true,
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text('Delete'),
+                      child: Text(confirmText),
                     ),
                   ],
                 ),
@@ -33,9 +36,9 @@ Future<void> confirmDeleteNotes(
             context: context,
             builder:
                 (context) => AlertDialog(
-                  title: Text('Delete Notes'),
+                  title: Text(title),
                   content: Text(
-                    'Are you sure you want to delete the selected notes?',
+                    content,
                   ),
                   actions: [
                     TextButton(
@@ -45,7 +48,7 @@ Future<void> confirmDeleteNotes(
                     TextButton(
                       style: TextButton.styleFrom(foregroundColor: Colors.red),
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text('Delete'),
+                      child: Text(confirmText),
                     ),
                   ],
                 ),
@@ -53,6 +56,50 @@ Future<void> confirmDeleteNotes(
 
   // If confirmed, delete the notes
   if (confirmed == true) {
-    await deleteNotes();
+    await action();
+  }
+}
+
+Future<void> actionSheet(
+  BuildContext context, {
+  required List<Widget> actions,
+  String? title,
+  String? subtitle,
+}) async {
+  if (Platform.isIOS) {
+    await showCupertinoModalPopup<void>(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: title != null ? Text(title) : null,
+        message: subtitle != null ? Text(subtitle) : null,
+        actions: actions,
+      ),
+    );
+  } else {
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (title != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+          if (subtitle != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ...actions
+        ],
+      ),
+    );
   }
 }
