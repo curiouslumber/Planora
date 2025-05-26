@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/notes_model.dart';
+import 'package:planora/utils/dialogs.dart';
 import 'package:planora/widgets/note_builder.dart';
 
 enum NoteMode { none, editing, creating, selecting }
@@ -145,7 +146,7 @@ class _NotesState extends State<Notes> {
           if (selectedNoteIndices.isNotEmpty) ...[
             IconButton(
               icon: Icon(CupertinoIcons.delete),
-              onPressed: deleteNotes,
+              onPressed: () => confirmDeleteNotes(context, deleteNotes),
             ),
           ],
           if (isEditingOrCreating) ...[
