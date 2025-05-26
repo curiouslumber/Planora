@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/notes_model.dart';
 
 class Notes extends StatefulWidget {
   const Notes({super.key});
@@ -9,6 +11,22 @@ class Notes extends StatefulWidget {
 
 class _NotesState extends State<Notes> {
   int? selectedIndex;
+  List<NotesModel> notes = [];
+
+  void getNotes() async {
+    // Get notes from hive
+    var notesData = await HiveEvents.getNotesFromHive();
+    setState(() {
+      notes = notesData;
+    });
+  }
+
+  @override
+  void initState() {
+    getNotes();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +49,7 @@ class _NotesState extends State<Notes> {
       body: Stack(
         children: [
           GridView.builder(
-            itemCount: 4,
+            itemCount: notes.length,
             padding: const EdgeInsets.all(8.0),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
