@@ -17,7 +17,8 @@ class Notes extends StatefulWidget {
 class _NotesState extends State<Notes> {
   NoteMode mode = NoteMode.none;
   int? selectedIndex;
-  List<NotesModel> notes = [];
+  late List<NotesModel> notes = [];
+  bool areNotesLoading = false;
   late TextEditingController titleController;
   late TextEditingController textController;
   Set<int> selectedNoteIndices = {};
@@ -25,6 +26,7 @@ class _NotesState extends State<Notes> {
   @override
   void initState() {
     super.initState();
+    areNotesLoading = true;
     titleController = TextEditingController();
     textController = TextEditingController();
     getNotes();
@@ -42,6 +44,7 @@ class _NotesState extends State<Notes> {
     var notesData = await HiveEvents.getNotesFromHive();
     setState(() {
       notes = notesData;
+      areNotesLoading = false;
     });
   }
 
@@ -87,8 +90,10 @@ class _NotesState extends State<Notes> {
         createdAt: DateTime.now(),
       );
       await HiveEvents.addNoteToHive(note);
-      // Append new note to the end
-      notes.add(note);
+      setState(() {
+        // Append new note to the end
+        notes.add(note);
+      });
     } else if (mode == NoteMode.editing && selectedIndex != null) {
       final oldNote = notes[selectedIndex!];
       if (oldNote.title != title || oldNote.text != text) {
@@ -98,8 +103,10 @@ class _NotesState extends State<Notes> {
           createdAt: notes[selectedIndex!].createdAt,
         );
         await HiveEvents.updateNoteToHive(newNote, selectedIndex!);
-        // Update note with the new data
-        notes[selectedIndex!] = newNote;
+        setState(() {
+          // Update note with the new data
+          notes[selectedIndex!] = newNote;
+        });
       }
     }
 
@@ -128,6 +135,10 @@ class _NotesState extends State<Notes> {
       for (var index in sortedIndices) {
         notes.removeAt(index);
       }
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${selectedNoteIndices.length} note/s deleted')),
+      );
       selectedNoteIndices.clear();
       setState(() {});
     }
@@ -155,128 +166,147 @@ class _NotesState extends State<Notes> {
                 icon: Icon(CupertinoIcons.delete),
                 onPressed: deleteNote,
               ),
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: saveOrUpdateNote,
-            ),
-          ]
+            IconButton(icon: Icon(Icons.close), onPressed: saveOrUpdateNote),
+          ],
         ],
       ),
-      body: Stack(
-        children: [
-          GridView.builder(
-            itemCount: notes.length,
-            padding: const EdgeInsets.all(8.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16.0,
-              crossAxisSpacing: 16.0,
-            ),
-            itemBuilder: (context, index) {
-              final isSelected =
-                  mode == NoteMode.editing && selectedIndex == index;
-              return GestureDetector(
-                onTap: () => openNote(index: index),
-                child:
-                    isSelected
-                        ? const SizedBox.shrink()
-                        : Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Hero(
-                              tag: 'note_$index',
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                                alignment: Alignment.topLeft,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 16.0,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: 8.0,
+      body:
+          notes.isNotEmpty || mode == NoteMode.creating
+              ? Stack(
+                children: [
+                  GridView.builder(
+                    itemCount: notes.length,
+                    padding: const EdgeInsets.all(8.0),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16.0,
+                          crossAxisSpacing: 16.0,
+                        ),
+                    itemBuilder: (context, index) {
+                      final isSelected =
+                          mode == NoteMode.editing && selectedIndex == index;
+                      return GestureDetector(
+                        onTap: () => openNote(index: index),
+                        child:
+                            isSelected
+                                ? const SizedBox.shrink()
+                                : Stack(
+                                  fit: StackFit.expand,
                                   children: [
-                                    Text(
-                                      notes[index].title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.headlineSmall!.copyWith(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.surface,
+                                    Hero(
+                                      tag: 'note_$index',
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+                                        alignment: Alignment.topLeft,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 16.0,
+                                          horizontal: 16.0,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          spacing: 8.0,
+                                          children: [
+                                            Text(
+                                              notes[index].title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall!
+                                                  .copyWith(
+                                                    color:
+                                                        Theme.of(
+                                                          context,
+                                                        ).colorScheme.surface,
+                                                  ),
+                                            ),
+                                            Text(
+                                              notes[index].text,
+                                              maxLines: 4,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium!.copyWith(
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.surface,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      notes[index].text,
-                                      maxLines: 4,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium!.copyWith(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.surface,
+                                    Positioned(
+                                      bottom: 8,
+                                      right: 8,
+                                      child: Transform.scale(
+                                        scale: 1.3,
+                                        child: Checkbox(
+                                          value: selectedNoteIndices.contains(
+                                            index,
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (selectedNoteIndices.contains(
+                                                index,
+                                              )) {
+                                                selectedNoteIndices.remove(
+                                                  index,
+                                                );
+                                              } else {
+                                                selectedNoteIndices.add(index);
+                                              }
+                                            });
+                                          },
+                                          shape: CircleBorder(),
+                                          side: BorderSide(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.surface,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 8,
-                              right: 8,
-                              child: Transform.scale(
-                                scale: 1.3,
-                                child: Checkbox(
-                                  value: selectedNoteIndices.contains(index),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (selectedNoteIndices.contains(index)) {
-                                        selectedNoteIndices.remove(index);
-                                      } else {
-                                        selectedNoteIndices.add(index);
-                                      }
-                                    });
-                                  },
-                                  shape: CircleBorder(),
-                                  side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-              );
-            },
-          ),
-          if (isEditingOrCreating)
-            Positioned.fill(
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Hero(
-                    tag: 'note_$selectedIndex',
-                    child: NoteBuilder(
-                      selectedIndex: selectedIndex,
-                      titleController: titleController,
-                      textController: textController,
-                    ),
+                      );
+                    },
                   ),
-                ),
-              ),
-            ),
-        ],
-      ),
+                  if (isEditingOrCreating)
+                    Positioned.fill(
+                      child: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Hero(
+                            tag: 'note_$selectedIndex',
+                            child: NoteBuilder(
+                              selectedIndex: selectedIndex,
+                              titleController: titleController,
+                              textController: textController,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              )
+              : !areNotesLoading
+              ? Center(child: Text("No notes found"))
+              : CircularProgressIndicator(),
       floatingActionButton:
           mode == NoteMode.none
               ? FloatingActionButton(
