@@ -38,4 +38,10 @@ class HiveEvents {
     var box = await Hive.openBox<NotesModel>(notesBox);
     await box.deleteAt(index);
   }
+
+  static Future<void> deleteNotesFromHive(Set<int> selectedNoteIndices) async {
+    var box = await Hive.openBox<NotesModel>(notesBox);
+    final keysToDelete = selectedNoteIndices.map((index) => box.keyAt(index));
+    await box.deleteAll(keysToDelete);
+  }
 }

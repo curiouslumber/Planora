@@ -4,7 +4,7 @@ import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/widgets/note_builder.dart';
 
-enum NoteMode { none, editing, creating }
+enum NoteMode { none, editing, creating, selecting }
 
 class Notes extends StatefulWidget {
   const Notes({super.key});
@@ -19,6 +19,7 @@ class _NotesState extends State<Notes> {
   List<NotesModel> notes = [];
   late TextEditingController titleController;
   late TextEditingController textController;
+  Set<int> selectedNoteIndices = {};
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _NotesState extends State<Notes> {
     super.dispose();
   }
 
+  // Get all notes
   void getNotes() async {
     var notesData = await HiveEvents.getNotesFromHive();
     setState(() {
@@ -42,6 +44,7 @@ class _NotesState extends State<Notes> {
     });
   }
 
+  // Open Note
   void openNote({int? index}) {
     if (index != null) {
       titleController.text = notes[index].title;
@@ -57,6 +60,7 @@ class _NotesState extends State<Notes> {
     setState(() {});
   }
 
+  // Create or Update Existing Note
   Future<void> saveOrUpdateNote() async {
     if (mode == NoteMode.none) {
       setState(() {
@@ -82,6 +86,8 @@ class _NotesState extends State<Notes> {
         createdAt: DateTime.now(),
       );
       await HiveEvents.addNoteToHive(note);
+      // Append new note to the end
+      notes.add(note);
     } else if (mode == NoteMode.editing && selectedIndex != null) {
       final oldNote = notes[selectedIndex!];
       if (oldNote.title != title || oldNote.text != text) {
@@ -91,10 +97,11 @@ class _NotesState extends State<Notes> {
           createdAt: notes[selectedIndex!].createdAt,
         );
         await HiveEvents.updateNoteToHive(newNote, selectedIndex!);
+        // Update note with the new data
+        notes[selectedIndex!] = newNote;
       }
     }
 
-    notes = await HiveEvents.getNotesFromHive();
     setState(() {
       selectedIndex = null;
       mode = NoteMode.none;
@@ -104,23 +111,43 @@ class _NotesState extends State<Notes> {
   Future<void> deleteNote() async {
     if (selectedIndex != null) {
       await HiveEvents.deleteNoteFromHive(selectedIndex!);
-      notes = await HiveEvents.getNotesFromHive();
+      notes.removeAt(selectedIndex!);
+      setState(() {
+        selectedIndex = null;
+        mode = NoteMode.none;
+      });
     }
-    setState(() {
-      selectedIndex = null;
-      mode = NoteMode.none;
-    });
+  }
+
+  Future<void> deleteNotes() async {
+    if (selectedNoteIndices.isNotEmpty) {
+      await HiveEvents.deleteNotesFromHive(selectedNoteIndices);
+      final sortedIndices =
+          selectedNoteIndices.toList()..sort((a, b) => b.compareTo(a));
+      for (var index in sortedIndices) {
+        notes.removeAt(index);
+      }
+      selectedNoteIndices.clear();
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isEditingOrCreating =
         mode == NoteMode.editing || mode == NoteMode.creating;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Notes"),
         actionsPadding: EdgeInsets.only(right: 24.0),
         actions: [
+          if (selectedNoteIndices.isNotEmpty) ...[
+            IconButton(
+              icon: Icon(CupertinoIcons.delete),
+              onPressed: deleteNotes,
+            ),
+          ],
           if (isEditingOrCreating) ...[
             if (mode == NoteMode.editing)
               IconButton(
@@ -208,8 +235,16 @@ class _NotesState extends State<Notes> {
                               child: Transform.scale(
                                 scale: 1.3,
                                 child: Checkbox(
-                                  value: false,
-                                  onChanged: (value) {},
+                                  value: selectedNoteIndices.contains(index),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (selectedNoteIndices.contains(index)) {
+                                        selectedNoteIndices.remove(index);
+                                      } else {
+                                        selectedNoteIndices.add(index);
+                                      }
+                                    });
+                                  },
                                   shape: CircleBorder(),
                                   side: BorderSide(
                                     color:
