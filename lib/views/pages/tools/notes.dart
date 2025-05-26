@@ -170,9 +170,12 @@ class _NotesState extends State<Notes> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: 8.0,
                                   children: [
                                     Text(
                                       notes[index].title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: Theme.of(
                                         context,
                                       ).textTheme.headlineSmall!.copyWith(
@@ -184,6 +187,8 @@ class _NotesState extends State<Notes> {
                                     ),
                                     Text(
                                       notes[index].text,
+                                      maxLines: 4,
+                                      overflow: TextOverflow.ellipsis,
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodyMedium!.copyWith(
