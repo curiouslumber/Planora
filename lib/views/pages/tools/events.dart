@@ -46,7 +46,9 @@ class Events extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(6.0),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.onPrimary,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withAlpha(200),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -152,8 +154,8 @@ class Events extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        foregroundColor: Theme.of(context).colorScheme.primary,
         shape: const CircleBorder(),
         onPressed: () {},
         child: const Icon(Icons.add),

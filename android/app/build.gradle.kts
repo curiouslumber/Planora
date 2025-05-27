@@ -20,7 +20,7 @@ val keystoreProperties = Properties().apply {
 android {
     namespace = "com.noelpinto47.planora"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "27.1.12297006"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

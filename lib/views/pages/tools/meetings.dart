@@ -272,7 +272,7 @@ class _MeetingsState extends State<Meetings> {
                         trailing: IconButton(
                           icon: Icon(
                             Icons.edit,
-                            color: Theme.of(context).colorScheme.surface,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           onPressed: () => updateMeeting(index),
                         ),
