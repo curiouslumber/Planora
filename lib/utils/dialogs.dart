@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Future<void> confirmationDialog(
@@ -88,7 +89,17 @@ Future<void> actionSheet(
   String? title,
   String? subtitle,
 }) async {
-  if (Platform.isIOS) {
+  if (kIsWeb) {
+    await showDialog<void>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: title != null ? Text(title) : null,
+            content: subtitle != null ? Text(subtitle) : null,
+            actions: actions,
+          ),
+    );
+  } else if (Platform.isIOS) {
     await showCupertinoModalPopup<void>(
       context: context,
       builder: (context) => CupertinoActionSheet(

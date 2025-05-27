@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -81,7 +82,7 @@ class _MeetingsState extends State<Meetings> {
   Future<void> startMeeting(int index) async {
     final meeting = meetings[index];
     String meetingLink = meeting.meetingLink;
- 
+
     // Check if it's a known meeting platform
     if (meetingLink.contains('zoom.us')) {
       final zoomAppUrl = meetingLink.replaceFirst('https://', 'zoomus://');
@@ -141,8 +142,8 @@ class _MeetingsState extends State<Meetings> {
     final meeting = meetings[index];
     await Clipboard.setData(ClipboardData(text: meeting.meetingLink));
     // Show snackbar
-    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(
+      // ignore: use_build_context_synchronously
       context,
     ).showSnackBar(SnackBar(content: Text('Meeting link copied to clipboard')));
     setState(() {});
@@ -198,6 +199,34 @@ class _MeetingsState extends State<Meetings> {
                     (context, index) => Container(
                       margin: const EdgeInsets.only(bottom: 8.0),
                       child: ListTile(
+                        minTileHeight: 100.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        tileColor: Theme.of(context).colorScheme.primary,
+                        title: Text(
+                          meetings[index].meetingTitle,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                        subtitle: Container(
+                          margin: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            meetings[index].meetingLink,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(
+                            Icons.edit,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          onPressed: () => updateMeeting(index),
+                        ),
                         leading:
                             selectedMeetingIndices.contains(index)
                                 ? Checkbox(
@@ -230,182 +259,231 @@ class _MeetingsState extends State<Meetings> {
                           vertical: 8.0,
                           horizontal: 16.0,
                         ),
-                        onTap:
-                            () =>
-                                Platform.isIOS
-                                    ? actionSheet(
-                                      context,
-                                      actions: [
-                                        CupertinoActionSheetAction(
-                                          child: Text(
-                                            'Start or Join Meeting',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
-                                          ),
-                                          onPressed: () => startMeeting(index),
-                                        ),
-                                        CupertinoActionSheetAction(
-                                          child: Text(
-                                            'Copy or Share Meeting Link',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
-                                          ),
-                                          onPressed:
-                                              () => shareMeetingLink(index),
-                                        ),
-                                        CupertinoActionSheetAction(
-                                          onPressed: () => updateMeeting(index),
-                                          child: Text(
-                                            'Update Meeting Details',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
+                        onTap: () async {
+                          if (kIsWeb) {
+                            return showDialog<void>(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: Text(meetings[index].meetingTitle),
+                                    content: Text(meetings[index].meetingLink),
+                                    actions: [
+                                      TextButton(
+                                        child: Text(
+                                          'Start or Join Meeting',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                           ),
                                         ),
-                                        CupertinoActionSheetAction(
-                                          child: Text(
-                                            'Delete Meeting',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
+                                        onPressed: () => startMeeting(index),
+                                      ),
+                                      TextButton(
+                                        child: Text(
+                                          'Copy or Share Meeting Link',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                           ),
-                                          onPressed:
-                                              () => confirmationDialog(
+                                        ),
+                                        onPressed:
+                                            () => shareMeetingLink(index),
+                                      ),
+                                      TextButton(
+                                        child: Text(
+                                          'Update Meeting Details',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                          ),
+                                        ),
+                                        onPressed: () => updateMeeting(index),
+                                      ),
+                                      TextButton(
+                                        child: Text(
+                                          'Delete Meeting',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                          ),
+                                        ),
+                                        onPressed:
+                                            () => confirmationDialog(
+                                              context,
+                                              () => deleteMeeting(index),
+                                              'Delete Meeting',
+                                              'Are you sure you want to delete the selected meeting?',
+                                              'Delete',
+                                            ),
+                                      ),
+                                      TextButton(
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.error,
+                                          ),
+                                        ),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                          } else {
+                            return Platform.isIOS
+                                ? actionSheet(
+                                  context,
+                                  actions: [
+                                    CupertinoActionSheetAction(
+                                      child: Text(
+                                        'Start or Join Meeting',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
                                                 context,
-                                                () => deleteMeeting(index),
-                                                'Delete Meeting',
-                                                'Are you sure you want to delete the selected meeting?',
-                                                'Delete',
-                                              ),
+                                              ).colorScheme.onSurface,
                                         ),
-                                        CupertinoActionSheetAction(
-                                          isDestructiveAction: true,
-                                          child: Text('Cancel'),
-                                          onPressed:
-                                              () => Navigator.pop(context),
-                                        ),
-                                      ],
-                                      title: meetings[index].meetingTitle,
-                                      subtitle: meetings[index].meetingLink,
-                                    )
-                                    : actionSheet(
-                                      context,
-                                      actions: [
-                                        TextButton(
-                                          child: Text(
-                                            'Start or Join Meeting',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
-                                          ),
-                                          onPressed: () => startMeeting(index),
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            'Copy or Share Meeting Link',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
-                                          ),
-                                          onPressed:
-                                              () => shareMeetingLink(index),
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            'Update Meeting Details',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
-                                          ),
-                                          onPressed: () => updateMeeting(index),
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            'Delete Meeting',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                            ),
-                                          ),
-                                          onPressed:
-                                              () => confirmationDialog(
-                                                context,
-                                                () => deleteMeeting(index),
-                                                'Delete Meeting',
-                                                'Are you sure you want to delete the selected meeting?',
-                                                'Delete',
-                                              ),
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.error,
-                                            ),
-                                          ),
-                                          onPressed:
-                                              () => Navigator.pop(context),
-                                        ),
-                                      ],
-                                      title: meetings[index].meetingTitle,
-                                      subtitle: meetings[index].meetingLink,
+                                      ),
+                                      onPressed: () => startMeeting(index),
                                     ),
-                        minTileHeight: 100.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        tileColor: Theme.of(context).colorScheme.primary,
-                        title: Text(
-                          meetings[index].meetingTitle,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                        subtitle: Container(
-                          margin: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            meetings[index].meetingLink,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                          ),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(
-                            Icons.edit,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          onPressed: () => updateMeeting(index),
-                        ),
+                                    CupertinoActionSheetAction(
+                                      child: Text(
+                                        'Copy or Share Meeting Link',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      onPressed: () => shareMeetingLink(index),
+                                    ),
+                                    CupertinoActionSheetAction(
+                                      onPressed: () => updateMeeting(index),
+                                      child: Text(
+                                        'Update Meeting Details',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ),
+                                    CupertinoActionSheetAction(
+                                      child: Text(
+                                        'Delete Meeting',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      onPressed:
+                                          () => confirmationDialog(
+                                            context,
+                                            () => deleteMeeting(index),
+                                            'Delete Meeting',
+                                            'Are you sure you want to delete the selected meeting?',
+                                            'Delete',
+                                          ),
+                                    ),
+                                    CupertinoActionSheetAction(
+                                      isDestructiveAction: true,
+                                      child: Text('Cancel'),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                  ],
+                                  title: meetings[index].meetingTitle,
+                                  subtitle: meetings[index].meetingLink,
+                                )
+                                : actionSheet(
+                                  context,
+                                  actions: [
+                                    TextButton(
+                                      child: Text(
+                                        'Start or Join Meeting',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      onPressed: () => startMeeting(index),
+                                    ),
+                                    TextButton(
+                                      child: Text(
+                                        'Copy or Share Meeting Link',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      onPressed: () => shareMeetingLink(index),
+                                    ),
+                                    TextButton(
+                                      child: Text(
+                                        'Update Meeting Details',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      onPressed: () => updateMeeting(index),
+                                    ),
+                                    TextButton(
+                                      child: Text(
+                                        'Delete Meeting',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      onPressed:
+                                          () => confirmationDialog(
+                                            context,
+                                            () => deleteMeeting(index),
+                                            'Delete Meeting',
+                                            'Are you sure you want to delete the selected meeting?',
+                                            'Delete',
+                                          ),
+                                    ),
+                                    TextButton(
+                                      child: Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.error,
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                  ],
+                                  title: meetings[index].meetingTitle,
+                                  subtitle: meetings[index].meetingLink,
+                                );
+                          }
+                        },
                       ),
                     ),
               ),
