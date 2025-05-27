@@ -191,7 +191,29 @@ class _NotesState extends State<Notes> {
                       final isSelected =
                           mode == NoteMode.editing && selectedIndex == index;
                       return GestureDetector(
-                        onTap: () => openNote(index: index),
+                        onLongPress:
+                            () => setState(() {
+                              if (selectedNoteIndices.contains(index)) {
+                                selectedNoteIndices.remove(index);
+                              } else {
+                                selectedNoteIndices.add(index);
+                              }
+                            }),
+                        onTap:
+                            () => {
+                              if (selectedNoteIndices.isEmpty)
+                                {openNote(index: index)}
+                              else
+                                {
+                                  setState(() {
+                                    if (selectedNoteIndices.contains(index)) {
+                                      selectedNoteIndices.remove(index);
+                                    } else {
+                                      selectedNoteIndices.add(index);
+                                    }
+                                  }),
+                                },
+                            },
                         child:
                             isSelected
                                 ? const SizedBox.shrink()
