@@ -104,7 +104,7 @@ class Events extends StatelessWidget {
                             ),
                           ),
                           VerticalDivider(
-                            color: Theme.of(context).colorScheme.surface,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             indent: 16.0,
                             endIndent: 16.0,
                           ),

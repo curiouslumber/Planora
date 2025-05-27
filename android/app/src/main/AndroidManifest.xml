@@ -43,4 +43,9 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+    <queries>
+      <!-- For Zoom -->
+      <package android:name="us.zoom.videomeetings" />
+      <!-- For other meeting apps if needed -->
+    </queries>
 </manifest>

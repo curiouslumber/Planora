@@ -21,13 +21,23 @@ Future<void> confirmationDialog(
                   ),
                   actions: [
                     CupertinoDialogAction(
-                      child: Text('Cancel'),
+                      child: Text(
+                        'Cancel',
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                       onPressed: () => Navigator.of(context).pop(false),
                     ),
                     CupertinoDialogAction(
                       isDestructiveAction: true,
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(confirmText),
+                      child: Text(
+                        confirmText,
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -42,13 +52,25 @@ Future<void> confirmationDialog(
                   ),
                   actions: [
                     TextButton(
-                      child: Text('Cancel'),
+                      child: Text(
+                        'Cancel',
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                       onPressed: () => Navigator.of(context).pop(false),
                     ),
                     TextButton(
-                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error,
+                      ),
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(confirmText),
+                      child: Text(
+                        confirmText,
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -78,28 +100,57 @@ Future<void> actionSheet(
   } else {
     await showModalBottomSheet<void>(
       context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall,
+      builder:
+          (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (title != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    top: 16.0,
+                    bottom: 8.0,
+                  ),
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              if (subtitle != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    bottom: 16.0,
+                  ),
+                  child: Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ...List.generate(
+                actions.length,
+                (index) =>
+                    index > 0
+                        ? Column(
+                          children: [
+                            const Divider(
+                              height: 1,
+                              indent: 16.0,
+                              endIndent: 16.0,
+                            ),
+                            actions[index],
+                          ],
+                        )
+                        : actions[index],
               ),
-            ),
-          if (subtitle != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-          ...actions
-        ],
-      ),
+            ],
+          ),
     );
   }
 }

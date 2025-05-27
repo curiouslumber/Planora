@@ -81,33 +81,46 @@ class _MeetingsState extends State<Meetings> {
   Future<void> startMeeting(int index) async {
     final meeting = meetings[index];
     String meetingLink = meeting.meetingLink;
-
+ 
     // Check if it's a known meeting platform
     if (meetingLink.contains('zoom.us')) {
-      // Handle Zoom links
-      meetingLink = meetingLink.replaceFirst('https://', 'zoomus://');
+      final zoomAppUrl = meetingLink.replaceFirst('https://', 'zoomus://');
+      try {
+        if (await canLaunchUrlString(zoomAppUrl)) {
+          await launchUrlString(
+            zoomAppUrl,
+            mode: LaunchMode.externalApplication,
+          );
+          return; // Successfully launched Zoom app
+        }
+      } catch (e) {
+        // Continue to web fallback
+        print('Failed to launch Zoom app: $e');
+      }
     }
-    // Add other platform-specific handling here
 
+    // Fallback to web URL
     try {
-      if (await canLaunchUrlString(meetingLink)) {
-        await launchUrlString(
-          meetingLink,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        // Fallback to original web URL
-        await launchUrlString(
-          meeting.meetingLink,
-          mode: LaunchMode.platformDefault,
+      await launchUrlString(meetingLink, mode: LaunchMode.platformDefault);
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+      // If everything fails, show an error to the user
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 100.0,
+            content: Text(
+              'Failed to launch meeting.',
+              // ignore: use_build_context_synchronously
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            ),
+            // ignore: use_build_context_synchronously
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
         );
       }
-    } catch (e) {
-      // Final fallback
-      await launchUrlString(
-        meeting.meetingLink,
-        mode: LaunchMode.platformDefault,
-      );
     }
   }
 
@@ -249,6 +262,18 @@ class _MeetingsState extends State<Meetings> {
                                               () => shareMeetingLink(index),
                                         ),
                                         CupertinoActionSheetAction(
+                                          onPressed: () => updateMeeting(index),
+                                          child: Text(
+                                            'Update Meeting Details',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                          ),
+                                        ),
+                                        CupertinoActionSheetAction(
                                           child: Text(
                                             'Delete Meeting',
                                             style: TextStyle(
@@ -281,18 +306,52 @@ class _MeetingsState extends State<Meetings> {
                                       context,
                                       actions: [
                                         TextButton(
-                                          child: Text('Start or Join Meeting'),
+                                          child: Text(
+                                            'Start or Join Meeting',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                          ),
                                           onPressed: () => startMeeting(index),
                                         ),
                                         TextButton(
                                           child: Text(
                                             'Copy or Share Meeting Link',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
                                           ),
                                           onPressed:
                                               () => shareMeetingLink(index),
                                         ),
                                         TextButton(
-                                          child: Text('Delete Meeting'),
+                                          child: Text(
+                                            'Update Meeting Details',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                          ),
+                                          onPressed: () => updateMeeting(index),
+                                        ),
+                                        TextButton(
+                                          child: Text(
+                                            'Delete Meeting',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                          ),
                                           onPressed:
                                               () => confirmationDialog(
                                                 context,
@@ -303,7 +362,15 @@ class _MeetingsState extends State<Meetings> {
                                               ),
                                         ),
                                         TextButton(
-                                          child: Text('Cancel'),
+                                          child: Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.error,
+                                            ),
+                                          ),
                                           onPressed:
                                               () => Navigator.pop(context),
                                         ),
