@@ -10,15 +10,15 @@ class Tools extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toolsText = ['Notes', 'People', 'Meetings', 'Calendar', 'Events'];
+    final toolsText = ['Events', 'People', 'Calendar', 'Meetings', 'Notes'];
     final toolsIcons = [
-      Icons.sticky_note_2_outlined,
-      Icons.people,
-      Icons.meeting_room,
-      Icons.calendar_today,
       Icons.event,
+      Icons.people,
+      Icons.calendar_today,
+      Icons.meeting_room,
+      Icons.sticky_note_2_outlined,
     ];
-    final toolPages = [Notes(), People(), Meetings(), CalendarTool(), Events()];
+    final toolPages = [Events(), People(), CalendarTool(), Meetings(), Notes()];
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +34,7 @@ class Tools extends StatelessWidget {
               (constraints.maxWidth - 48) / 2; // Adjust for padding and spacing
           return GridView.builder(
             padding: const EdgeInsets.all(24.0),
-            itemCount: 6,
+            itemCount: 5,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: itemSize,
               crossAxisSpacing: 24,
@@ -44,7 +44,18 @@ class Tools extends StatelessWidget {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap:
-                    () => Navigator.push(
+                    () =>
+                        index == 5
+                            ? ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Coming soon!',
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                                duration: Duration(seconds: 2),
+                              ),
+                            )
+                            : Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => toolPages[index]),
                     ),
