@@ -11,7 +11,9 @@ class AddEvent extends StatefulWidget {
 }
 
 class _AddEventState extends State<AddEvent> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _eventNameController = TextEditingController();
+  final TextEditingController _eventObjectiveController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class _AddEventState extends State<AddEvent> {
                           ),
                         ),
                         TextField(
-                          controller: _emailController,
+                          controller: _eventNameController,
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.none,
                           autocorrect: false,
@@ -95,7 +97,7 @@ class _AddEventState extends State<AddEvent> {
                           ),
                         ),
                         TextField(
-                          controller: _emailController,
+                          controller: _eventObjectiveController,
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.none,
                           autocorrect: false,
