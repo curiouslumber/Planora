@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:planora/utils/font_weights.dart';
+import 'package:planora/views/pages/tools/events/add_event.dart';
+import 'package:planora/views/pages/tools/events/event_page.dart';
 
 class Events extends StatelessWidget {
   const Events({super.key});
@@ -13,16 +15,23 @@ class Events extends StatelessWidget {
       body: Center(
         child: ListView.separated(
           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          itemCount: 5,
+          itemCount: 0,
           separatorBuilder:
               (context, index) => Divider(color: Colors.transparent),
           itemBuilder: (context, index) {
-            return Container(
-              height: 200.0,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(16.0),
-              ),
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EventPage()),
+                );
+              },
+              child: Container(
+                height: 200.0,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
               child: Column(
                 children: [
                   Expanded(
@@ -44,7 +53,7 @@ class Events extends StatelessWidget {
                           top: 8.0,
                           right: 8.0,
                           child: Container(
-                            padding: const EdgeInsets.all(6.0),
+                              padding: const EdgeInsets.all(8.0),
                             decoration: BoxDecoration(
                               color: Theme.of(
                                 context,
@@ -54,7 +63,7 @@ class Events extends StatelessWidget {
                             child: Icon(
                               Icons.edit,
                               color: Theme.of(context).colorScheme.primary,
-                              size: 14.0,
+                                size: 16.0,
                             ),
                           ),
                         ),
@@ -149,6 +158,7 @@ class Events extends StatelessWidget {
                   ),
                 ],
               ),
+              ),
             );
           },
         ),
@@ -157,7 +167,12 @@ class Events extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         foregroundColor: Theme.of(context).colorScheme.primary,
         shape: const CircleBorder(),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddEvent()),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
