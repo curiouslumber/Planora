@@ -413,7 +413,7 @@ class _PeopleState extends State<People> {
                                               child: Row(
                                                 spacing: 4.0,
                                                 children: [
-                                                  Icon(Icons.generating_tokens),
+                                                  Icon(CupertinoIcons.sparkles),
                                                   Text("AI Generate"),
                                                 ],
                                               ),
