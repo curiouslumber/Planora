@@ -1,9 +1,10 @@
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:planora/utils/font_weights.dart';
-import 'package:planora/views/pages/tools/people/create_new_contact.dart';
 
 class People extends StatefulWidget {
   const People({super.key});
@@ -15,6 +16,8 @@ class People extends StatefulWidget {
 class _PeopleState extends State<People> {
   List<Contact> allContacts = [];
   List<Contact> filteredContacts = [];
+
+  List<Contact> appContacts = [];
 
   @override
   void initState() {
@@ -30,7 +33,9 @@ class _PeopleState extends State<People> {
         filteredContacts = contacts;
       });
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -53,13 +58,6 @@ class _PeopleState extends State<People> {
     super.dispose();
   }
 
-  static const templateNames = [
-    "Noel Pinto",
-    "Hansel Presley Saldanha",
-    "Eben Dsouza",
-    "Umraan Mastan",
-  ];
-
   final TextEditingController contactSearchController = TextEditingController();
 
   @override
@@ -78,7 +76,7 @@ class _PeopleState extends State<People> {
           runSpacing: 24.0,
           spacing: 16.0,
           children: List.generate(
-            templateNames.length,
+            appContacts.length,
             (index) => Column(
               spacing: 8.0,
               children: [
@@ -89,7 +87,7 @@ class _PeopleState extends State<People> {
                   ),
                 ),
                 Text(
-                  templateNames[index].split(" ").join("\n"),
+                  appContacts[index].structuredName!.givenName,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -312,11 +310,184 @@ class _PeopleState extends State<People> {
             labelBackgroundColor: Colors.transparent,
             labelShadow: List.empty(),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CreateNewContact(),
-                ),
+              showCupertinoModalPopup<void>(
+                context: context,
+                builder:
+                    (context) => CupertinoContextMenu.builder(
+                      actions: [
+                        CupertinoContextMenuAction(
+                          child: Text("New Contact"),
+                          onPressed: () {},
+                        ),
+                      ],
+                      builder: (
+                        BuildContext context,
+                        Animation<double> animation,
+                      ) {
+                        return Container(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          alignment: Alignment.topCenter,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: MediaQuery.removePadding(
+                            context: context,
+                            removeTop: true,
+                            child: CupertinoPageScaffold(
+                              navigationBar: CupertinoNavigationBar(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                leading: CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  sizeStyle: CupertinoButtonSize.medium,
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                middle: Text(
+                                  "New Contact",
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                trailing: CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  sizeStyle: CupertinoButtonSize.medium,
+                                  child: Text(
+                                    "Done",
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 16.0),
+                                    Column(
+                                      spacing: 16.0,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 60,
+                                          backgroundColor:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                          foregroundColor:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary,
+                                          child: Icon(Icons.person),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          spacing: 8.0,
+                                          children: [
+                                            CupertinoButton.filled(
+                                              sizeStyle:
+                                                  CupertinoButtonSize.small,
+                                              onPressed: () {},
+                                              child: Text('Add Photo'),
+                                            ),
+                                            CupertinoButton.filled(
+                                              sizeStyle:
+                                                  CupertinoButtonSize.small,
+                                              onPressed: () {},
+                                              child: Row(
+                                                spacing: 4.0,
+                                                children: [
+                                                  Icon(Icons.generating_tokens),
+                                                  Text("AI Generate"),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    CupertinoFormSection(
+                                      backgroundColor: Colors.transparent,
+                                      children: [
+                                        CupertinoFormRow(
+                                          padding: EdgeInsets.zero,
+                                          child: CupertinoTextField(
+                                            placeholder: 'Name',
+                                            keyboardType: TextInputType.name,
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.zero,
+                                            ),
+                                          ),
+                                        ),
+                                        CupertinoFormRow(
+                                          padding: EdgeInsets.zero,
+                                          child: CupertinoTextField(
+                                            placeholder: 'Email',
+                                            keyboardType:
+                                                TextInputType.emailAddress,
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.zero,
+                                            ),
+                                          ),
+                                        ),
+                                        CupertinoFormRow(
+                                          padding: EdgeInsets.zero,
+                                          child: CupertinoTextField(
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            placeholder: 'Phone Number',
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.zero,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
               );
             },
           ),
