@@ -184,7 +184,7 @@ class _PeopleState extends State<People> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0,
+                                              horizontal: 24.0,
                                             ),
                                             child: CupertinoSearchTextField(
                                               onChanged: (value) {
