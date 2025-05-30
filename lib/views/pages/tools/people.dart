@@ -1,7 +1,8 @@
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:planora/views/pages/tools/people/contact_list.dart';
+import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/people/create_new_contact.dart';
 
 class People extends StatefulWidget {
@@ -12,18 +13,54 @@ class People extends StatefulWidget {
 }
 
 class _PeopleState extends State<People> {
-  static const contacts = [
-    {"name": "Noel Pinto", "phoneNumber": "1234567890"},
-    {"name": "Hansel Presley Saldanha", "phoneNumber": "1234567890"},
-    {"name": "Eben Dsouza", "phoneNumber": "1234567890"},
-    {"name": "Umraan Mastan", "phoneNumber": "1234567890"},
-  ];
+  List<Contact> allContacts = [];
+  List<Contact> filteredContacts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadContacts();
+  }
+
+  Future<void> loadContacts() async {
+    try {
+      final contacts = await FastContacts.getAllContacts();
+      setState(() {
+        allContacts = contacts;
+        filteredContacts = contacts;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      filteredContacts =
+          allContacts
+              .where(
+                (contact) => contact.structuredName!.givenName
+                    .toLowerCase()
+                    .contains(value.toLowerCase()),
+              )
+              .toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    contactSearchController.dispose();
+    super.dispose();
+  }
+
   static const templateNames = [
     "Noel Pinto",
     "Hansel Presley Saldanha",
     "Eben Dsouza",
     "Umraan Mastan",
   ];
+
+  final TextEditingController contactSearchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +148,10 @@ class _PeopleState extends State<People> {
                                       backgroundColor:
                                           Theme.of(context).colorScheme.surface,
                                       navigationBar: CupertinoNavigationBar(
+                                        backgroundColor:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.surface,
                                         automaticallyImplyLeading: false,
                                         middle: Text(
                                           "Contact List",
@@ -119,9 +160,11 @@ class _PeopleState extends State<People> {
                                                 Theme.of(
                                                   context,
                                                 ).colorScheme.onSurface,
+                                            fontWeight: FontWeights.regular
                                           ),
                                         ),
                                         trailing: CupertinoButton(
+                                          padding: EdgeInsets.zero,
                                           sizeStyle: CupertinoButtonSize.medium,
                                           child: Text(
                                             "Close",
@@ -137,41 +180,81 @@ class _PeopleState extends State<People> {
                                           },
                                         ),
                                       ),
-                                      child: ListView.builder(
-                                        itemCount: contacts.length,
-                                        itemBuilder: (context, index) {
-                                          final contact = contacts[index];
-                                          return CupertinoListSection(
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0,
+                                            ),
+                                            child: CupertinoSearchTextField(
+                                              onChanged: (value) {
+                                                _onSearchChanged(value);
+                                              },
+                                              onSubmitted: (value) {
+                                                _onSearchChanged(value);
+                                              },
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                              controller:
+                                                  contactSearchController,
+                                              placeholder: 'Search',
+                                            ),
+                                          ),
+                                          CupertinoListSection.insetGrouped(
                                             backgroundColor:
                                                 Theme.of(
                                                   context,
                                                 ).colorScheme.surface,
-                                            header: Text(
-                                              contact["name"]!.substring(0, 1),
-                                            ),
-                                            children: [
-                                              CupertinoListTile(
-                                                leading: CircleAvatar(
-                                                  child: Text(
-                                                    contact["name"]!.substring(
-                                                      0,
-                                                      1,
-                                                    ),
-                                                  ),
-                                                ),
-                                                title: Text(
-                                                  contact["name"]!,
-                                                  style: TextStyle(
-                                                    color:
-                                                        Theme.of(
-                                                          context,
-                                                        ).colorScheme.onSurface,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
+                                            children:
+                                                filteredContacts
+                                                    .map(
+                                                      (
+                                                        contact,
+                                                      ) => CupertinoListTile.notched(
+                                                        key: ValueKey(
+                                                          contact
+                                                              .structuredName!
+                                                              .givenName,
+                                                        ),
+                                                        onTap:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                            ),
+                                                        trailing:
+                                                            const CupertinoListTileChevron(),
+                                                        leading: CircleAvatar(
+                                                          child: Text(
+                                                            contact
+                                                                .structuredName!
+                                                                .givenName
+                                                                .substring(
+                                                                  0,
+                                                                  1,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        title: Text(
+                                                          contact
+                                                              .structuredName!
+                                                              .givenName,
+                                                          style: TextStyle(
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                          ),
+                                        ],
                                       ),
                                     )
                                     : Scaffold(
@@ -188,21 +271,24 @@ class _PeopleState extends State<People> {
                                         ],
                                       ),
                                       body: ListView.builder(
-                                        itemCount: contacts.length,
+                                        itemCount: filteredContacts.length,
                                         itemBuilder: (context, index) {
-                                          final contact = contacts[index];
+                                          final contact =
+                                              filteredContacts[index];
                                           return ListTile(
                                             leading: CircleAvatar(
                                               child: Text(
-                                                contact["name"]!.substring(
+                                                contact
+                                                    .structuredName!
+                                                    .givenName
+                                                    .substring(
                                                   0,
                                                   1,
                                                 ),
                                               ),
                                             ),
-                                            title: Text(contact["name"]!),
-                                            subtitle: Text(
-                                              contact["phoneNumber"]!,
+                                            title: Text(
+                                              contact.structuredName!.givenName,
                                             ),
                                             trailing: Icon(Icons.arrow_forward),
                                             onTap: () {},
