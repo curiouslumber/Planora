@@ -404,13 +404,13 @@ class _AddEventState extends State<AddEvent> {
           borderRadius: BorderRadius.circular(32.0),
         ),
         onPressed: () {},
-        backgroundColor: Theme.of(context).colorScheme.onSurface,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         label: Text(
           "Create",
           style: TextStyle(
             fontSize: 16.0,
             fontWeight: FontWeights.bold,
-            color: Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ),

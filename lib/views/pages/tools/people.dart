@@ -1,10 +1,9 @@
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:planora/utils/font_weights.dart';
+import 'package:planora/widgets/contact_picker_modal.dart';
 
 class People extends StatefulWidget {
   const People({super.key});
@@ -16,47 +15,7 @@ class People extends StatefulWidget {
 class _PeopleState extends State<People> {
   List<Contact> allContacts = [];
   List<Contact> filteredContacts = [];
-
   List<Contact> appContacts = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadContacts();
-  }
-
-  Future<void> loadContacts() async {
-    try {
-      final contacts = await FastContacts.getAllContacts();
-      setState(() {
-        allContacts = contacts;
-        filteredContacts = contacts;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
-  }
-
-  void _onSearchChanged(String value) {
-    setState(() {
-      filteredContacts =
-          allContacts
-              .where(
-                (contact) => contact.structuredName!.givenName
-                    .toLowerCase()
-                    .contains(value.toLowerCase()),
-              )
-              .toList();
-    });
-  }
-
-  @override
-  void dispose() {
-    contactSearchController.dispose();
-    super.dispose();
-  }
 
   final TextEditingController contactSearchController = TextEditingController();
 
@@ -78,6 +37,7 @@ class _PeopleState extends State<People> {
           children: List.generate(
             appContacts.length,
             (index) => Column(
+              key: ValueKey(appContacts[index].id),
               spacing: 8.0,
               children: [
                 CircleAvatar(
@@ -142,157 +102,11 @@ class _PeopleState extends State<People> {
                             removeTop: true,
                             child:
                                 Theme.of(context).platform == TargetPlatform.iOS
-                                    ? CupertinoPageScaffold(
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.surface,
-                                      navigationBar: CupertinoNavigationBar(
-                                        backgroundColor:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.surface,
-                                        automaticallyImplyLeading: false,
-                                        middle: Text(
-                                          "Contact List",
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurface,
-                                            fontWeight: FontWeights.regular
-                                          ),
-                                        ),
-                                        trailing: CupertinoButton(
-                                          padding: EdgeInsets.zero,
-                                          sizeStyle: CupertinoButtonSize.medium,
-                                          child: Text(
-                                            "Close",
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 24.0,
-                                            ),
-                                            child: CupertinoSearchTextField(
-                                              onChanged: (value) {
-                                                _onSearchChanged(value);
-                                              },
-                                              onSubmitted: (value) {
-                                                _onSearchChanged(value);
-                                              },
-                                              style: TextStyle(
-                                                color:
-                                                    Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface,
-                                              ),
-                                              controller:
-                                                  contactSearchController,
-                                              placeholder: 'Search',
-                                            ),
-                                          ),
-                                          CupertinoListSection.insetGrouped(
-                                            backgroundColor:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.surface,
-                                            children:
-                                                filteredContacts
-                                                    .map(
-                                                      (
-                                                        contact,
-                                                      ) => CupertinoListTile.notched(
-                                                        key: ValueKey(
-                                                          contact
-                                                              .structuredName!
-                                                              .givenName,
-                                                        ),
-                                                        onTap:
-                                                            () => Navigator.pop(
-                                                              context,
-                                                            ),
-                                                        trailing:
-                                                            const CupertinoListTileChevron(),
-                                                        leading: CircleAvatar(
-                                                          child: Text(
-                                                            contact
-                                                                .structuredName!
-                                                                .givenName
-                                                                .substring(
-                                                                  0,
-                                                                  1,
-                                                                ),
-                                                          ),
-                                                        ),
-                                                        title: Text(
-                                                          contact
-                                                              .structuredName!
-                                                              .givenName,
-                                                          style: TextStyle(
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .onSurface,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                          ),
-                                        ],
-                                      ),
+                                    ? ContactPickerModalIOS(
+                                      appContacts: appContacts,
                                     )
-                                    : Scaffold(
-                                      appBar: AppBar(
-                                        title: Text("Contact List"),
-                                        automaticallyImplyLeading: false,
-                                        actions: [
-                                          IconButton(
-                                            icon: Icon(Icons.close),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      body: ListView.builder(
-                                        itemCount: filteredContacts.length,
-                                        itemBuilder: (context, index) {
-                                          final contact =
-                                              filteredContacts[index];
-                                          return ListTile(
-                                            leading: CircleAvatar(
-                                              child: Text(
-                                                contact
-                                                    .structuredName!
-                                                    .givenName
-                                                    .substring(
-                                                  0,
-                                                  1,
-                                                ),
-                                              ),
-                                            ),
-                                            title: Text(
-                                              contact.structuredName!.givenName,
-                                            ),
-                                            trailing: Icon(Icons.arrow_forward),
-                                            onTap: () {},
-                                          );
-                                        },
-                                      ),
+                                    : ContactPickerModalAndroid(
+                                      appContacts: appContacts,
                                     ),
                           ),
                         );
