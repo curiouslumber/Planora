@@ -15,6 +15,9 @@ class People extends StatefulWidget {
 
 class _PeopleState extends State<People> {
   List<PeopleModel> people = [];
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   @override
   void initState() {
@@ -27,6 +30,16 @@ class _PeopleState extends State<People> {
     setState(() {
       people = contacts;
     });
+  }
+
+  Future<void> addPeopleToHive(PeopleModel people) async {
+    await HiveEvents.addPeopleToHive(people);
+    getPeople();
+  }
+
+  Future<void> deletePeopleFromHive(int index) async {
+    await HiveEvents.deletePeopleFromHive(index);
+    getPeople();
   }
 
   @override
@@ -113,10 +126,48 @@ class _PeopleState extends State<People> {
                             child:
                                 Theme.of(context).platform == TargetPlatform.iOS
                                     ? ContactPickerModalIOS(
-                                      appContacts: people,
+                                      onContactSelected: (contact) {
+                                        addPeopleToHive(
+                                          PeopleModel(
+                                            name: contact.displayName,
+                                            imageUrl: "",
+                                            email:
+                                                contact.emails
+                                                    .map(
+                                                      (email) => email.address,
+                                                    )
+                                                    .toList(),
+                                            phone:
+                                                contact.phones
+                                                    .map(
+                                                      (phone) => phone.number,
+                                                    )
+                                                    .toList(),
+                                          ),
+                                        );
+                                      },
                                     )
                                     : ContactPickerModalAndroid(
-                                      appContacts: people,
+                                      onContactSelected: (contact) {
+                                        addPeopleToHive(
+                                          PeopleModel(
+                                            name: contact.displayName,
+                                            imageUrl: "",
+                                            email:
+                                                contact.emails
+                                                    .map(
+                                                      (email) => email.address,
+                                                    )
+                                                    .toList(),
+                                            phone:
+                                                contact.phones
+                                                    .map(
+                                                      (phone) => phone.number,
+                                                    )
+                                                    .toList(),
+                                          ),
+                                        );
+                                      },
                                     ),
                           ),
                         );
@@ -194,6 +245,22 @@ class _PeopleState extends State<People> {
                                     ),
                                   ),
                                   onPressed: () {
+                                    if (nameController.text.isNotEmpty &&
+                                        (emailController.text.isNotEmpty ||
+                                            phoneController.text.isNotEmpty)) {
+                                      addPeopleToHive(
+                                        PeopleModel(
+                                          name: nameController.text,
+                                          imageUrl: "",
+                                          email: emailController.text.split(
+                                            ",",
+                                          ),
+                                          phone: phoneController.text.split(
+                                            ",",
+                                          ),
+                                        ),
+                                      );
+                                    }
                                     Navigator.pop(context);
                                   },
                                 ),
@@ -252,6 +319,7 @@ class _PeopleState extends State<People> {
                                         CupertinoFormRow(
                                           padding: EdgeInsets.zero,
                                           child: CupertinoTextField(
+                                            controller: nameController,
                                             placeholder: 'Name',
                                             keyboardType: TextInputType.name,
                                             style: TextStyle(
@@ -268,6 +336,7 @@ class _PeopleState extends State<People> {
                                         CupertinoFormRow(
                                           padding: EdgeInsets.zero,
                                           child: CupertinoTextField(
+                                            controller: emailController,
                                             placeholder: 'Email',
                                             keyboardType:
                                                 TextInputType.emailAddress,
@@ -285,6 +354,7 @@ class _PeopleState extends State<People> {
                                         CupertinoFormRow(
                                           padding: EdgeInsets.zero,
                                           child: CupertinoTextField(
+                                            controller: phoneController,
                                             keyboardType: TextInputType.number,
                                             inputFormatters: [
                                               FilteringTextInputFormatter

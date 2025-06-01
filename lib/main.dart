@@ -9,6 +9,7 @@ import 'package:planora/databases/shared_preferences_helper.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/meetings_model.dart';
 import 'package:planora/models/notes_model.dart';
+import 'package:planora/models/people_model.dart';
 import 'package:planora/views/home_page.dart';
 
 void main() async {
@@ -22,6 +23,7 @@ void main() async {
   Hive.registerAdapter(EventModelAdapter());
   Hive.registerAdapter(NotesModelAdapter());
   Hive.registerAdapter(MeetingsModelAdapter());
+  Hive.registerAdapter(PeopleModelAdapter());
   runApp(MyApp(initialTheme: initialTheme));
 }
 

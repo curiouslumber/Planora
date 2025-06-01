@@ -3,12 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:fast_contacts/fast_contacts.dart';
-import 'package:planora/models/people_model.dart';
 
 class ContactPickerModalIOS extends StatefulWidget {
-  const ContactPickerModalIOS({super.key, required this.appContacts});
+  const ContactPickerModalIOS({super.key, required this.onContactSelected});
 
-  final List<PeopleModel> appContacts;
+  final Function(Contact contact) onContactSelected;
 
   @override
   State<ContactPickerModalIOS> createState() => _ContactPickerModalIOSState();
@@ -134,24 +133,7 @@ class _ContactPickerModalIOSState extends State<ContactPickerModalIOS> {
                           key: ValueKey(contact.id),
                           onTap: () {
                             Navigator.pop(context);
-                            widget.appContacts.add(
-                              PeopleModel(
-                                name: contact.structuredName!.givenName,
-                                imageUrl: "",
-                                email:
-                                    contact.emails.isNotEmpty
-                                        ? contact.emails
-                                            .map((e) => e.address)
-                                            .toList()
-                                        : [],
-                                phone:
-                                    contact.phones.isNotEmpty
-                                        ? contact.phones
-                                            .map((e) => e.number)
-                                            .toList()
-                                        : [],
-                              ),
-                            );
+                            widget.onContactSelected(contact);
                             setState(() {});
                           },
                           trailing: const CupertinoListTileChevron(),
@@ -177,9 +159,9 @@ class _ContactPickerModalIOSState extends State<ContactPickerModalIOS> {
 }
 
 class ContactPickerModalAndroid extends StatefulWidget {
-  const ContactPickerModalAndroid({super.key, required this.appContacts});
+  const ContactPickerModalAndroid({super.key, required this.onContactSelected});
 
-  final List<PeopleModel> appContacts;
+  final Function(dynamic contact) onContactSelected;
 
   @override
   State<ContactPickerModalAndroid> createState() =>
@@ -251,7 +233,10 @@ class _ContactPickerModalAndroidState extends State<ContactPickerModalAndroid> {
             ),
             title: Text(contact.structuredName!.givenName),
             trailing: Icon(Icons.arrow_forward),
-            onTap: () {},
+            onTap: () {
+              widget.onContactSelected(contact);
+              Navigator.pop(context);
+            },
           );
         },
       ),
