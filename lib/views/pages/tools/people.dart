@@ -1,8 +1,9 @@
-import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/people_model.dart';
 import 'package:planora/widgets/contact_picker_modal.dart';
 
 class People extends StatefulWidget {
@@ -13,11 +14,20 @@ class People extends StatefulWidget {
 }
 
 class _PeopleState extends State<People> {
-  List<Contact> allContacts = [];
-  List<Contact> filteredContacts = [];
-  List<Contact> appContacts = [];
+  List<PeopleModel> people = [];
 
-  final TextEditingController contactSearchController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    getPeople();
+  }
+
+  Future<void> getPeople() async {
+    final contacts = await HiveEvents.getPeopleFromHive();
+    setState(() {
+      people = contacts;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +45,9 @@ class _PeopleState extends State<People> {
           runSpacing: 24.0,
           spacing: 16.0,
           children: List.generate(
-            appContacts.length,
+            people.length,
             (index) => Column(
-              key: ValueKey(appContacts[index].id),
+              key: ValueKey(people[index].hashCode),
               spacing: 8.0,
               children: [
                 CircleAvatar(
@@ -47,7 +57,7 @@ class _PeopleState extends State<People> {
                   ),
                 ),
                 Text(
-                  appContacts[index].structuredName!.givenName,
+                  people[index].name,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -103,10 +113,10 @@ class _PeopleState extends State<People> {
                             child:
                                 Theme.of(context).platform == TargetPlatform.iOS
                                     ? ContactPickerModalIOS(
-                                      appContacts: appContacts,
+                                      appContacts: people,
                                     )
                                     : ContactPickerModalAndroid(
-                                      appContacts: appContacts,
+                                      appContacts: people,
                                     ),
                           ),
                         );
