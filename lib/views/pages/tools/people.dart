@@ -15,6 +15,7 @@ class People extends StatefulWidget {
 
 class _PeopleState extends State<People> {
   List<PeopleModel> people = [];
+  Set<int> selectedPeople = <int>{};
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -51,7 +52,25 @@ class _PeopleState extends State<People> {
     final diameter = (screenWidth - totalSpacing) / circlesPerRow;
     final radius = diameter / 2;
     return Scaffold(
-      appBar: AppBar(title: Text("People")),
+      appBar: AppBar(
+        title: Text("People"),
+        actions: [
+          if (selectedPeople.isNotEmpty) ...[
+            IconButton(onPressed: () {}, icon: Icon(CupertinoIcons.add)),
+            IconButton(
+              onPressed: () {
+                for (var index in selectedPeople) {
+                  deletePeopleFromHive(index);
+                }
+                setState(() {
+                  selectedPeople.clear();
+                });
+              },
+              icon: Icon(CupertinoIcons.trash),
+            ),
+          ],
+        ],
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.only(top: 8.0, bottom: 8.0, left: 4.0, right: 4.0),
         child: Wrap(
@@ -63,10 +82,48 @@ class _PeopleState extends State<People> {
               key: ValueKey(people[index].hashCode),
               spacing: 8.0,
               children: [
-                CircleAvatar(
-                  radius: radius,
-                  foregroundImage: NetworkImage(
-                    "https://randomuser.me/api/portraits/men/${index + 1}.jpg",
+                Badge(
+                  smallSize: 24,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  offset: Offset(-16, 4),
+                  label: Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    size: 16,
+                  ),
+                  isLabelVisible: selectedPeople.contains(index),
+                  child: InkWell(
+                    customBorder: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    onTap: () {
+                      if (selectedPeople.isNotEmpty) {
+                        setState(() {
+                          if (selectedPeople.contains(index)) {
+                            selectedPeople.remove(index);
+                          } else {
+                            selectedPeople.add(index);
+                          }
+                        });
+                        return;
+                      }
+                    },
+                    onLongPress: () {
+                      setState(() {
+                        if (selectedPeople.contains(index)) {
+                          selectedPeople.remove(index);
+                        } else {
+                          selectedPeople.add(index);
+                        }
+                      });
+                    },
+                    child: CircleAvatar(
+                      radius: radius,
+                      foregroundImage: NetworkImage(
+                        "https://randomuser.me/api/portraits/men/${index + 1}.jpg",
+                      ),
+                    ),
                   ),
                 ),
                 Text(

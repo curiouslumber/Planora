@@ -96,7 +96,9 @@ class _MeetingsState extends State<Meetings> {
         }
       } catch (e) {
         // Continue to web fallback
-        print('Failed to launch Zoom app: $e');
+        if (kDebugMode) {
+          print('Failed to launch Zoom app: $e');
+        }
       }
     }
 
