@@ -34,7 +34,7 @@ class Tools extends StatelessWidget {
               (constraints.maxWidth - 48) / 2; // Adjust for padding and spacing
           return GridView.builder(
             padding: const EdgeInsets.all(24.0),
-            itemCount: 5,
+            itemCount: 6,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: itemSize,
               crossAxisSpacing: 24,
@@ -64,7 +64,9 @@ class Tools extends StatelessWidget {
                     color:
                         index == 5
                             ? Theme.of(context).colorScheme.surfaceContainer
-                            : Theme.of(context).colorScheme.primary,
+                            : Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(32.0),
                   ),
                   child: Center(

@@ -90,8 +90,10 @@ class Guest extends StatelessWidget {
                       ),
                       child: SvgPicture.asset(
                         'assets/shapes/profile_card.svg',
-                        // ignore: deprecated_member_use
-                        color: Theme.of(context).colorScheme.primary,
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.primary,
+                          BlendMode.srcIn,
+                        ),
                         fit: BoxFit.cover,
                         clipBehavior: Clip.antiAlias,
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -269,7 +271,9 @@ class Guest extends StatelessWidget {
                           );
                         },
                         contentPadding: EdgeInsets.symmetric(horizontal: 32.0),
-                        tileColor: Theme.of(context).colorScheme.primary,
+                        tileColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.9),
                         minTileHeight:
                             MediaQuery.of(context).size.height * 0.08,
                         shape: RoundedRectangleBorder(

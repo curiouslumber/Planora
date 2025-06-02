@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/people_model.dart';
+import 'package:planora/views/pages/tools/people/people_page.dart';
 import 'package:planora/widgets/contact_picker_modal.dart';
 
 class People extends StatefulWidget {
@@ -108,6 +109,14 @@ class _PeopleState extends State<People> {
                         });
                         return;
                       }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => PeoplePage(people: people[index]),
+                        ),
+                      );
                     },
                     onLongPress: () {
                       setState(() {
@@ -120,8 +129,35 @@ class _PeopleState extends State<People> {
                     },
                     child: CircleAvatar(
                       radius: radius,
-                      foregroundImage: NetworkImage(
-                        "https://randomuser.me/api/portraits/men/${index + 1}.jpg",
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.9),
+                      child: ClipOval(
+                        child:
+                            people[index].imageUrl.isNotEmpty
+                                ? Image.network(
+                                  people[index].imageUrl,
+                                  fit: BoxFit.cover,
+                                )
+                                : CircleAvatar(
+                                  radius: radius / 2,
+                                  backgroundColor:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.secondaryFixed,
+                                  child: Text(
+                                    people[index].name
+                                        .split(' ')
+                                        .map((name) => name[0])
+                                        .join(),
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSecondaryFixed,
+                                    ),
+                                  ),
+                                ),
                       ),
                     ),
                   ),
