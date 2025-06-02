@@ -10,6 +10,7 @@ class HiveEvents {
   static const String meetingsBox = 'meetingsBox';
   static const String peopleBox = 'peopleBox';
 
+// Events CRUD
   static Future<void> addEventToHive(EventModel event) async {
     var box = await Hive.openBox<EventModel>(eventsBox);
     await box.add(event);
@@ -18,6 +19,27 @@ class HiveEvents {
   static Future<List<EventModel>> getEventsFromHive() async {
     var box = await Hive.openBox<EventModel>(eventsBox);
     return box.values.toList();
+  }
+
+  static Future<void> updateEventToHive(
+    int selectedIndex,
+    EventModel event,
+  ) async {
+    var box = await Hive.openBox<EventModel>(eventsBox);
+    await box.putAt(selectedIndex, event);
+  }
+
+  static Future<void> deleteEventFromHive(int index) async {
+    var box = await Hive.openBox<EventModel>(eventsBox);
+    await box.deleteAt(index);
+  }
+
+  static Future<void> deleteEventsFromHive(
+    Set<int> selectedEventIndices,
+  ) async {
+    var box = await Hive.openBox<EventModel>(eventsBox);
+    final keysToDelete = selectedEventIndices.map((index) => box.keyAt(index));
+    await box.deleteAll(keysToDelete);
   }
 
 // Notes CRUD

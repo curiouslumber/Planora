@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/event_model.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 
-class Events extends StatelessWidget {
+class Events extends StatefulWidget {
   const Events({super.key});
+
+  @override
+  State<Events> createState() => _EventsState();
+}
+
+class _EventsState extends State<Events> {
+  List<EventModel> events = [];
+
+  @override
+  void initState() {
+    getEvents();
+    super.initState();
+  }
+
+  Future<void> getEvents() async {
+    events = await HiveEvents.getEventsFromHive();
+    setState(() {});
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +37,7 @@ class Events extends StatelessWidget {
       body: Center(
         child: ListView.separated(
           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          itemCount: 0,
+          itemCount: events.length,
           separatorBuilder:
               (context, index) => Divider(color: Colors.transparent),
           itemBuilder: (context, index) {
@@ -23,7 +45,9 @@ class Events extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EventPage()),
+                  MaterialPageRoute(
+                    builder: (context) => EventPage(event: events[index]),
+                  ),
                 );
               },
               child: Container(
