@@ -382,7 +382,7 @@ class _AddEventState extends State<AddEvent> {
                           ),
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           spacing: 8.0,
                           children: [
                             Chip(label: Text("Create new")),
@@ -399,7 +399,6 @@ class _AddEventState extends State<AddEvent> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         icon: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
         shape: RoundedRectangleBorder(
