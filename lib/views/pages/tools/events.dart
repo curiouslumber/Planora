@@ -1,9 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/utils/dialogs.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
+
+enum EventMode { none, selecting }
 
 class Events extends StatefulWidget {
   const Events({super.key});
@@ -14,6 +19,8 @@ class Events extends StatefulWidget {
 
 class _EventsState extends State<Events> {
   List<EventModel> events = [];
+  Set<int> checkedEvents = {};
+  EventMode mode = EventMode.none;
 
   @override
   void initState() {
@@ -26,13 +33,51 @@ class _EventsState extends State<Events> {
     setState(() {});
   }
 
-  
+  Future<void> deleteEvents() async {
+    await HiveEvents.deleteEventsFromHive(checkedEvents);
+    setState(() {
+      checkedEvents.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Events"),
+        actionsPadding: EdgeInsets.only(right: 8.0),
+        actions: [
+          if (checkedEvents.isNotEmpty)
+            IconButton(
+              icon: const Icon(CupertinoIcons.delete),
+              onPressed:
+                  () => confirmationDialog(
+                    context,
+                    () => deleteEvents(),
+                    "Delete Events",
+                    "Are you sure you want to delete ${checkedEvents.length} ${checkedEvents.length > 1 ? "events" : "event"}?",
+                    "Delete",
+                  ),
+            ),
+
+          IconButton(
+            onPressed: () {
+              setState(() {
+                if (mode == EventMode.selecting) {
+                  checkedEvents.clear();
+                }
+                mode =
+                    mode == EventMode.selecting
+                        ? EventMode.none
+                        : EventMode.selecting;
+              });
+            },
+            icon:
+                mode == EventMode.selecting
+                    ? Icon(Icons.radio_button_checked)
+                    : Icon(Icons.radio_button_unchecked),
+          ),
+        ],
       ),
       body: Center(
         child: ListView.separated(
@@ -41,14 +86,36 @@ class _EventsState extends State<Events> {
           separatorBuilder:
               (context, index) => Divider(color: Colors.transparent),
           itemBuilder: (context, index) {
+            final event = events[index];
             return GestureDetector(
+              onLongPress: () {
+                setState(() {
+                  if (checkedEvents.contains(event.hashCode)) {
+                    checkedEvents.remove(event.hashCode);
+                  } else {
+                    checkedEvents.add(event.hashCode);
+                  }
+                });
+              },
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EventPage(event: events[index]),
-                  ),
-                );
+                if (mode == EventMode.selecting) {
+                  if (checkedEvents.contains(event.hashCode)) {
+                    setState(() {
+                      checkedEvents.remove(event.hashCode);
+                    });
+                    return;
+                  }
+                  setState(() {
+                    checkedEvents.add(event.hashCode);
+                  });
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EventPage(event: event),
+                    ),
+                  );
+                }
               },
               child: Container(
                 height: 200.0,
@@ -56,12 +123,11 @@ class _EventsState extends State<Events> {
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(16.0),
                 ),
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Stack(
-                      alignment: Alignment.topRight,
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Stack(
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(16.0),
@@ -91,13 +157,34 @@ class _EventsState extends State<Events> {
                             ),
                           ),
                         ),
+                          if (checkedEvents.contains(event.hashCode) ||
+                              mode == EventMode.selecting)
+                            Positioned(
+                              left: 8.0,
+                              top: 8.0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  checkedEvents.contains(event.hashCode)
+                                      ? Icons.check
+                                      : null,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  size: 16.0,
+                                ),
+                              ),
+                            ),
                       ],
                     ),
                   ),
                   Expanded(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,7 +197,7 @@ class _EventsState extends State<Events> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Event title - a lot of text",
+                                    event.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(
@@ -122,7 +209,7 @@ class _EventsState extends State<Events> {
                                   ),
                                 ),
                                 Text(
-                                  "Event description - a lot of description here",
+                                    event.description,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(
@@ -149,7 +236,9 @@ class _EventsState extends State<Events> {
                               children: [
                                 FittedBox(
                                   child: Text(
-                                    "27th May 2025",
+                                      DateFormat(
+                                        'd MMM yyyy',
+                                      ).format(event.startDate),
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodyMedium!.copyWith(
@@ -162,7 +251,7 @@ class _EventsState extends State<Events> {
                                 ),
                                 FittedBox(
                                   child: Text(
-                                    "10:00 am - 2:00 pm",
+                                      "${DateFormat('h:mm a').format(event.startTime)} - ${DateFormat('h:mm a').format(event.endTime)}",
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodyMedium!.copyWith(
@@ -194,7 +283,7 @@ class _EventsState extends State<Events> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddEvent()),
+            MaterialPageRoute(builder: (context) => AddEvent()),
           );
         },
         child: const Icon(Icons.add),

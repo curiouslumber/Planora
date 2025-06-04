@@ -7,7 +7,7 @@ class EventModel {
   @HiveField(0)
   final String name;
   @HiveField(1)
-  final String objective;
+  final String description;
   @HiveField(2)
   final DateTime startDate;
   @HiveField(3)
@@ -23,7 +23,7 @@ class EventModel {
 
   EventModel({
     required this.name,
-    required this.objective,
+    required this.description,
     required this.startDate,
     this.endDate,
     required this.startTime,

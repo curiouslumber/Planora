@@ -1,6 +1,9 @@
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/event_model.dart';
+import 'package:planora/models/people_model.dart';
 import 'package:planora/utils/font_weights.dart';
 
 class AddEvent extends StatefulWidget {
@@ -12,9 +15,23 @@ class AddEvent extends StatefulWidget {
 
 class _AddEventState extends State<AddEvent> {
   final TextEditingController _eventNameController = TextEditingController();
-  final TextEditingController _eventObjectiveController =
+  final TextEditingController _eventDescriptionController =
       TextEditingController();
-  Set<String> addedPeople = {};
+  DateTime? startDate;
+  DateTime? endDate;
+  DateTime? startTime;
+  DateTime? endTime;
+  Set<PeopleModel> addedPeople = {};
+
+  void addPeople(PeopleModel people) {
+    setState(() {
+      addedPeople.add(people);
+    });
+  }
+
+  void addEvent(EventModel event) {
+    HiveEvents.addEventToHive(event);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +115,7 @@ class _AddEventState extends State<AddEvent> {
                           ),
                         ),
                         TextField(
-                          controller: _eventObjectiveController,
+                          controller: _eventDescriptionController,
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.none,
                           autocorrect: false,
@@ -152,7 +169,12 @@ class _AddEventState extends State<AddEvent> {
                               DateTimeField(
                                 dateFormat: DateFormat('dd/MM/yyyy'),
                                 firstDate: DateTime.now(),
-                                value: DateTime.now(),
+                                value: startDate,
+                                onChanged: (value) {
+                                  setState(() {
+                                    startDate = value;
+                                  });
+                                },
                                 mode: DateTimeFieldPickerMode.date,
                                 style: TextStyle(
                                   fontSize: 14.0,
@@ -201,7 +223,12 @@ class _AddEventState extends State<AddEvent> {
                                 ),
                               ),
                               DateTimeField(
-                                value: DateTime.now(),
+                                value: endDate,
+                                onChanged: (value) {
+                                  setState(() {
+                                    endDate = value;
+                                  });
+                                },
                                 dateFormat: DateFormat('dd/MM/yyyy'),
                                 mode: DateTimeFieldPickerMode.date,
                                 style: TextStyle(
@@ -256,7 +283,12 @@ class _AddEventState extends State<AddEvent> {
                                 ),
                               ),
                               DateTimeField(
-                                value: DateTime.now(),
+                                value: startTime,
+                                onChanged: (value) {
+                                  setState(() {
+                                    startTime = value;
+                                  });
+                                },
                                 mode: DateTimeFieldPickerMode.time,
                                 initialPickerDateTime: DateTime.now(),
                                 style: TextStyle(
@@ -306,6 +338,12 @@ class _AddEventState extends State<AddEvent> {
                                 ),
                               ),
                               DateTimeField(
+                                value: endTime,
+                                onChanged: (value) {
+                                  setState(() {
+                                    endTime = value;
+                                  });
+                                },
                                 mode: DateTimeFieldPickerMode.time,
                                 style: TextStyle(
                                   fontSize: 14.0,
@@ -358,7 +396,7 @@ class _AddEventState extends State<AddEvent> {
                           runSpacing: 4.0,
                           children: [
                             for (var person in addedPeople)
-                              Chip(label: Text(person), onDeleted: () {}),
+                              Chip(label: Text(person.name), onDeleted: () {}),
                             if (addedPeople.length < 5)
                               Chip(
                                 avatar: Icon(Icons.add),
@@ -381,14 +419,17 @@ class _AddEventState extends State<AddEvent> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          spacing: 8.0,
-                          children: [
-                            Chip(label: Text("Create new")),
-                            Text("or"),
-                            Chip(label: Text("Add Existing")),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            spacing: 8.0,
+                            children: [
+                              Chip(label: Text("Create new")),
+                              Text("or"),
+                              Chip(label: Text("Add Existing")),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -404,7 +445,21 @@ class _AddEventState extends State<AddEvent> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),
-        onPressed: () {},
+        onPressed: () {
+          addEvent(
+            EventModel(
+              name: _eventNameController.text,
+              description: _eventDescriptionController.text,
+              startDate: startDate!,
+              endDate: endDate!,
+              startTime: startTime!,
+              endTime: endTime!,
+              people: addedPeople.map((e) => e.hashCode).toSet(),
+              meetingLink: null,
+            ),
+          );
+          Navigator.pop(context);
+        },
         backgroundColor: Theme.of(context).colorScheme.primary,
         label: Text(
           "Create",

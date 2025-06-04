@@ -18,12 +18,12 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
     };
     return EventModel(
       name: fields[0] as String,
-      objective: fields[1] as String,
+      description: fields[1] as String,
       startDate: fields[2] as DateTime,
       endDate: fields[3] as DateTime?,
       startTime: fields[4] as DateTime,
       endTime: fields[5] as DateTime,
-      people: (fields[6] as List<int>).toSet(),
+      people: (fields[6] as List<int>?)?.toSet(),
       meetingLink: fields[7] as String?,
     );
   }
@@ -35,7 +35,7 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.objective)
+      ..write(obj.description)
       ..writeByte(2)
       ..write(obj.startDate)
       ..writeByte(3)
