@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
+import 'package:planora/views/pages/tools/events/add_event.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -141,34 +142,43 @@ class Home extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 100.0,
-              child: DottedBorder(
-                options: RoundedRectDottedBorderOptions(
-                  radius: Radius.circular(8.0),
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
-                  padding: EdgeInsets.all(16.0),
-                  stackFit: StackFit.expand,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withAlpha(180),
-                    ),
-                    Text(
-                      "Create Event or Schedule a Meeting",
-                      style: TextStyle(
+            InkWell(
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AddEvent()),
+                  ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 100.0,
+                child: DottedBorder(
+                  options: RoundedRectDottedBorderOptions(
+                    radius: Radius.circular(8.0),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withAlpha(180),
+                    padding: EdgeInsets.all(16.0),
+                    stackFit: StackFit.expand,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add,
                         color: Theme.of(
                           context,
                         ).colorScheme.onSurface.withAlpha(180),
                       ),
-                    ),
-                  ],
+                      Text(
+                        "Create Event or Schedule a Meeting",
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withAlpha(180),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

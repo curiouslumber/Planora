@@ -14,11 +14,12 @@ class _AddEventState extends State<AddEvent> {
   final TextEditingController _eventNameController = TextEditingController();
   final TextEditingController _eventObjectiveController =
       TextEditingController();
+  Set<String> addedPeople = {};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Event")),
+      appBar: AppBar(title: Text("Create New Event")),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -89,7 +90,7 @@ class _AddEventState extends State<AddEvent> {
                       spacing: 8.0,
                       children: [
                         Text(
-                          'Event Objective',
+                          'Event Description',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
@@ -131,7 +132,7 @@ class _AddEventState extends State<AddEvent> {
                       ],
                     ),
                     Row(
-                      spacing: 8.0,
+                      spacing: 16.0,
                       children: [
                         Flexible(
                           child: Column(
@@ -154,7 +155,7 @@ class _AddEventState extends State<AddEvent> {
                                 value: DateTime.now(),
                                 mode: DateTimeFieldPickerMode.date,
                                 style: TextStyle(
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeights.regular,
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
@@ -204,7 +205,7 @@ class _AddEventState extends State<AddEvent> {
                                 dateFormat: DateFormat('dd/MM/yyyy'),
                                 mode: DateTimeFieldPickerMode.date,
                                 style: TextStyle(
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeights.regular,
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
@@ -237,7 +238,7 @@ class _AddEventState extends State<AddEvent> {
                       ],
                     ),
                     Row(
-                      spacing: 8.0,
+                      spacing: 16.0,
                       children: [
                         Flexible(
                           child: Column(
@@ -259,7 +260,7 @@ class _AddEventState extends State<AddEvent> {
                                 mode: DateTimeFieldPickerMode.time,
                                 initialPickerDateTime: DateTime.now(),
                                 style: TextStyle(
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeights.regular,
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
@@ -307,7 +308,7 @@ class _AddEventState extends State<AddEvent> {
                               DateTimeField(
                                 mode: DateTimeFieldPickerMode.time,
                                 style: TextStyle(
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeights.regular,
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
@@ -356,12 +357,13 @@ class _AddEventState extends State<AddEvent> {
                           spacing: 8.0,
                           runSpacing: 4.0,
                           children: [
-                            Chip(label: Text('John Doe')),
-                            Chip(label: Text('Jane Doe')),
-                            Chip(label: Text('Abel Doe')),
-                            Chip(label: Text('Katy Doe')),
-                            Chip(label: Text('& 2 more')),
-                            IconButton(onPressed: () {}, icon: Icon(Icons.add)),
+                            for (var person in addedPeople)
+                              Chip(label: Text(person), onDeleted: () {}),
+                            if (addedPeople.length < 5)
+                              Chip(
+                                avatar: Icon(Icons.add),
+                                label: Text("Add People"),
+                              ),
                           ],
                         ),
                       ],
