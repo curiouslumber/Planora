@@ -1,11 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:planora/models/event_model.dart';
 
 class TwoColumnRandomGrid extends StatelessWidget {
   final Random random = Random();
   final double minHeight = 80; // Minimum height for each block
+  final List<EventModel> events;
 
-  TwoColumnRandomGrid({super.key});
+  TwoColumnRandomGrid({super.key, required this.events});
 
   @override
   Widget build(BuildContext context) {

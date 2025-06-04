@@ -1,13 +1,32 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/event_model.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
+import 'package:planora/widgets/home_grid.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
-  static const cardRadius = 10.0;
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  List<EventModel> events = [];
+
+  void getEvents() async {
+    events = await HiveEvents.getEventsFromHive();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getEvents();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,46 +161,52 @@ class Home extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            InkWell(
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AddEvent()),
-                  ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 100.0,
-                child: DottedBorder(
-                  options: RoundedRectDottedBorderOptions(
-                    radius: Radius.circular(8.0),
-                    color: Theme.of(
+            if (events.isEmpty)
+              InkWell(
+                onTap:
+                    () => Navigator.push(
                       context,
-                    ).colorScheme.onSurface.withAlpha(180),
-                    padding: EdgeInsets.all(16.0),
-                    stackFit: StackFit.expand,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withAlpha(180),
-                      ),
-                      Text(
-                        "Create Event or Schedule a Meeting",
-                        style: TextStyle(
+                      MaterialPageRoute(builder: (context) => const AddEvent()),
+                    ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 100.0,
+                  child: DottedBorder(
+                    options: RoundedRectDottedBorderOptions(
+                      radius: Radius.circular(8.0),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(180),
+                      padding: EdgeInsets.all(16.0),
+                      stackFit: StackFit.expand,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add,
                           color: Theme.of(
                             context,
                           ).colorScheme.onSurface.withAlpha(180),
                         ),
-                      ),
-                    ],
+                        Text(
+                          "Create Event or Schedule a Meeting",
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withAlpha(180),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            if (events.isNotEmpty)
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.38,
+                child: TwoColumnRandomGrid(events: events),
+              ),
             const SizedBox(height: 24),
             Text(
               'Recent Activity',
