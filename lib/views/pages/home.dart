@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
@@ -27,6 +28,25 @@ class _HomeState extends State<Home> {
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
     setState(() {});
+  }
+
+  String getCompletedEventsPercentage(List<EventModel> events) {
+    if (events.isEmpty) return '-';
+    final completedCount =
+        events.where((e) => e.eventStatus == Constants.eventStatus[2]).length;
+    final percent = (completedCount / events.length * 100).round();
+    return '$percent%';
+  }
+
+  String getMilestoneMessage(String percent) {
+    if (percent == "-") return "Start planning events to get started!";
+    final int percentInt = int.parse(percent.replaceAll('%', ''));
+    if (percentInt <= 0) return Constants.milestoneMessages[0]!;
+    if (percentInt <= 1) return Constants.milestoneMessages[1]!;
+    if (percentInt <= 26) return Constants.milestoneMessages[26]!;
+    if (percentInt <= 50) return Constants.milestoneMessages[50]!;
+    if (percentInt <= 75) return Constants.milestoneMessages[75]!;
+    return Constants.milestoneMessages[100]!;
   }
 
   @override
@@ -74,7 +94,11 @@ class _HomeState extends State<Home> {
             children: [
               SizedBox(height: 8),
               Text(
-                'Good Morning,',
+                DateTime.now().hour < 12
+                    ? Constants.greetingMorning
+                    : DateTime.now().hour < 18
+                    ? Constants.greetingAfternoon
+                    : Constants.greetingEvening,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
@@ -114,11 +138,14 @@ class _HomeState extends State<Home> {
               ),
               alignment: Alignment.center,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 8.0,
                 children: [
                   Expanded(
                     flex: 2,
                     child: Text(
-                      'Excellent! Your today’s plan is almost done',
+                      getMilestoneMessage(getCompletedEventsPercentage(events)),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 18,
@@ -137,14 +164,20 @@ class _HomeState extends State<Home> {
                           CircularProgressIndicator(
                             strokeWidth: 6,
                             strokeAlign: 8,
-                            value: 0.8,
+                            value:
+                                double.tryParse(
+                                  getCompletedEventsPercentage(
+                                    events,
+                                  ).replaceAll('%', ''),
+                                ) ??
+                                0,
                             color: Theme.of(context).colorScheme.onPrimary,
                             backgroundColor: Theme.of(
                               context,
                             ).colorScheme.surface.withValues(alpha: 0.4),
                           ),
                           Text(
-                            '82%',
+                            getCompletedEventsPercentage(events),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 18,
@@ -415,31 +448,53 @@ class _HomeState extends State<Home> {
                           color: Theme.of(context).colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                event.name,
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 13,
-                                ),
-                              ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.network(
+                            'https://freepngimg.com/thumb/paper_sheet/50195-1-exam-free-download-image.png',
+                            fit: BoxFit.cover,
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainer
+                                  .withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                '${DateFormat('jm').format(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').format(event.endDate!)}' : ''}',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 12,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    event.name,
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeights.bold,
+                                    ),
+                                  ),
                                 ),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    '${DateFormat('jm').format(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').format(event.endDate!)}' : ''}',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeights.semiBold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                               ),
-                            ),
+                          ),
                           ],
                         ),
                       ),
@@ -462,7 +517,7 @@ class _HomeState extends State<Home> {
               height: 60.0,
               alignment: Alignment.center,
               child: Text(
-                'None to show here...',
+                'Start by completing your first event!',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),

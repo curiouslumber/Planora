@@ -111,6 +111,7 @@ class AddMeeting extends StatelessWidget {
                       endTime: DateTime.now(),
                     ),
                   );
+                  
                   Navigator.pop(context);
                 },
                 child: Text('Add'),

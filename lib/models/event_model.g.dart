@@ -24,9 +24,9 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       endDate: fields[4] as DateTime?,
       startTime: fields[5] as DateTime,
       endTime: fields[6] as DateTime,
-      people: (fields[7] as Set?)?.cast<String>(),
+      people: (fields[7] as List<dynamic>?)?.cast<String>().toSet(),
       meeting: fields[8] as String?,
-      eventStatus: fields[9] as EventStatus,
+      eventStatus: fields[9] as String,
     );
   }
 
