@@ -8,6 +8,7 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
+import 'package:planora/views/pages/tools/events/event_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -442,68 +443,75 @@ class _HomeState extends State<Home> {
                           gridTileConstants[index]!['crossAxisCellCount']!,
                       mainAxisCellCount:
                           gridTileConstants[index]!['mainAxisCellCount']!,
+                    child: GestureDetector(
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EventPage(event: event),
+                            ),
+                          ),
                       child: Container(
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.network(
-                            'https://freepngimg.com/thumb/paper_sheet/50195-1-exam-free-download-image.png',
-                            fit: BoxFit.cover,
-                          ),
-                          Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainer
-                                  .withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(8.0),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.network(
+                              'https://freepngimg.com/thumb/paper_sheet/50195-1-exam-free-download-image.png',
+                              fit: BoxFit.cover,
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    event.name,
-                                    style: TextStyle(
-                                      color:
-                                          Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.8),
-                                      fontSize: 14,
-                                      fontWeight: FontWeights.bold,
-                                    ),
-                                  ),
-                                ),
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    '${DateFormat('jm').format(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').format(event.endDate!)}' : ''}',
-                                    style: TextStyle(
-                                      color:
-                                          Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.8),
-                                      fontSize: 12,
-                                      fontWeight: FontWeights.semiBold,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainer
+                                    .withValues(alpha: 0.8),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
-                          ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      event.name,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.8),
+                                        fontSize: 14,
+                                        fontWeight: FontWeights.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      '${DateFormat('jm').format(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').format(event.endDate!)}' : ''}',
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.8),
+                                        fontSize: 12,
+                                        fontWeight: FontWeights.semiBold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
+                    ),
                     );
                   },
                 ),
@@ -525,11 +533,13 @@ class _HomeState extends State<Home> {
               child: Text(
                 'Start by completing your first event!',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32.0),
             Container(
               margin: EdgeInsets.only(top: 8.0),
               child: Text(
