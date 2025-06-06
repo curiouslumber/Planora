@@ -35,6 +35,7 @@ class _EventsState extends State<Events> {
 
   Future<void> deleteEvents() async {
     await HiveEvents.deleteEventsFromHive(checkedEvents);
+    await getEvents();
     setState(() {
       checkedEvents.clear();
     });
@@ -90,23 +91,23 @@ class _EventsState extends State<Events> {
             return GestureDetector(
               onLongPress: () {
                 setState(() {
-                  if (checkedEvents.contains(event.hashCode)) {
-                    checkedEvents.remove(event.hashCode);
+                  if (checkedEvents.contains(index)) {
+                    checkedEvents.remove(index);
                   } else {
-                    checkedEvents.add(event.hashCode);
+                    checkedEvents.add(index);
                   }
                 });
               },
               onTap: () {
                 if (mode == EventMode.selecting) {
-                  if (checkedEvents.contains(event.hashCode)) {
+                  if (checkedEvents.contains(index)) {
                     setState(() {
-                      checkedEvents.remove(event.hashCode);
+                      checkedEvents.remove(index);
                     });
                     return;
                   }
                   setState(() {
-                    checkedEvents.add(event.hashCode);
+                    checkedEvents.add(index);
                   });
                 } else {
                   Navigator.push(
@@ -157,7 +158,7 @@ class _EventsState extends State<Events> {
                             ),
                           ),
                         ),
-                          if (checkedEvents.contains(event.hashCode) ||
+                          if (checkedEvents.contains(index) ||
                               mode == EventMode.selecting)
                             Positioned(
                               left: 8.0,
@@ -169,7 +170,7 @@ class _EventsState extends State<Events> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
-                                  checkedEvents.contains(event.hashCode)
+                                  checkedEvents.contains(index)
                                       ? Icons.check
                                       : null,
                                   color:

@@ -451,7 +451,7 @@ class _AddEventState extends State<AddEvent> {
               name: _eventNameController.text,
               description: _eventDescriptionController.text,
               startDate: startDate!,
-              endDate: endDate!,
+              endDate: endDate,
               startTime: startTime!,
               endTime: endTime!,
               people: addedPeople.map((e) => e.hashCode).toSet(),

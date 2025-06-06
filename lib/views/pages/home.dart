@@ -1,11 +1,12 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
-import 'package:planora/widgets/home_grid.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,6 +17,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<EventModel> events = [];
+  Map<int, Map<String, int>> gridTileConstants = {
+    0: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
+    1: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
+    2: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
+    3: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
+  };
 
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
@@ -152,13 +159,43 @@ class _HomeState extends State<Home> {
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Today\'s Schedule',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 18,
-                fontWeight: FontWeights.semiBold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Today\'s Schedule',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeights.semiBold,
+                  ),
+                ),
+                if (events.length == 2)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4.0),
+                    child: InkWell(
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddEvent(),
+                            ),
+                          ),
+                      child: DottedBorder(
+                        options: CircularDottedBorderOptions(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          padding: const EdgeInsets.all(6.0),
+                          dashPattern: const [2, 2],
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
             if (events.isEmpty)
@@ -203,9 +240,212 @@ class _HomeState extends State<Home> {
                 ),
               ),
             if (events.isNotEmpty)
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.38,
-                child: TwoColumnRandomGrid(events: events),
+              StaggeredGrid.count(
+                crossAxisCount: 3,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                children: List.generate(
+                  events.length < 3 ? events.length + 1 : 4,
+                  (index) {
+                    if (events.length > 3 && index == 3) {
+                      return StaggeredGridTile.count(
+                        crossAxisCellCount:
+                            gridTileConstants[3]!['crossAxisCellCount']!,
+                        mainAxisCellCount:
+                            gridTileConstants[3]!['mainAxisCellCount']!,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "View More",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.surface,
+                                  fontFamily:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.fontFamily,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "+${events.length - 3} schedule",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Theme.of(context).colorScheme.surface,
+                                  fontFamily:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.fontFamily,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (events.length == 1 && index == 1) {
+                      return StaggeredGridTile.count(
+                        crossAxisCellCount:
+                            gridTileConstants[1]!['crossAxisCellCount']!,
+                        mainAxisCellCount:
+                            gridTileConstants[1]!['mainAxisCellCount']!,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: DottedBorder(
+                            options: RoundedRectDottedBorderOptions(
+                              radius: Radius.circular(8.0),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withAlpha(180),
+                              padding: EdgeInsets.all(16.0),
+                              stackFit: StackFit.expand,
+                            ),
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                spacing: 4.0,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.9),
+                                  ),
+                                  Text(
+                                    "Add Event",
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.9),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (events.length == 2 && index == 2) {
+                      return Container();
+                    }
+
+                    if (events.length == 3 && index == 3) {
+                      return StaggeredGridTile.count(
+                        crossAxisCellCount:
+                            gridTileConstants[3]!['crossAxisCellCount']!,
+                        mainAxisCellCount:
+                            gridTileConstants[3]!['mainAxisCellCount']!,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: DottedBorder(
+                            options: RoundedRectDottedBorderOptions(
+                              radius: Radius.circular(8.0),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withAlpha(180),
+                              padding: EdgeInsets.all(16.0),
+                              stackFit: StackFit.expand,
+                            ),
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                spacing: 4.0,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.9),
+                                  ),
+                                  Text(
+                                    "Add Event/Meeting",
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.9),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    final event = events.asMap().entries.elementAt(index).value;
+                    return StaggeredGridTile.count(
+                      crossAxisCellCount:
+                          gridTileConstants[index]!['crossAxisCellCount']!,
+                      mainAxisCellCount:
+                          gridTileConstants[index]!['mainAxisCellCount']!,
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                event.name,
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                '${DateFormat('jm').format(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').format(event.endDate!)}' : ''}',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             const SizedBox(height: 24),
             Text(
@@ -224,7 +464,7 @@ class _HomeState extends State<Home> {
               child: Text(
                 'None to show here...',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -234,7 +474,7 @@ class _HomeState extends State<Home> {
               child: Text(
                 'Made with ❤️\nby Noel Pinto',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),

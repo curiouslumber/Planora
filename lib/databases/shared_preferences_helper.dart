@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
   static const String themeKey = "theme";
+  static const String eventsHomeBoxesRandomHeightsKey =
+      "eventsHomeBoxesRandomHeights";
 
   static Future<ThemeData> getTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -24,5 +26,26 @@ class SharedPreferencesHelper {
       themeKey,
       theme.brightness == Brightness.light ? "light" : "dark",
     );
+  }
+
+  static Future<void> saveEventsHomeBoxesRandomHeights(
+    List<double> heights,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      eventsHomeBoxesRandomHeightsKey,
+      heights.map((height) => height.toString()).toList(),
+    );
+  }
+
+  static Future<List<double>> getEventsHomeBoxesRandomHeights() async {
+    final prefs = await SharedPreferences.getInstance();
+    final heightsStringList = prefs.getStringList(
+      eventsHomeBoxesRandomHeightsKey,
+    );
+    if (heightsStringList == null) {
+      return [];
+    }
+    return heightsStringList.map((height) => double.parse(height)).toList();
   }
 }
