@@ -474,7 +474,10 @@ class _HomeState extends State<Home> {
                                     event.name,
                                     style: TextStyle(
                                       color:
-                                          Theme.of(context).colorScheme.primary,
+                                          Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.8),
                                       fontSize: 14,
                                       fontWeight: FontWeights.bold,
                                     ),
@@ -486,7 +489,10 @@ class _HomeState extends State<Home> {
                                     '${DateFormat('jm').format(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').format(event.endDate!)}' : ''}',
                                     style: TextStyle(
                                       color:
-                                          Theme.of(context).colorScheme.primary,
+                                          Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.8),
                                       fontSize: 12,
                                       fontWeight: FontWeights.semiBold,
                                     ),
