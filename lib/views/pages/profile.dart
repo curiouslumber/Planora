@@ -1,15 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/utils/app_theme.dart';
 import 'package:planora/utils/font_weights.dart';
 
 class Profile extends StatelessWidget {
-  final User user;
-  const Profile({super.key, required this.user});
+  const Profile({super.key});
 
   static const List<String> options = ['Account', 'Settings', 'Help'];
 
@@ -121,7 +118,7 @@ class Profile extends StatelessWidget {
                             Column(
                               children: [
                                 Text(
-                                  user.displayName ?? 'User Name',
+                                  'User Name',
                                   style: TextStyle(
                                     fontSize: 24.0,
                                     fontWeight: FontWeights.semiBold,
@@ -145,7 +142,7 @@ class Profile extends StatelessWidget {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: '\u00A0${user.email}',
+                                        text: '\u00A0user@example.com',
                                         style: TextStyle(
                                           fontSize: 12.0,
                                           color:
@@ -279,10 +276,7 @@ class Profile extends StatelessWidget {
                     itemBuilder: (context, index) {
                       if (index == 3) {
                         return ListTile(
-                          onTap:
-                              () => context.read<AuthBloc>().add(
-                                GoogleSignOutRequested(),
-                              ),
+                          onTap: () {},
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 32.0,
                           ),

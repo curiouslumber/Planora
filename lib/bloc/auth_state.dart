@@ -14,12 +14,12 @@ final class AuthLoading extends AuthState {}
 
 // Signed-in succesfully
 final class Authenticated extends AuthState {
-  final User user;
+  // final User user;
 
-  Authenticated(this.user);
+  Authenticated();
 
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [];
 }
 
 // Not signed in

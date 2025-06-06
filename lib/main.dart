@@ -1,5 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,9 +13,6 @@ import 'package:planora/views/home_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-  }
   await Hive.initFlutter();
   final initialTheme = await SharedPreferencesHelper.getTheme();
   Hive.registerAdapter(EventModelAdapter());
