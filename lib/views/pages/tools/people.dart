@@ -6,6 +6,7 @@ import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/people_model.dart';
 import 'package:planora/views/pages/tools/people/people_page.dart';
 import 'package:planora/widgets/contact_picker_modal.dart';
+import 'package:uuid/uuid.dart';
 
 class People extends StatefulWidget {
   const People({super.key});
@@ -222,6 +223,7 @@ class _PeopleState extends State<People> {
                                       onContactSelected: (contact) {
                                         addPeopleToHive(
                                           PeopleModel(
+                                            id: Uuid().v4(),
                                             name: contact.displayName,
                                             imageUrl: "",
                                             email:
@@ -244,6 +246,7 @@ class _PeopleState extends State<People> {
                                       onContactSelected: (contact) {
                                         addPeopleToHive(
                                           PeopleModel(
+                                            id: Uuid().v4(),
                                             name: contact.displayName,
                                             imageUrl: "",
                                             email:
@@ -343,6 +346,7 @@ class _PeopleState extends State<People> {
                                             phoneController.text.isNotEmpty)) {
                                       addPeopleToHive(
                                         PeopleModel(
+                                          id: Uuid().v4(),
                                           name: nameController.text,
                                           imageUrl: "",
                                           email: emailController.text.split(

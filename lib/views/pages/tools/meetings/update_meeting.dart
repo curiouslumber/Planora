@@ -117,6 +117,7 @@ class _UpdateMeetingState extends State<UpdateMeeting> {
                 ),
                 onPressed: () {
                   final meeting = MeetingsModel(
+                    id: widget.meeting.id,
                     meetingTitle: meetingTitleController.text,
                     meetingLink: meetingLinkController.text,
                     startTime: widget.meeting.startTime,

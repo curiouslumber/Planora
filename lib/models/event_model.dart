@@ -2,26 +2,33 @@ import 'package:hive/hive.dart';
 
 part 'event_model.g.dart';
 
+enum EventStatus { upcoming, inProgress, completed, missed, cancelled }
+
 @HiveType(typeId: 0)
 class EventModel {
   @HiveField(0)
-  final String name;
+  final String id;
   @HiveField(1)
-  final String description;
+  final String name;
   @HiveField(2)
-  final DateTime startDate;
+  final String description;
   @HiveField(3)
-  final DateTime? endDate;
+  final DateTime startDate;
   @HiveField(4)
-  final DateTime startTime;
+  final DateTime? endDate;
   @HiveField(5)
-  final DateTime endTime;
+  final DateTime startTime;
   @HiveField(6)
-  final Set<int>? people;
+  final DateTime endTime;
   @HiveField(7)
-  final String? meetingLink;
+  final Set<String>? people;
+  @HiveField(8)
+  final String? meeting;
+  @HiveField(9)
+  final EventStatus eventStatus;
 
   EventModel({
+    required this.id,
     required this.name,
     required this.description,
     required this.startDate,
@@ -29,6 +36,7 @@ class EventModel {
     required this.startTime,
     required this.endTime,
     this.people,
-    this.meetingLink,
+    this.meeting,
+    this.eventStatus = EventStatus.upcoming,
   });
 }

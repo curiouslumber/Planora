@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:planora/models/meetings_model.dart';
 import 'package:planora/utils/font_weights.dart';
+import 'package:uuid/uuid.dart';
 
 class AddMeeting extends StatelessWidget {
   AddMeeting({super.key, required this.addMeetingToHive});
@@ -103,6 +104,7 @@ class AddMeeting extends StatelessWidget {
                   final meetingLink = meetingLinkController.text.trim();
                   addMeetingToHive(
                     MeetingsModel(
+                      id: Uuid().v4(),
                       meetingTitle: meetingTitle.isNotEmpty ? meetingTitle : DateFormat('dd MMMM yyyy, hh:mm a').format(DateTime.now()),
                       meetingLink: meetingLink,
                       startTime: DateTime.now(),

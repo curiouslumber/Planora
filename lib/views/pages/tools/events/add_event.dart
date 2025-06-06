@@ -5,6 +5,7 @@ import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/people_model.dart';
 import 'package:planora/utils/font_weights.dart';
+import 'package:uuid/uuid.dart';
 
 class AddEvent extends StatefulWidget {
   const AddEvent({super.key});
@@ -448,14 +449,15 @@ class _AddEventState extends State<AddEvent> {
         onPressed: () {
           addEvent(
             EventModel(
+              id: Uuid().v4(),
               name: _eventNameController.text,
               description: _eventDescriptionController.text,
               startDate: startDate!,
               endDate: endDate,
               startTime: startTime!,
               endTime: endTime!,
-              people: addedPeople.map((e) => e.hashCode).toSet(),
-              meetingLink: null,
+              people: addedPeople.map((e) => e.id).toSet(),
+              meeting: null,
             ),
           );
           Navigator.pop(context);

@@ -4,6 +4,7 @@ import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/utils/dialogs.dart';
 import 'package:planora/widgets/note_builder.dart';
+import 'package:uuid/uuid.dart';
 
 enum NoteMode { none, editing, creating, selecting }
 
@@ -85,6 +86,7 @@ class _NotesState extends State<Notes> {
         return;
       }
       final note = NotesModel(
+        id: Uuid().v4(),
         title: title.isEmpty ? "Title here" : title,
         text: text,
         createdAt: DateTime.now(),
@@ -98,9 +100,10 @@ class _NotesState extends State<Notes> {
       final oldNote = notes[selectedIndex!];
       if (oldNote.title != title || oldNote.text != text) {
         NotesModel newNote = NotesModel(
+          id: oldNote.id,
           title: title,
           text: text,
-          createdAt: notes[selectedIndex!].createdAt,
+          createdAt: oldNote.createdAt,
         );
         await HiveEvents.updateNoteToHive(newNote, selectedIndex!);
         setState(() {
