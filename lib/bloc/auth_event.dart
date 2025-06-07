@@ -6,7 +6,16 @@ sealed class AuthEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Email Password Events
+// User tapped "Sign In with Google"
+class GoogleSignInRequested extends AuthEvent {}
+
+// User tapped "Sign Out"
+class GoogleSignOutRequested extends AuthEvent {}
+
+// Checking if already signed in at startup
+class GoogleSignInCheckRequested extends AuthEvent {}
+
+// User tapped "Create Account with Email and Password"
 class EmailSignUpRequested extends AuthEvent {
   final String name;
   final String email;
@@ -19,6 +28,7 @@ class EmailSignUpRequested extends AuthEvent {
   List<Object?> get props => [email, password];
 }
 
+// User tapped "Sign In with Email and Password"
 class EmailSignInRequested extends AuthEvent {
   final String email;
   final String password;
@@ -29,12 +39,5 @@ class EmailSignInRequested extends AuthEvent {
   List<Object?> get props => [email, password];
 }
 
+// User tapped "Sign Out"
 class EmailSignOutRequested extends AuthEvent {}
-
-// Google Events
-class GoogleSignInRequested extends AuthEvent {}
-
-class GoogleSignOutRequested extends AuthEvent {}
-
-// Checking if already signed in at startup
-class GoogleSignInCheckRequested extends AuthEvent {}

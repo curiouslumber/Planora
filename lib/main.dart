@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
-import 'package:planora/utils/globals.dart';
+import 'package:planora/models/event_model.dart';
+import 'package:planora/models/meetings_model.dart';
+import 'package:planora/models/notes_model.dart';
+import 'package:planora/models/people_model.dart';
 import 'package:planora/views/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load();
-  Globals.initializeSupabase();
-  Globals.initializeHive();
+  await Hive.initFlutter();
   final initialTheme = await SharedPreferencesHelper.getTheme();
-
-  runApp(PlanoraApp(initialTheme: initialTheme));
+  Hive.registerAdapter(EventModelAdapter());
+  Hive.registerAdapter(NotesModelAdapter());
+  Hive.registerAdapter(MeetingsModelAdapter());
+  Hive.registerAdapter(PeopleModelAdapter());
+  runApp(MyApp(initialTheme: initialTheme));
 }
 
-class PlanoraApp extends StatelessWidget {
-  const PlanoraApp({super.key, required this.initialTheme});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key, required this.initialTheme});
 
   final ThemeData? initialTheme;
 
