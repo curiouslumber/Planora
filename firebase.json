@@ -1,0 +1,41 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "planora-ce1d3",
+          "appId": "1:1059127705166:android:b5f08be15ae4a2abf0cd1f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "planora-ce1d3",
+          "appId": "1:1059127705166:ios:d717790cf41dbdf0f0cd1f",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "planora-ce1d3",
+          "configurations": {
+            "android": "1:1059127705166:android:b5f08be15ae4a2abf0cd1f",
+            "ios": "1:1059127705166:ios:d717790cf41dbdf0f0cd1f"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
+  }
+}

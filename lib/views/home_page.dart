@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (state is AuthLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is Authenticated) {
-          return const Profile();
+          return Profile(user: state.user);
         } else {
           return Guest();
         }
