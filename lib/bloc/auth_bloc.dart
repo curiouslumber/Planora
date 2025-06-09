@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:planora/models/user_model.dart';
@@ -52,8 +53,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             event.email,
             event.password,
           );
-      if (user == null) {
-        emit(AuthError('User not created'));
+      if (user is! User) {
+        emit(AuthError(user.toString()));
         return;
       }
 
@@ -137,8 +138,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.email,
         event.password,
       );
-      if (user == null) {
-        emit(AuthError('User not found'));
+      if (user is! User) {
+        emit(AuthError(user.toString()));
         return;
       }
 

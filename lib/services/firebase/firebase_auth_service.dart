@@ -14,7 +14,7 @@ class FirebaseAuthService {
   User? get currentUser => _firebaseAuth.currentUser;
 
   // Create a new user with email and password
-  Future<User?> createUserWithEmailAndPassword(
+  Future<Object?> createUserWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -28,12 +28,12 @@ class FirebaseAuthService {
       if (kDebugMode) {
         print('Error during Email Sign-Up: $e');
       }
-      return null;
+      return e;
     }
   }
 
   // Sign with email and password
-  Future<User?> signInFirebaseWithEmail(String email, String password) async {
+  Future<Object?> signInFirebaseWithEmail(String email, String password) async {
     try {
       final userCred = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -44,7 +44,7 @@ class FirebaseAuthService {
       if (kDebugMode) {
         print('Error during Email Sign-In: $e');
       }
-      return null;
+      return e;
     }
   }
 

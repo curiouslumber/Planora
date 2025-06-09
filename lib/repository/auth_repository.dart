@@ -25,7 +25,7 @@ class AuthRepository {
     return _firebaseFirestoreService.getUserDocument(uuid);
   }
 
-  Future<User?> createFirebaseAuthUserWithEmailAndPassword(
+  Future<Object?> createFirebaseAuthUserWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -50,7 +50,7 @@ class AuthRepository {
     );
   }
 
-  Future<User?> signInWithEmail(String email, String password) async {
+  Future<Object?> signInWithEmail(String email, String password) async {
     return _firebaseAuthService.signInFirebaseWithEmail(email, password);
   }
 
