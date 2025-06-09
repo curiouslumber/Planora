@@ -24,6 +24,22 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
+        if (state is AuthLoading) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return const Center(child: CircularProgressIndicator());
+            },
+          );
+        }
+        if (state is AuthError) {
+          Navigator.pop(context);
+          final msg = state.message;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(msg)));
+        }
         if (state is Unauthenticated) {
           Navigator.pushReplacement(
             context,
