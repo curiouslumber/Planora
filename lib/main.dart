@@ -26,11 +26,11 @@ void main() async {
   Hive.registerAdapter(NotesModelAdapter());
   Hive.registerAdapter(MeetingsModelAdapter());
   Hive.registerAdapter(PeopleModelAdapter());
-  runApp(MyApp(initialTheme: initialTheme));
+  runApp(PlanoraApp(initialTheme: initialTheme));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.initialTheme});
+class PlanoraApp extends StatelessWidget {
+  const PlanoraApp({super.key, required this.initialTheme});
 
   final ThemeData? initialTheme;
 
