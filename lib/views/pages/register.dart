@@ -26,6 +26,7 @@ class _RegisterState extends State<Register> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
+          Navigator.pop(context);
           final msg = state.message;
           ScaffoldMessenger.of(
             context,

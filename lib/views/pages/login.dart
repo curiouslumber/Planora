@@ -18,12 +18,14 @@ class _LoginState extends State<Login> {
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
+          Navigator.pop(context);
           final msg = state.message;
           ScaffoldMessenger.of(
             context,
