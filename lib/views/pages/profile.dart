@@ -281,7 +281,7 @@ class Profile extends StatelessWidget {
                         return ListTile(
                           onTap:
                               () => context.read<AuthBloc>().add(
-                                GoogleSignOutRequested(),
+                                SignOutRequested(),
                               ),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 32.0,

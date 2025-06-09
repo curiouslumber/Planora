@@ -66,6 +66,8 @@ class MyApp extends StatelessWidget {
                     );
                   } else if (state is Authenticated) {
                     return HomeScreen(user: state.user);
+                  } else if (state is Unauthenticated) {
+                    return HomeScreen(user: null);
                   } else {
                     return Scaffold(
                       body: Center(

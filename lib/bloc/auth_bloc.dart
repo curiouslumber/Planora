@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc(this._authRepository) : super(AuthInitial()) {
     on<CheckSignInRequested>(_checkSignInRequested);
+    on<SignOutRequested>(_onSignOutRequested);
 
     on<EmailSignInRequested>(_onEmailSignInRequested);
     on<EmailSignUpRequested>(_onEmailSignUpRequested);
@@ -73,6 +74,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
 
       emit(Authenticated(userDoc));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  // Event handlers
+  Future<void> _onSignOutRequested(
+    SignOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await _authRepository.signOut();
+      emit(Unauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));
     }

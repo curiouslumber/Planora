@@ -14,7 +14,7 @@ import 'package:planora/views/pages/tools/events/event_page.dart';
 class Home extends StatefulWidget {
   const Home({super.key, required this.user});
 
-  final UserModel user;
+  final UserModel? user;
 
   @override
   State<Home> createState() => _HomeState();
@@ -111,7 +111,7 @@ class _HomeState extends State<Home> {
               ),
               SizedBox(height: 2),
               Text(
-                widget.user.displayName,
+                widget.user?.displayName ?? 'Guest',
                 style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headlineLarge!.fontFamily,

@@ -9,6 +9,9 @@ sealed class AuthEvent extends Equatable {
 // Checking if already signed in at startup
 class CheckSignInRequested extends AuthEvent {}
 
+// Universal Sign Out
+class SignOutRequested extends AuthEvent {}
+
 // Email/Password Sign In/Sign Up
 // User tapped "Create Account with Email and Password"
 class EmailSignUpRequested extends AuthEvent {

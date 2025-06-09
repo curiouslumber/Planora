@@ -3,6 +3,7 @@ import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/pages/calendar.dart';
+import 'package:planora/views/pages/guest.dart';
 import 'package:planora/views/pages/home.dart';
 import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
@@ -12,7 +13,7 @@ import 'package:ionicons/ionicons.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.user});
 
-  final UserModel user;
+  final UserModel? user;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Home(user: widget.user),
       Calendar(),
       Tools(),
-      Profile(user: widget.user),
+      widget.user != null ? Profile(user: widget.user!) : Guest(),
     ];
 
     return RepositoryProvider(
