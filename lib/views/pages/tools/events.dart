@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/utils/dialogs.dart';
@@ -237,9 +236,9 @@ class _EventsState extends State<Events> {
                               children: [
                                 FittedBox(
                                   child: Text(
-                                      DateFormat(
-                                        'd MMM yyyy',
-                                      ).format(event.startDate),
+                                      DateTime.parse(
+                                        event.startDate,
+                                      ).toString(),
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodyMedium!.copyWith(
@@ -252,7 +251,7 @@ class _EventsState extends State<Events> {
                                 ),
                                 FittedBox(
                                   child: Text(
-                                      "${DateFormat('h:mm a').format(event.startTime)} - ${DateFormat('h:mm a').format(event.endTime)}",
+                                      "${DateTime.parse(event.startTime).hour}:${DateTime.parse(event.startTime).minute} - ${DateTime.parse(event.endTime).hour}:${DateTime.parse(event.endTime).minute}",
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodyMedium!.copyWith(

@@ -7,26 +7,29 @@ class EventModel {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String name;
+  final String eventTileImage;
   @HiveField(2)
-  final String description;
+  final String name;
   @HiveField(3)
-  final DateTime startDate;
+  final String description;
   @HiveField(4)
-  final DateTime? endDate;
+  final String startDate;
   @HiveField(5)
-  final DateTime startTime;
+  final String? endDate;
   @HiveField(6)
-  final DateTime endTime;
+  final String startTime;
   @HiveField(7)
-  final Set<String>? people;
+  final String endTime;
   @HiveField(8)
-  final String? meeting;
+  final List<String>? people;
   @HiveField(9)
+  final String? meeting;
+  @HiveField(10)
   final String eventStatus;
 
   EventModel({
     required this.id,
+    this.eventTileImage = '',
     required this.name,
     required this.description,
     required this.startDate,
@@ -37,4 +40,20 @@ class EventModel {
     this.meeting,
     this.eventStatus = "upcoming",
   });
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'eventTileImage': eventTileImage,
+      'name': name,
+      'description': description,
+      'startDate': startDate,
+      'endDate': endDate,
+      'startTime': startTime,
+      'endTime': endTime,
+      'people': people,
+      'meeting': meeting,
+      'eventStatus': eventStatus,
+    };
+  }
 }

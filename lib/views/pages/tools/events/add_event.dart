@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/people_model.dart';
+import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
 
@@ -30,7 +31,8 @@ class _AddEventState extends State<AddEvent> {
     });
   }
 
-  void addEvent(EventModel event) {
+  void addEvent(EventModel event) async {
+    await FirebaseFirestoreService().createEventDocument(event: event);
     HiveEvents.addEventToHive(event);
   }
 
@@ -452,11 +454,11 @@ class _AddEventState extends State<AddEvent> {
               id: Uuid().v4(),
               name: _eventNameController.text,
               description: _eventDescriptionController.text,
-              startDate: startDate!,
-              endDate: endDate,
-              startTime: startTime!,
-              endTime: endTime!,
-              people: addedPeople.map((e) => e.id).toSet(),
+              startDate: startDate!.toString(),
+              endDate: endDate?.toString(),
+              startTime: startTime!.toString(),
+              endTime: endTime!.toString(),
+              people: addedPeople.map((e) => e.id).toList(),
               meeting: null,
             ),
           );
