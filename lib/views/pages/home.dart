@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,9 @@ import 'package:planora/views/pages/tools/events/add_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({super.key, required this.user});
+
+  final UserModel user;
 
   @override
   State<Home> createState() => _HomeState();
@@ -108,7 +111,7 @@ class _HomeState extends State<Home> {
               ),
               SizedBox(height: 2),
               Text(
-                'Noel Pinto!',
+                widget.user.displayName,
                 style: TextStyle(
                   fontFamily:
                       Theme.of(context).textTheme.headlineLarge!.fontFamily,

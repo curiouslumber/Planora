@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/meetings_model.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/models/people_model.dart';
+import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/home_page.dart';
 
 void main() async {
@@ -42,7 +44,40 @@ class MyApp extends StatelessWidget {
             theme: state.theme,
             title: 'Planora',
             debugShowCheckedModeBanner: false,
-            home: const HomeScreen(),
+            home: BlocProvider(
+              create: (context) => AuthBloc(AuthRepository()),
+              child: BlocConsumer<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthError) {
+                    final msg = state.message;
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(msg)));
+                  }
+                },
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return Scaffold(
+                      body: Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    );
+                  } else if (state is Authenticated) {
+                    return HomeScreen(user: state.user);
+                  } else {
+                    return Scaffold(
+                      body: Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
           );
         },
       ),

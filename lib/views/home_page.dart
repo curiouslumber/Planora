@@ -1,16 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planora/bloc/auth_bloc.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/pages/calendar.dart';
 import 'package:planora/views/pages/home.dart';
-import 'package:planora/views/pages/guest.dart';
 import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.user});
+
+  final UserModel user;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -24,30 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // Flag to control whether the custom (direct) animation overlay is active.
   bool _isCustomTransitionActive = false;
 
-  static final List<Widget> _pages = [
-    Home(),
-    Calendar(),
-    Tools(),
-    BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthError) {
-          final msg = state.message;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(msg)));
-        }
-      },
-      builder: (context, state) {
-        if (state is AuthLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is Authenticated) {
-          return Profile(user: state.user);
-        } else {
-          return Guest();
-        }
-      },
-    ),
-  ];
 
   // Called when a bottom nav item is tapped.
   void _onBottomNavTap(int index) {
@@ -90,6 +68,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      Home(user: widget.user),
+      Calendar(),
+      Tools(),
+      Profile(user: widget.user),
+    ];
+
     return RepositoryProvider(
       create: (context) => AuthRepository(),
       child: BlocProvider(
@@ -104,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _currentIndex = index;
                   });
                 },
-                children: _pages,
+                children: pages,
               ),
               if (_isCustomTransitionActive)
                 AnimatedSwitcher(
@@ -123,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   child: Container(
                     key: ValueKey<int>(_currentIndex),
-                    child: _pages[_currentIndex],
+                    child: pages[_currentIndex],
                   ),
                 ),
             ],
