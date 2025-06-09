@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +7,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/user_model.dart';
+import 'package:planora/services/firebase/firebase_ai_service.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,7 @@ class _HomeState extends State<Home> {
     2: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
     3: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
   };
+  Uint8List? imageBytes;
 
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
@@ -56,8 +60,18 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     getEvents();
+    // generateImage();
     super.initState();
   }
+
+  // void generateImage() async {
+  //   final imageBytes = await FirebaseAiService().generateImage();
+  //   if (imageBytes != null) {
+  //     setState(() {
+  //       this.imageBytes = imageBytes;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -441,6 +455,7 @@ class _HomeState extends State<Home> {
                     }
 
                     final event = events.asMap().entries.elementAt(index).value;
+
                     return StaggeredGridTile.count(
                       crossAxisCellCount:
                           gridTileConstants[index]!['crossAxisCellCount']!,
@@ -463,10 +478,15 @@ class _HomeState extends State<Home> {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            Image.network(
-                              'https://freepngimg.com/thumb/paper_sheet/50195-1-exam-free-download-image.png',
-                              fit: BoxFit.cover,
-                            ),
+                              if (imageBytes != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.memory(
+                                    imageBytes!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  ),
+                                ),
                             Container(
                               width: double.infinity,
                               height: double.infinity,

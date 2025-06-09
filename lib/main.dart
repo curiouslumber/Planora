@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planora/bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
+import 'package:planora/firebase_options.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/meetings_model.dart';
 import 'package:planora/models/notes_model.dart';
@@ -18,7 +19,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   if (!kIsWeb) {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
   await Hive.initFlutter();
   final initialTheme = await SharedPreferencesHelper.getTheme();
