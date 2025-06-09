@@ -302,7 +302,9 @@ class _RegisterState extends State<Register> {
                                 _nameController.text,
                                 _emailController.text,
                                 _passwordController.text,
-                                "EMAIL_PASSWORD"
+                                "EMAIL_PASSWORD",
+                                null,
+                                null
                               ),
                             ),
                         style: ElevatedButton.styleFrom(

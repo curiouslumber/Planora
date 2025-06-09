@@ -14,7 +14,7 @@ final class AuthLoading extends AuthState {}
 
 // Signed-in succesfully
 final class Authenticated extends AuthState {
-  final User user;
+  final UserModel user;
 
   Authenticated(this.user);
 
