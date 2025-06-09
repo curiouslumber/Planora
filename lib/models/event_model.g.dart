@@ -19,43 +19,46 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
     return EventModel(
       id: fields[0] as String,
       eventTileImage: fields[1] as String,
-      name: fields[2] as String,
-      description: fields[3] as String,
-      startDate: fields[4] as String,
-      endDate: fields[5] as String?,
-      startTime: fields[6] as String,
-      endTime: fields[7] as String,
-      people: (fields[8] as List?)?.cast<String>(),
-      meeting: fields[9] as String?,
-      eventStatus: fields[10] as String,
+      eventTileVector: (fields[2] as List).cast<double>(),
+      name: fields[3] as String,
+      description: fields[4] as String,
+      startDate: fields[5] as String,
+      endDate: fields[6] as String?,
+      startTime: fields[7] as String,
+      endTime: fields[8] as String,
+      people: (fields[9] as List?)?.cast<String>(),
+      meeting: fields[10] as String?,
+      eventStatus: fields[11] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, EventModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.eventTileImage)
       ..writeByte(2)
-      ..write(obj.name)
+      ..write(obj.eventTileVector)
       ..writeByte(3)
-      ..write(obj.description)
+      ..write(obj.name)
       ..writeByte(4)
-      ..write(obj.startDate)
+      ..write(obj.description)
       ..writeByte(5)
-      ..write(obj.endDate)
+      ..write(obj.startDate)
       ..writeByte(6)
-      ..write(obj.startTime)
+      ..write(obj.endDate)
       ..writeByte(7)
-      ..write(obj.endTime)
+      ..write(obj.startTime)
       ..writeByte(8)
-      ..write(obj.people?.toList())
+      ..write(obj.endTime)
       ..writeByte(9)
-      ..write(obj.meeting)
+      ..write(obj.people)
       ..writeByte(10)
+      ..write(obj.meeting)
+      ..writeByte(11)
       ..write(obj.eventStatus);
   }
 

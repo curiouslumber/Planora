@@ -4,12 +4,15 @@ import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/people_model.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
 
 class AddEvent extends StatefulWidget {
-  const AddEvent({super.key});
+  const AddEvent({super.key, this.user});
+
+  final UserModel? user;
 
   @override
   State<AddEvent> createState() => _AddEventState();
@@ -458,7 +461,7 @@ class _AddEventState extends State<AddEvent> {
               endDate: endDate?.toString(),
               startTime: startTime!.toString(),
               endTime: endTime!.toString(),
-              people: addedPeople.map((e) => e.id).toList(),
+              people: [widget.user!.uid, ...addedPeople.map((e) => e.id)],
               meeting: null,
             ),
           );

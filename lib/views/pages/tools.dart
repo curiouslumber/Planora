@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/views/pages/tools/calendar_tool.dart';
 import 'package:planora/views/pages/tools/events.dart';
 import 'package:planora/views/pages/tools/meetings.dart';
@@ -6,7 +7,9 @@ import 'package:planora/views/pages/tools/notes.dart';
 import 'package:planora/views/pages/tools/people.dart';
 
 class Tools extends StatelessWidget {
-  const Tools({super.key});
+  const Tools({super.key, this.user});
+
+  final UserModel? user;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,13 @@ class Tools extends StatelessWidget {
       Icons.meeting_room,
       Icons.sticky_note_2_outlined,
     ];
-    final toolPages = [Events(), People(), CalendarTool(), Meetings(), Notes()];
+    final toolPages = [
+      Events(user: user),
+      People(),
+      CalendarTool(),
+      Meetings(),
+      Notes(),
+    ];
 
     return Scaffold(
       appBar: AppBar(

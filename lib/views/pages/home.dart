@@ -517,7 +517,7 @@ class _HomeState extends State<Home> {
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                        '${DateFormat('jm').parse(event.startDate)} ${event.endDate != null ? ' - ${DateFormat('jm').parse(event.endDate!)}' : ''}',
+                                        '${DateFormat('jm').format(DateTime.parse(event.startDate))} ${event.endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(event.endDate!))}' : ''}',
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme

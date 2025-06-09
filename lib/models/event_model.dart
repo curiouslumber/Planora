@@ -9,27 +9,30 @@ class EventModel {
   @HiveField(1)
   final String eventTileImage;
   @HiveField(2)
-  final String name;
+  final List<double> eventTileVector;
   @HiveField(3)
-  final String description;
+  final String name;
   @HiveField(4)
-  final String startDate;
+  final String description;
   @HiveField(5)
-  final String? endDate;
+  final String startDate;
   @HiveField(6)
-  final String startTime;
+  final String? endDate;
   @HiveField(7)
-  final String endTime;
+  final String startTime;
   @HiveField(8)
-  final List<String>? people;
+  final String endTime;
   @HiveField(9)
-  final String? meeting;
+  final List<String>? people;
   @HiveField(10)
+  final String? meeting;
+  @HiveField(11)
   final String eventStatus;
 
   EventModel({
     required this.id,
     this.eventTileImage = '',
+    this.eventTileVector = const [],
     required this.name,
     required this.description,
     required this.startDate,
@@ -45,6 +48,7 @@ class EventModel {
     return {
       'id': id,
       'eventTileImage': eventTileImage,
+      'eventTileVector': eventTileVector,
       'name': name,
       'description': description,
       'startDate': startDate,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/utils/dialogs.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
@@ -10,7 +11,9 @@ import 'package:planora/views/pages/tools/events/event_page.dart';
 enum EventMode { none, selecting }
 
 class Events extends StatefulWidget {
-  const Events({super.key});
+  const Events({super.key, this.user});
+
+  final UserModel? user;
 
   @override
   State<Events> createState() => _EventsState();
@@ -283,7 +286,9 @@ class _EventsState extends State<Events> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddEvent()),
+            MaterialPageRoute(
+              builder: (context) => AddEvent(user: widget.user),
+            ),
           );
         },
         child: const Icon(Icons.add),

@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> pages = [
       Home(user: widget.user),
       Calendar(),
-      Tools(),
+      Tools(user: widget.user),
       widget.user != null ? Profile(user: widget.user!) : Guest(),
     ];
 
