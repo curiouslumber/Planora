@@ -8,10 +8,12 @@ environment:
   sdk: ^3.7.0
 
 dependencies:
+  action_slider: ^0.7.0
   bloc: ^9.0.0
   build_runner: ^2.4.15
   cached_network_image: ^3.4.1
   cloud_firestore: ^5.6.8
+  confetti: ^0.8.0
   cupertino_icons: ^1.0.8
   date_field: ^6.0.3+1
   dio: ^5.8.0+1

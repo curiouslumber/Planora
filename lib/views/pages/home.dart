@@ -40,7 +40,9 @@ class _HomeState extends State<Home> {
         imageIdToUrl[event.id] = downloadUrl;
       }
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   String getCompletedEventsPercentage(List<EventModel> events) {
@@ -511,7 +513,10 @@ class _HomeState extends State<Home> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: CachedNetworkImage(
-                                    imageUrl: imageIdToUrl[event.id]!,
+                                    imageUrl: imageIdToUrl[event.id] ?? '',
+                                    placeholder: (context, url) => Container(),
+                                    errorWidget:
+                                        (context, url, error) => Container(),
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                   ),
