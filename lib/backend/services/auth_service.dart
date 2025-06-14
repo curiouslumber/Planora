@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:planora/apis/api_client.dart';
-import 'package:planora/apis/models/auth/login_request.dart';
-import 'package:planora/apis/models/auth/login_response.dart';
-import 'package:planora/apis/models/auth/register_request.dart';
-import 'package:planora/apis/models/auth/register_response.dart';
+import 'package:planora/backend/api_client.dart';
+import 'package:planora/backend/models/auth/login_request.dart';
+import 'package:planora/backend/models/auth/login_response.dart';
+import 'package:planora/backend/models/auth/register_request.dart';
+import 'package:planora/backend/models/auth/register_response.dart';
 import 'package:planora/constants/api_endpoints.dart';
 
 class AuthService {
-
   // Login API
   Future<LoginResponse> login(LoginRequest request) async {
     try {

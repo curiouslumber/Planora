@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:planora/apis/interceptors/auth_interceptor.dart';
+import 'package:planora/backend/interceptors/auth_interceptor.dart';
 
 class ApiClient {
   static final Dio _dio = Dio(

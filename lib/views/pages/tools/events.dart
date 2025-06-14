@@ -115,7 +115,8 @@ class _EventsState extends State<Events> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EventPage(event: event),
+                      builder:
+                          (context) => EventPage(event: event, imageUrl: ''),
                     ),
                   );
                 }

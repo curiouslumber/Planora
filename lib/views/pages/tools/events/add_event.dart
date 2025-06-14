@@ -6,6 +6,7 @@ import 'package:planora/models/event_model.dart';
 import 'package:planora/models/people_model.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
+import 'package:planora/services/pinecone/pinecone_vector_service.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
 
@@ -451,10 +452,16 @@ class _AddEventState extends State<AddEvent> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),
-        onPressed: () {
+        onPressed: () async {
+          String imagePrompt =
+              _eventNameController.text + _eventDescriptionController.text;
+          String? semanticSearchResponse =
+              await PineconeVectorService.semanticSearch(imagePrompt);
+
           addEvent(
             EventModel(
               id: Uuid().v4(),
+              eventTileImage: semanticSearchResponse ?? '',
               name: _eventNameController.text,
               description: _eventDescriptionController.text,
               startDate: startDate!.toString(),

@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
@@ -7,10 +6,10 @@ import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/user_model.dart';
-import 'package:planora/services/firebase/firebase_ai_service.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
+import 'package:planora/utils/helper.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 
@@ -25,16 +24,22 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<EventModel> events = [];
+  Map<String, String> imageIdToUrl = {};
   Map<int, Map<String, int>> gridTileConstants = {
     0: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
     1: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
     2: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
     3: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
   };
-  Uint8List? imageBytes;
 
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
+    for (var event in events) {
+      if (event.eventTileImage.isNotEmpty) {
+        String downloadUrl = await Helper.getDownloadUrl(event.eventTileImage);
+        imageIdToUrl[event.id] = downloadUrl;
+      }
+    }
     setState(() {});
   }
 
@@ -60,6 +65,24 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     getEvents();
+
+    // vectorize the prompt which is a combination of event name and event descripiton.
+    // String eventName = "Meeting with Hansel";
+    // String eventDescription =
+    //     "Flutter App Meeting to integrate AI features in the main app";
+
+    // String prompt = "Create an image for $eventName $eventDescription";
+
+    // FirebaseAiService().vectorizePrompt(prompt);
+
+    // FirebaseFirestoreService().createImageDocument(
+    //   image: ImageModel(
+    //     uid: '1',
+    //     imagePrompt: 'Exam Test',
+    //     imageVectorizedData: 'Exam Test',
+    //     imageLink: 'Exam Test',
+    //   ),
+    // );
     // generateImage();
     super.initState();
   }
@@ -67,9 +90,11 @@ class _HomeState extends State<Home> {
   // void generateImage() async {
   //   final imageBytes = await FirebaseAiService().generateImage();
   //   if (imageBytes != null) {
-  //     setState(() {
-  //       this.imageBytes = imageBytes;
-  //     });
+  //     FirebaseStorageService().uploadImageUsingBytes(
+  //       '${'Exam Test'.replaceAll(' ', '_')}.png',
+  //       'event_images',
+  //       imageBytes,
+  //     );
   //   }
   // }
 
@@ -466,7 +491,11 @@ class _HomeState extends State<Home> {
                           () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => EventPage(event: event),
+                                builder:
+                                    (context) => EventPage(
+                                      event: event,
+                                      imageUrl: imageIdToUrl[event.id]!,
+                                    ),
                             ),
                           ),
                       child: Container(
@@ -478,11 +507,11 @@ class _HomeState extends State<Home> {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                              if (imageBytes != null)
+                              if (event.eventTileImage.isNotEmpty)
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.memory(
-                                    imageBytes!,
+                                  child: CachedNetworkImage(
+                                    imageUrl: imageIdToUrl[event.id]!,
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                   ),

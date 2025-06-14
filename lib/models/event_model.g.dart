@@ -19,7 +19,7 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
     return EventModel(
       id: fields[0] as String,
       eventTileImage: fields[1] as String,
-      eventTileVector: (fields[2] as List).cast<double>(),
+      eventTileImageId: fields[2] as String?,
       name: fields[3] as String,
       description: fields[4] as String,
       startDate: fields[5] as String,
@@ -41,7 +41,7 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       ..writeByte(1)
       ..write(obj.eventTileImage)
       ..writeByte(2)
-      ..write(obj.eventTileVector)
+      ..write(obj.eventTileImageId)
       ..writeByte(3)
       ..write(obj.name)
       ..writeByte(4)

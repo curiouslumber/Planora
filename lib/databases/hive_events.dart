@@ -9,6 +9,7 @@ class HiveEvents {
   static const String notesBox = 'notesBox';
   static const String meetingsBox = 'meetingsBox';
   static const String peopleBox = 'peopleBox';
+  static const String imageBox = 'imageBox';
 
 // Events CRUD
   static Future<void> addEventToHive(EventModel event) async {

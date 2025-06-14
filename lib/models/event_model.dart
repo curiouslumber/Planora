@@ -9,7 +9,7 @@ class EventModel {
   @HiveField(1)
   final String eventTileImage;
   @HiveField(2)
-  final List<double> eventTileVector;
+  final String? eventTileImageId;
   @HiveField(3)
   final String name;
   @HiveField(4)
@@ -32,14 +32,14 @@ class EventModel {
   EventModel({
     required this.id,
     this.eventTileImage = '',
-    this.eventTileVector = const [],
+    this.eventTileImageId,
     required this.name,
     required this.description,
     required this.startDate,
     this.endDate,
     required this.startTime,
     required this.endTime,
-    this.people,
+    this.people = const [],
     this.meeting,
     this.eventStatus = "upcoming",
   });
@@ -48,7 +48,7 @@ class EventModel {
     return {
       'id': id,
       'eventTileImage': eventTileImage,
-      'eventTileVector': eventTileVector,
+      'eventTileImageId': eventTileImageId,
       'name': name,
       'description': description,
       'startDate': startDate,

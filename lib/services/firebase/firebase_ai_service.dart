@@ -18,4 +18,6 @@ class FirebaseAiService {
       return null;
     }
   }
+
+  void vectorizePrompt(String prompt) {}
 }

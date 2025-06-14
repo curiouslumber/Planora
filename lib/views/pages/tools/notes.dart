@@ -230,7 +230,7 @@ class _NotesState extends State<Notes> {
                                           color:
                                               Theme.of(
                                                 context,
-                                              ).colorScheme.primary,
+                                              ).colorScheme.tertiary,
                                           borderRadius: BorderRadius.circular(
                                             16,
                                           ),

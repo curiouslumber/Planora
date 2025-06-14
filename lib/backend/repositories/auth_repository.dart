@@ -1,6 +1,6 @@
-import 'package:planora/apis/models/auth/login_request.dart';
-import 'package:planora/apis/models/auth/login_response.dart';
-import 'package:planora/apis/services/auth_service.dart';
+import 'package:planora/backend/models/auth/login_request.dart';
+import 'package:planora/backend/models/auth/login_response.dart';
+import 'package:planora/backend/services/auth_service.dart';
 
 class AuthRepository {
   final AuthService _authService;

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/models/image_model.dart';
 import 'package:planora/models/user_model.dart';
 
 class FirebaseFirestoreService {
@@ -13,6 +14,9 @@ class FirebaseFirestoreService {
 
   // Reference to the 'events' collection
   CollectionReference get _eventsCollection => _firestore.collection('events');
+
+  // Reference to the 'images' collection
+  CollectionReference get _imagesCollection => _firestore.collection('images');
 
   // Create a new user document in Firestore
   Future<void> createUserDocument({
@@ -46,5 +50,19 @@ class FirebaseFirestoreService {
   // Create a new event document in Firestore
   Future<void> createEventDocument({required EventModel event}) async {
     await _eventsCollection.doc(event.id).set(event.toFirestore());
+  }
+
+  // Create a new image document in Firestore
+  Future<void> createImageDocument({required ImageModel image}) async {
+    await _imagesCollection.doc(image.uid).set(image.toFirestore());
+  }
+
+  // Get image document from Firestore
+  Future<ImageModel?> getImageDocument(String imageId) async {
+    final doc = await _imagesCollection.doc(imageId).get();
+    if (doc.exists) {
+      return ImageModel.fromFirestore(doc);
+    }
+    return null;
   }
 }
