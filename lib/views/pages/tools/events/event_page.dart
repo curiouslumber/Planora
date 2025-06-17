@@ -46,7 +46,9 @@ class _EventPageState extends State<EventPage> {
                 leadingWidth: 64.0,
                 leading: MaterialButton(
                   elevation: 0.0,
-                  color: Theme.of(context).colorScheme.surface,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface.withValues(alpha: 0.8),
                   child: const Icon(Icons.arrow_back, size: 24.0),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -55,7 +57,9 @@ class _EventPageState extends State<EventPage> {
                     minWidth: 64.0,
                     height: 56.0,
                     elevation: 0.0,
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: 0.8),
                     child: Icon(
                       Icons.notifications_active_outlined,
                       size: 24.0,
@@ -83,7 +87,9 @@ class _EventPageState extends State<EventPage> {
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16.0),
-                          color: Theme.of(context).colorScheme.surface,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surface.withValues(alpha: 0.9),
                         ),
                         child: Text(
                           widget.event.name,
