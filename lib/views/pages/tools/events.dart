@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
@@ -7,6 +8,7 @@ import 'package:planora/utils/dialogs.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
+import 'package:planora/utils/helper.dart';
 
 enum EventMode { none, selecting }
 
@@ -22,6 +24,8 @@ class Events extends StatefulWidget {
 class _EventsState extends State<Events> {
   List<EventModel> events = [];
   Set<int> checkedEvents = {};
+
+  Map<String, String> imageIdToUrl = {};
   EventMode mode = EventMode.none;
 
   @override
@@ -32,6 +36,12 @@ class _EventsState extends State<Events> {
 
   Future<void> getEvents() async {
     events = await HiveEvents.getEventsFromHive();
+    for (var event in events) {
+      if (event.eventTileImage.isNotEmpty) {
+        String downloadUrl = await Helper.getDownloadUrl(event.eventTileImage);
+        imageIdToUrl[event.id] = downloadUrl;
+      }
+    }
     setState(() {});
   }
 
@@ -40,6 +50,17 @@ class _EventsState extends State<Events> {
     await getEvents();
     setState(() {
       checkedEvents.clear();
+    });
+  }
+
+  void toggleCheckedEvent(int index) {
+    setState(() {
+      if (checkedEvents.contains(index)) {
+        checkedEvents.remove(index);
+      } else {
+        checkedEvents.add(index);
+      }
+      mode = checkedEvents.isNotEmpty ? EventMode.selecting : EventMode.none;
     });
   }
 
@@ -62,24 +83,6 @@ class _EventsState extends State<Events> {
                     "Delete",
                   ),
             ),
-
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (mode == EventMode.selecting) {
-                  checkedEvents.clear();
-                }
-                mode =
-                    mode == EventMode.selecting
-                        ? EventMode.none
-                        : EventMode.selecting;
-              });
-            },
-            icon:
-                mode == EventMode.selecting
-                    ? Icon(Icons.radio_button_checked)
-                    : Icon(Icons.radio_button_unchecked),
-          ),
         ],
       ),
       body: Center(
@@ -92,31 +95,20 @@ class _EventsState extends State<Events> {
             final event = events[index];
             return GestureDetector(
               onLongPress: () {
-                setState(() {
-                  if (checkedEvents.contains(index)) {
-                    checkedEvents.remove(index);
-                  } else {
-                    checkedEvents.add(index);
-                  }
-                });
+                toggleCheckedEvent(index);
               },
               onTap: () {
                 if (mode == EventMode.selecting) {
-                  if (checkedEvents.contains(index)) {
-                    setState(() {
-                      checkedEvents.remove(index);
-                    });
-                    return;
-                  }
-                  setState(() {
-                    checkedEvents.add(index);
-                  });
+                  toggleCheckedEvent(index);
                 } else {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder:
-                          (context) => EventPage(event: event, imageUrl: ''),
+                          (context) => EventPage(
+                            event: event,
+                            imageUrl: imageIdToUrl[event.id]!,
+                          ),
                     ),
                   );
                 }
@@ -137,10 +129,17 @@ class _EventsState extends State<Events> {
                           borderRadius: BorderRadius.circular(16.0),
                           child: SizedBox(
                             width: double.infinity,
-                            child: Image.network(
-                              "https://th.bing.com/th/id/OIP.4eWWTUHB9wIPvudLm1DIcAHaEK?cb=iwp2&rs=1&pid=ImgDetMain",
-                              fit: BoxFit.cover,
-                            ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: imageIdToUrl[event.id] ?? '',
+                                  placeholder: (context, url) => Container(),
+                                  errorWidget:
+                                      (context, url, error) => Container(),
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
                           ),
                         ),
                         Positioned(

@@ -15,7 +15,7 @@ class NoteBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).colorScheme.primary,
+      color: Theme.of(context).colorScheme.tertiary,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(24.0),
@@ -26,18 +26,18 @@ class NoteBuilder extends StatelessWidget {
             TextField(
               controller: titleController,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               cursorColor: Theme.of(context).colorScheme.surface,
               decoration: InputDecoration(
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -51,7 +51,7 @@ class NoteBuilder extends StatelessWidget {
                   maxLines: 500,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   cursorColor: Theme.of(context).colorScheme.surface,
                   decoration: InputDecoration(

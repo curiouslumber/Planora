@@ -528,7 +528,7 @@ class _HomeState extends State<Home> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .surfaceContainer
-                                    .withValues(alpha: 0.8),
+                                      .withValues(alpha: 0.7),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Column(

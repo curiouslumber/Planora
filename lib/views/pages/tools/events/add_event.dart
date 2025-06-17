@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -5,8 +7,11 @@ import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/people_model.dart';
 import 'package:planora/models/user_model.dart';
+import 'package:planora/services/firebase/firebase_ai_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
+import 'package:planora/services/firebase/firebase_storage_service.dart';
 import 'package:planora/services/pinecone/pinecone_vector_service.dart';
+import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
 
@@ -35,9 +40,65 @@ class _AddEventState extends State<AddEvent> {
     });
   }
 
-  void addEvent(EventModel event) async {
+  Future<void> addEvent(EventModel event) async {
     await FirebaseFirestoreService().createEventDocument(event: event);
-    HiveEvents.addEventToHive(event);
+    await HiveEvents.addEventToHive(event);
+  }
+
+  void generateImageTileAsync(
+    EventModel event,
+    String eventName,
+    String eventDescription,
+  ) async {
+    String imagePrompt = eventName + eventDescription;
+    String? semanticSearchResponse = await PineconeVectorService.semanticSearch(
+      imagePrompt,
+    );
+
+    List<EventModel> events = await HiveEvents.getEventsFromHive();
+    int selectedIndex = events.indexWhere((e) => e.id == event.id);
+
+    // If semantic search response is not null, update the event
+    if (semanticSearchResponse != null) {
+      EventModel updatedEvent = event.copyWith(
+        eventTileImage: semanticSearchResponse,
+      );
+
+      await HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+      await FirebaseFirestoreService().updateEventDocument(
+        event.id,
+        updatedEvent,
+      );
+      if (mounted) {
+        setState(() {});
+      }
+      return;
+    }
+
+    // If semantic search response is null, generate the image
+    Uint8List? imageBytes = await FirebaseAiService().generateImage(
+      imagePrompt,
+    );
+    if (imageBytes != null) {
+      String? gsUrl = await FirebaseStorageService().uploadImageUsingBytes(
+        '${eventName.replaceAll(' ', '_')}.png',
+        'event_images',
+        imageBytes,
+      );
+      if (gsUrl != null) {
+        EventModel updatedEvent = event.copyWith(eventTileImage: gsUrl);
+        await HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+        await FirebaseFirestoreService().updateEventDocument(
+          event.id,
+          updatedEvent,
+        );
+        // Create the new index in pinecone
+        await PineconeVectorService.upsertNewIndex(imagePrompt, gsUrl);
+        if (mounted) {
+          setState(() {});
+        }
+      }
+    }
   }
 
   @override
@@ -453,25 +514,35 @@ class _AddEventState extends State<AddEvent> {
           borderRadius: BorderRadius.circular(32.0),
         ),
         onPressed: () async {
-          String imagePrompt =
-              _eventNameController.text + _eventDescriptionController.text;
-          String? semanticSearchResponse =
-              await PineconeVectorService.semanticSearch(imagePrompt);
 
-          addEvent(
-            EventModel(
-              id: Uuid().v4(),
-              eventTileImage: semanticSearchResponse ?? '',
-              name: _eventNameController.text,
-              description: _eventDescriptionController.text,
-              startDate: startDate!.toString(),
-              endDate: endDate?.toString(),
-              startTime: startTime!.toString(),
-              endTime: endTime!.toString(),
-              people: [widget.user!.uid, ...addedPeople.map((e) => e.id)],
-              meeting: null,
-            ),
+          if (_eventNameController.text.isEmpty) {
+            return;
+          }
+
+          EventModel event = EventModel(
+            id: Uuid().v4(),
+            eventTileImage: '',
+            name: _eventNameController.text,
+            description: _eventDescriptionController.text,
+            startDate: startDate!.toString(),
+            endDate: endDate?.toString(),
+            startTime: startTime!.toString(),
+            endTime: endTime!.toString(),
+            eventStatus: Constants.eventStatus[0],
+            people: addedPeople.map((e) => e.id).toList(),
           );
+
+          // Add event to Hive
+          await addEvent(event);
+
+          // Asynchronously function to generate event image tile
+          generateImageTileAsync(
+            event,
+            _eventNameController.text,
+            _eventDescriptionController.text,
+          );
+
+
           Navigator.pop(context);
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -484,6 +555,25 @@ class _AddEventState extends State<AddEvent> {
           ),
         ),
       ),
+    );
+  }
+}
+
+extension on EventModel {
+  EventModel copyWith({required String eventTileImage}) {
+    return EventModel(
+      id: id,
+      eventTileImage: eventTileImage,
+      eventTileImageId: eventTileImageId,
+      name: name,
+      description: description,
+      startDate: startDate,
+      endDate: endDate,
+      startTime: startTime,
+      endTime: endTime,
+      people: people,
+      meeting: meeting,
+      eventStatus: eventStatus,
     );
   }
 }

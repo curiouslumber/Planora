@@ -7,9 +7,7 @@ class FirebaseAiService {
     model: 'imagen-3.0-generate-002',
   );
 
-  final prompt = 'Exam Test';
-
-  Future<Uint8List?> generateImage() async {
+  Future<Uint8List?> generateImage(String prompt) async {
     final response = await model.generateImages(prompt);
     if (response.images.isNotEmpty) {
       final image = response.images[0];
@@ -18,6 +16,4 @@ class FirebaseAiService {
       return null;
     }
   }
-
-  void vectorizePrompt(String prompt) {}
 }

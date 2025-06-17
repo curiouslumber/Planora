@@ -52,6 +52,11 @@ class FirebaseFirestoreService {
     await _eventsCollection.doc(event.id).set(event.toFirestore());
   }
 
+  // Update event document in Firestore
+  Future<void> updateEventDocument(String id, EventModel updatedEvent) async {
+    await _eventsCollection.doc(id).update(updatedEvent.toFirestore());
+  }
+
   // Create a new image document in Firestore
   Future<void> createImageDocument({required ImageModel image}) async {
     await _imagesCollection.doc(image.uid).set(image.toFirestore());

@@ -258,7 +258,7 @@ class _NotesState extends State<Notes> {
                                                     color:
                                                         Theme.of(
                                                           context,
-                                                        ).colorScheme.onPrimary,
+                                                        ).colorScheme.primary,
                                                   ),
                                             ),
                                             Text(
@@ -271,7 +271,7 @@ class _NotesState extends State<Notes> {
                                                 color:
                                                     Theme.of(
                                                       context,
-                                                    ).colorScheme.onPrimary,
+                                                    ).colorScheme.primary,
                                               ),
                                             ),
                                           ],
@@ -305,7 +305,7 @@ class _NotesState extends State<Notes> {
                                             color:
                                                 Theme.of(
                                                   context,
-                                                ).colorScheme.onPrimary,
+                                                ).colorScheme.primary,
                                           ),
                                         ),
                                       ),

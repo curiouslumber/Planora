@@ -33,8 +33,7 @@ class FirebaseStorageService {
       final TaskSnapshot snapshot = await uploadTask;
 
       if (snapshot.state == TaskState.success) {
-        final String downloadUrl = await snapshot.ref.getDownloadURL();
-        return downloadUrl;
+        return 'gs://planora-np47.firebasestorage.app/$path/$fileName';
       } else {
         return null;
       }
