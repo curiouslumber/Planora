@@ -55,10 +55,14 @@ class _EventsState extends State<Events> {
           imageIdToUrl[event.id] = downloadUrl;
 
           // Cache the image
-          await CustomImageCacheManager().cacheImageByEventId(
+          File? cachedFile = await CustomImageCacheManager()
+              .cacheImageByEventId(
             downloadUrl,
             event.id,
           );
+          if (cachedFile != null) {
+            imageIdToUrl[event.id] = cachedFile.path;
+          }
         }
       }
     }

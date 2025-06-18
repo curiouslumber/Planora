@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
@@ -50,13 +52,13 @@ class _HomeState extends State<Home> {
           String downloadUrl = await Helper.getDownloadUrl(
             event.eventTileImage,
           );
-          imageIdToUrl[event.id] = downloadUrl;
 
           // Cache the image
-          await CustomImageCacheManager().cacheImageByEventId(
-            downloadUrl,
-            event.id,
-          );
+          File? cachedFile = await CustomImageCacheManager()
+              .cacheImageByEventId(downloadUrl, event.id);
+          if (cachedFile != null) {
+            imageIdToUrl[event.id] = cachedFile.path;
+          }
         }
       }
     }
@@ -555,51 +557,68 @@ class _HomeState extends State<Home> {
                             Container(
                               width: double.infinity,
                               height: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainer
-                                      .withValues(alpha: 0.7),
+                                decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
+                                padding: EdgeInsets.only(bottom: 12),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      event.name,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withValues(alpha: 0.8),
-                                        fontSize: 14,
-                                        fontWeight: FontWeights.bold,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.85,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              event.name,
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.8),
+                                                fontSize: 14,
+                                                fontWeight: FontWeights.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              '${DateFormat('jm').format(DateTime.parse(event.startDate))} ${event.endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(event.endDate!))}' : ''}',
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.8),
+                                                fontSize: 12,
+                                                fontWeight:
+                                                    FontWeights.semiBold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                  FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                        '${DateFormat('jm').format(DateTime.parse(event.startDate))} ${event.endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(event.endDate!))}' : ''}',
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withValues(alpha: 0.8),
-                                        fontSize: 12,
-                                        fontWeight: FontWeights.semiBold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     );
                   },
                 ),
@@ -614,19 +633,175 @@ class _HomeState extends State<Home> {
               ),
             ),
             const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              height: 60.0,
-              alignment: Alignment.center,
-              child: Text(
-                'Start by completing your first event!',
-                style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.8),
+            // Container(
+            //   width: double.infinity,
+            //   height: 60.0,
+            //   alignment: Alignment.center,
+            //   child: Text(
+            //     'Start by completing your first event!',
+            //     style: TextStyle(
+            //       color: Theme.of(
+            //         context,
+            //       ).colorScheme.onSurface.withValues(alpha: 0.8),
+            //     ),
+            //   ),
+            // ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.125,
+              child: CarouselSlider(
+                options: CarouselOptions(
+                  height: MediaQuery.of(context).size.height * 0.125,
+                  viewportFraction: 0.35,
+                  padEnds: false,
+                  enableInfiniteScroll: false,
+                  reverse: false,
+                  autoPlay: false,
+                  autoPlayInterval: const Duration(seconds: 3),
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                  pauseAutoPlayOnTouch: false,
+                  onPageChanged: (index, reason) {},
+                  scrollDirection: Axis.horizontal,
                 ),
+                items: List.generate(events.length + 1, (index) {
+                  if (events.length == index) {
+                    return Container(
+                      height: MediaQuery.of(context).size.height * 0.125,
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.arrow_forward,
+                            size: 24,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                          onPressed: () {},
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.125,
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    margin: EdgeInsets.only(right: index < 3 ? 16.0 : 0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (events[index].eventTileImage.isNotEmpty)
+                          FutureBuilder<File?>(
+                            future: CustomImageCacheManager()
+                                .getCachedImageByEventId(events[index].id),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.file(
+                                    snapshot.data!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                );
+                              } else {
+                                final imagePathOrUrl =
+                                    imageIdToUrl[events[index].id];
+                                if (imagePathOrUrl != null &&
+                                    File(imagePathOrUrl).existsSync()) {
+                                  // It's a file path
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.file(
+                                      File(imagePathOrUrl),
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  );
+                                } else {
+                                  // It's a network URL or null
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      imagePathOrUrl ?? '',
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainer
+                                .withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  events[index].name,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.8),
+                                    fontSize: 14,
+                                    fontWeight: FontWeights.bold,
+                                  ),
+                                ),
+                              ),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '${DateFormat('jm').format(DateTime.parse(events[index].startDate))} ${events[index].endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(events[index].endDate!))}' : ''}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.8),
+                                    fontSize: 12,
+                                    fontWeight: FontWeights.semiBold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ),
             ),
+
             const SizedBox(height: 32.0),
             Container(
               margin: EdgeInsets.only(top: 8.0),
