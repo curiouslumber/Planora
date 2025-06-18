@@ -570,9 +570,10 @@ class _HomeState extends State<Home> {
                                         vertical: 8,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.85,
-                                        ),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceContainer
+                                            .withValues(alpha: 0.9),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Column(
@@ -588,7 +589,7 @@ class _HomeState extends State<Home> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurface
-                                                    .withValues(alpha: 0.8),
+                                                    .withValues(alpha: 0.85),
                                                 fontSize: 14,
                                                 fontWeight: FontWeights.bold,
                                               ),
@@ -602,7 +603,7 @@ class _HomeState extends State<Home> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurface
-                                                    .withValues(alpha: 0.8),
+                                                    .withValues(alpha: 0.85),
                                                 fontSize: 12,
                                                 fontWeight:
                                                     FontWeights.semiBold,
