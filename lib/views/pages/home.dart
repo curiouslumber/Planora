@@ -1,4 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/user_model.dart';
+import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +38,26 @@ class _HomeState extends State<Home> {
     events = await HiveEvents.getEventsFromHive();
     for (var event in events) {
       if (event.eventTileImage.isNotEmpty) {
-        String downloadUrl = await Helper.getDownloadUrl(event.eventTileImage);
-        imageIdToUrl[event.id] = downloadUrl;
+        // Try to get the cached file
+        final cachedFile = await CustomImageCacheManager()
+            .getCachedImageByEventId(event.id);
+
+        if (cachedFile != null) {
+          // Store the local file path for the event
+          imageIdToUrl[event.id] = cachedFile.path;
+        } else {
+          // Fallback: get the download URL if not cached
+          String downloadUrl = await Helper.getDownloadUrl(
+            event.eventTileImage,
+          );
+          imageIdToUrl[event.id] = downloadUrl;
+
+          // Cache the image
+          await CustomImageCacheManager().cacheImageByEventId(
+            downloadUrl,
+            event.id,
+          );
+        }
       }
     }
     if (mounted) {
@@ -67,38 +87,8 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     getEvents();
-
-    // vectorize the prompt which is a combination of event name and event descripiton.
-    // String eventName = "Meeting with Hansel";
-    // String eventDescription =
-    //     "Flutter App Meeting to integrate AI features in the main app";
-
-    // String prompt = "Create an image for $eventName $eventDescription";
-
-    // FirebaseAiService().vectorizePrompt(prompt);
-
-    // FirebaseFirestoreService().createImageDocument(
-    //   image: ImageModel(
-    //     uid: '1',
-    //     imagePrompt: 'Exam Test',
-    //     imageVectorizedData: 'Exam Test',
-    //     imageLink: 'Exam Test',
-    //   ),
-    // );
-    // generateImage();
     super.initState();
   }
-
-  // void generateImage() async {
-  //   final imageBytes = await FirebaseAiService().generateImage();
-  //   if (imageBytes != null) {
-  //     FirebaseStorageService().uploadImageUsingBytes(
-  //       '${'Exam Test'.replaceAll(' ', '_')}.png',
-  //       'event_images',
-  //       imageBytes,
-  //     );
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -510,16 +500,57 @@ class _HomeState extends State<Home> {
                           alignment: Alignment.center,
                           children: [
                               if (event.eventTileImage.isNotEmpty)
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: CachedNetworkImage(
-                                    imageUrl: imageIdToUrl[event.id] ?? '',
-                                    placeholder: (context, url) => Container(),
-                                    errorWidget:
-                                        (context, url, error) => Container(),
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                  ),
+                                FutureBuilder<File?>(
+                                  future: CustomImageCacheManager()
+                                      .getCachedImageByEventId(event.id),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                            ConnectionState.done &&
+                                        snapshot.hasData) {
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
+                                        child: Image.file(
+                                          snapshot.data!,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        ),
+                                      );
+                                    } else {
+                                      final imagePathOrUrl =
+                                          imageIdToUrl[event.id];
+                                      if (imagePathOrUrl != null &&
+                                          File(imagePathOrUrl).existsSync()) {
+                                        // It's a file path
+                                        return ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            8.0,
+                                          ),
+                                          child: Image.file(
+                                            File(imagePathOrUrl),
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
+                                        );
+                                      } else {
+                                        // It's a network URL or null
+                                        return ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            8.0,
+                                          ),
+                                          child: Image.network(
+                                            imagePathOrUrl ?? '',
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
                                 ),
                             Container(
                               width: double.infinity,
