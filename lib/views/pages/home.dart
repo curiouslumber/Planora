@@ -33,15 +33,29 @@ class _HomeState extends State<Home> {
 
   DateTime now = DateTime.now();
   List<EventModel> todayUpcomingEvents = [];
+  List<EventModel> todayPastEvents = [];
+  List<EventModel> completedEvents = [];
 
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
     todayUpcomingEvents =
         events.where((event) {
           final start = DateTime.parse(event.startTime);
-          return start.year == now.year &&
-              start.month == now.month &&
-              start.day == now.day;
+          final end = DateTime.parse(event.endTime);
+          return isRangeInFuture(start, end, now);
+        }).toList();
+    todayPastEvents =
+        events.where((event) {
+          final start = DateTime.parse(event.startTime);
+          final end = DateTime.parse(event.endTime);
+          return isRangeInPast(start, end, now);
+        }).toList();
+    completedEvents =
+        events.where((event) {
+          final start = DateTime.parse(event.startTime);
+          final end = DateTime.parse(event.endTime);
+          return isRangeInPast(start, end, now) &&
+              event.eventStatus == Constants.eventStatus[2];
         }).toList();
     for (var event in events) {
       if (event.eventTileImage.isNotEmpty) {
@@ -72,6 +86,14 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void markEventComplete(EventModel event, int selectedIndex) {
+    EventModel updatedEvent = event.copyWith(
+      eventStatus: Constants.eventStatus[2],
+    );
+    HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+    getEvents();
+  }
+
   String getCompletedEventsPercentage(List<EventModel> events) {
     if (events.isEmpty) return '-';
     final completedCount =
@@ -91,6 +113,30 @@ class _HomeState extends State<Home> {
     return Constants.milestoneMessages[100]!;
   }
 
+  bool isRangeInPast(DateTime start, DateTime end, DateTime now) {
+    final today = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute,
+      now.second,
+    );
+    return end.isBefore(today);
+  }
+
+  bool isRangeInFuture(DateTime start, DateTime end, DateTime now) {
+    final today = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute,
+      now.second,
+    );
+    return start.isAfter(today);
+  }
+
   @override
   void initState() {
     getEvents();
@@ -99,6 +145,22 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate snapped progress for the day (0-24 scale)
+    final int snappedStep =
+        (getSnappedDayProgress(todayUpcomingEvents + todayPastEvents) * 24)
+            .round();
+
+    // Calculate checkpoint hours for current month events
+    final Set<int> checkpointHours =
+        events
+            .where((e) {
+              final eventDate = DateTime.parse(e.startTime);
+              final now = DateTime.now();
+              return eventDate.year == now.year && eventDate.month == now.month;
+            })
+            .map((e) => DateTime.parse(e.startTime).hour)
+            .toSet();
+
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -197,7 +259,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-        
+
             // SliverPersistentHeader for sticky search bar
             SliverPersistentHeader(
               pinned: true,
@@ -339,7 +401,7 @@ class _HomeState extends State<Home> {
                                     spacing: 16.0,
                                     children: [
                                       Text(
-                                        "15%",
+                                        getCompletedEventsPercentage(events),
                                         style: TextStyle(
                                           color:
                                               Theme.of(
@@ -354,7 +416,7 @@ class _HomeState extends State<Home> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4.0),
                                     child: Text(
-                                      "4 of 12 completed",
+                                      "${completedEvents.length} of ${events.length} completed",
                                       style: TextStyle(
                                         color:
                                             Theme.of(
@@ -367,10 +429,9 @@ class _HomeState extends State<Home> {
                                   ),
                                 ],
                               ),
-                              // 24-hour timeline with event checkpoints
                               StepProgressIndicator(
                                 height: 8.0,
-                                currentStep: DateTime.now().hour,
+                                currentStep: snappedStep,
                                 progressColor:
                                     Theme.of(context).colorScheme.tertiary,
                                 trackColor:
@@ -378,33 +439,25 @@ class _HomeState extends State<Home> {
                                 checkpointColor:
                                     Theme.of(context).colorScheme.primary,
                                 checkpointDiameter: 6.0,
-                                checkpointHours:
-                                    events
-                                        .where((e) {
-                                          final eventDate = DateTime.parse(
-                                            e.startTime,
-                                          );
-                                          final now = DateTime.now();
-                                          return eventDate.year == now.year &&
-                                              eventDate.month == now.month;
-                                        })
-                                        .map(
-                                          (e) =>
-                                              DateTime.parse(e.startTime).hour,
-                                        )
-                                        .toSet(),
+                                checkpointHours: checkpointHours,
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 2.0),
-                                child: Text(
-                                  getMilestoneMessage(
-                                    getCompletedEventsPercentage(events),
-                                  ),
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeights.semiBold,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    getMilestoneMessage(
+                                      getCompletedEventsPercentage(events),
+                                    ),
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeights.semiBold,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -428,6 +481,20 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
+                    if (todayUpcomingEvents.isEmpty)
+                      Container(
+                        alignment: Alignment.center,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: Text(
+                          "No events scheduled for today.",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16,
+                            fontWeight: FontWeights.regular,
+                          ),
+                        ),
+                      )
+                    else
                     ListView.separated(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
@@ -478,42 +545,15 @@ class _HomeState extends State<Home> {
                                       snapshot.data!,
                                       fit: BoxFit.cover,
                                     ),
-                                  );
-                                } else {
-                                  final imagePathOrUrl =
-                                      imageIdToUrl[event.id];
-                                  if (imagePathOrUrl != null) {
-                                    if (File(imagePathOrUrl).existsSync()) {
-                                      // It's a file path
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          8.0,
-                                        ),
-                                        child: Image.file(
-                                          File(imagePathOrUrl),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    } else {
-                                      // It's a network URL
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          8.0,
-                                        ),
-                                        child: Image.network(
-                                          imagePathOrUrl,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    }
+                                    );
                                   } else {
-                                    // No image found
                                     return Container(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.9),
                                     );
                                   }
-                                }
                               },
                             ),
                           ),
@@ -559,7 +599,7 @@ class _HomeState extends State<Home> {
                       separatorBuilder: (context, index) {
                         return SizedBox(height: 16);
                       },
-                      itemCount: events.length,
+                      itemCount: todayPastEvents.length,
                       itemBuilder: (context, index) {
                         return ListTile(
                           tileColor: Theme.of(
@@ -571,7 +611,7 @@ class _HomeState extends State<Home> {
                           ),
                           minVerticalPadding: 0.0,
                           title: Text(
-                            events[index].name,
+                            todayPastEvents[index].name,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 16,
@@ -579,7 +619,7 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                           subtitle: Text(
-                            '${DateFormat("jm").format(DateTime.parse(events[index].startTime))} - ${DateFormat("jm").format(DateTime.parse(events[index].endTime))}',
+                            '${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].startTime))} - ${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].endTime))}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 14,
@@ -591,7 +631,9 @@ class _HomeState extends State<Home> {
                             aspectRatio: 1,
                             child: FutureBuilder<File?>(
                               future: CustomImageCacheManager()
-                                  .getCachedImageByEventId(events[index].id),
+                                  .getCachedImageByEventId(
+                                    todayPastEvents[index].id,
+                                  ),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                         ConnectionState.done &&
@@ -604,39 +646,10 @@ class _HomeState extends State<Home> {
                                     ),
                                   );
                                 } else {
-                                  final imagePathOrUrl =
-                                      imageIdToUrl[events[index].id];
-                                  if (imagePathOrUrl != null) {
-                                    if (File(imagePathOrUrl).existsSync()) {
-                                      // It's a file path
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          8.0,
-                                        ),
-                                        child: Image.file(
-                                          File(imagePathOrUrl),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    } else {
-                                      // It's a network URL
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          8.0,
-                                        ),
-                                        child: Image.network(
-                                          imagePathOrUrl,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    }
-                                  } else {
-                                    // No image found
-                                    return Container(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    );
-                                  }
+                                  return Container(
+                                    color: Theme.of(context).colorScheme.primary
+                                        .withValues(alpha: 0.9),
+                                  );
                                 }
                               },
                             ),
@@ -645,8 +658,17 @@ class _HomeState extends State<Home> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           trailing: Checkbox(
-                            value: true,
-                            onChanged: (value) {},
+                            value:
+                                todayPastEvents[index].eventStatus ==
+                                Constants.eventStatus[2],
+                            onChanged: (value) {
+                              if (value != null) {
+                                markEventComplete(
+                                  todayPastEvents[index],
+                                  index,
+                                );
+                              }
+                            },
                             checkColor: Theme.of(context).colorScheme.onPrimary,
                             fillColor: WidgetStateProperty.all(
                               Colors.transparent,
@@ -658,7 +680,7 @@ class _HomeState extends State<Home> {
                               width: 1.5,
                               color: Theme.of(context).colorScheme.onPrimary,
                             ),
-                          )
+                          ),
                         );
                       },
                     ),
@@ -679,6 +701,25 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+    );
+  }
+}
+
+extension on EventModel {
+  EventModel copyWith({required String eventStatus}) {
+    return EventModel(
+      id: id,
+      eventTileImageId: eventTileImageId,
+      name: name,
+      description: description,
+      eventTileImage: eventTileImage,
+      eventStatus: eventStatus,
+      startDate: startDate,
+      endDate: endDate,
+      startTime: startTime,
+      endTime: endTime,
+      people: people,
+      meeting: meeting,
     );
   }
 }
@@ -723,6 +764,7 @@ class StepProgressIndicator extends StatelessWidget {
   final Set<int> checkpointHours;
 
   static const int _totalHours = 24;
+  
 
   const StepProgressIndicator({
     super.key,
@@ -796,4 +838,42 @@ class StepProgressIndicator extends StatelessWidget {
       },
     );
   }
+}
+
+double getSnappedDayProgress(List<EventModel> todayEvents) {
+  final now = DateTime.now();
+  // Normal progress by time of day
+  double timeProgress = (now.hour + now.minute / 60) / 24;
+
+  if (todayEvents.isEmpty) return timeProgress;
+
+  // If all events are completed, fill the bar
+  if (todayEvents.every((e) => e.eventStatus == Constants.eventStatus[2])) {
+    return 1.0;
+  }
+
+  // Find latest completed event whose end time is after now
+  DateTime? latestCompletedEnd;
+  for (final event in todayEvents) {
+    if (event.eventStatus == Constants.eventStatus[2]) {
+      final eventEnd = DateTime.parse(event.endTime);
+      if (eventEnd.isAfter(now)) {
+        if (latestCompletedEnd == null ||
+            eventEnd.isAfter(latestCompletedEnd)) {
+          latestCompletedEnd = eventEnd;
+        }
+      }
+    }
+  }
+
+  // If such a completed event exists, snap progress to its scheduled end time
+  if (latestCompletedEnd != null) {
+    double snappedProgress =
+        (latestCompletedEnd.hour + latestCompletedEnd.minute / 60) / 24;
+    // Only snap forward if snappedProgress > timeProgress
+    return snappedProgress > timeProgress ? snappedProgress : timeProgress;
+  }
+
+  // Default: progress by current time
+  return timeProgress;
 }

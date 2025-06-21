@@ -509,7 +509,7 @@ class _AddEventState extends State<AddEvent> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
+        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),

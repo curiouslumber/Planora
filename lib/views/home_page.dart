@@ -9,6 +9,7 @@ import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:planora/views/pages/tools/events/add_event.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.user});
@@ -117,7 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
           floatingActionButton: FloatingActionButton(
             backgroundColor: Theme.of(context).colorScheme.primary,
             shape: const CircleBorder(),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddEvent(user: widget.user),
+                ),
+              );
+            },
             child: Icon(
               Ionicons.add,
               color: Theme.of(context).colorScheme.onPrimary,
