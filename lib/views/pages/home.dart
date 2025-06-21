@@ -375,26 +375,49 @@ class _HomeState extends State<Home> {
                                   ),
                                 ],
                               ),
-                              LinearProgressIndicator(
-                                value: 0.3,
-                                color: Theme.of(context).colorScheme.tertiary,
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.onTertiary,
-                                borderRadius: BorderRadius.circular(25),
-                                minHeight: 8,
+                              // 24-hour timeline with event checkpoints
+                              StepProgressIndicator(
+                                currentStep: DateTime.now().hour,
+                                progressColor:
+                                    Theme.of(context).colorScheme.tertiary,
+                                trackColor:
+                                    Theme.of(context).colorScheme.onPrimary,
+                                checkpointColor:
+                                    Theme.of(context).colorScheme.primary,
+                                checkpointDiameter: 9.0,
+                                checkpointHours:
+                                    events
+                                        .where((e) {
+                                          final eventDate = DateTime.parse(
+                                            e.startTime,
+                                          );
+                                          final now = DateTime.now();
+                                          return eventDate.year == now.year &&
+                                              eventDate.month == now.month;
+                                        })
+                                        .map(
+                                          (e) =>
+                                              DateTime.parse(e.startTime).hour,
+                                        )
+                                        .toSet(),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  getMilestoneMessage(
-                                    getCompletedEventsPercentage(events),
-                                  ),
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeights.semiBold,
-                                  ),
+                              // LinearProgressIndicator(
+                              //   value: 0.3,
+                              //   color: Theme.of(context).colorScheme.tertiary,
+                              //   backgroundColor:
+                              //       Theme.of(context).colorScheme.onTertiary,
+                              //   borderRadius: BorderRadius.circular(25),
+                              //   minHeight: 8,
+                              // ),
+                              Text(
+                                getMilestoneMessage(
+                                  getCompletedEventsPercentage(events),
+                                ),
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeights.semiBold,
                                 ),
                               ),
                             ],
@@ -690,5 +713,88 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
     return oldDelegate.child != child ||
         oldDelegate.minExtent != minExtent ||
         oldDelegate.maxExtent != maxExtent;
+  }
+}
+
+class StepProgressIndicator extends StatelessWidget {
+  final int currentStep;
+  final Color progressColor;
+  final Color trackColor;
+  final Color checkpointColor;
+  final double checkpointDiameter;
+  final double height;
+  final Set<int> checkpointHours;
+
+  static const int _totalHours = 24;
+
+  const StepProgressIndicator({
+    super.key,
+    required this.currentStep,
+    this.progressColor = Colors.blue,
+    this.trackColor = Colors.grey,
+    this.checkpointColor = Colors.white,
+    this.checkpointDiameter = 8.0,
+    this.height = 10.0,
+    this.checkpointHours = const {},
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double barWidth = constraints.maxWidth;
+
+        return Container(
+          height: height + checkpointDiameter / 2,
+          alignment: Alignment.centerLeft,
+          child: Stack(
+            children: [
+              // Background track
+              Container(
+                height: height,
+                width: barWidth,
+                decoration: BoxDecoration(
+                  color: trackColor,
+                  borderRadius: BorderRadius.circular(height / 2),
+                ),
+              ),
+              // Filled progress
+              Container(
+                height: height,
+                width: barWidth * (currentStep / _totalHours),
+                decoration: BoxDecoration(
+                  color: progressColor,
+                  borderRadius: BorderRadius.circular(height / 2),
+                ),
+              ),
+              // Spots only at event hours
+              ...checkpointHours.map((hour) {
+                double positionX;
+                if (hour == 0) {
+                  // Place the first dot just inside the left border
+                  positionX = checkpointDiameter / 2;
+                } else {
+                  positionX = hour * (barWidth / (_totalHours - 1));
+                }
+                final bool isPast = hour < currentStep;
+                return Positioned(
+                  left: positionX - checkpointDiameter / 2,
+                  top: (height / 2) - checkpointDiameter / 2,
+                  child: Container(
+                    width: checkpointDiameter,
+                    height: checkpointDiameter,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isPast ? progressColor : checkpointColor,
+                      border: Border.all(color: progressColor, width: 1),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
