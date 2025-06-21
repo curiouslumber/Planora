@@ -114,48 +114,102 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             ],
           ),
-          bottomNavigationBar: Theme(
-            data: Theme.of(context).copyWith(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: const CircleBorder(),
+            onPressed: () {},
+            child: Icon(
+              Ionicons.add,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: BottomNavigationBar(
-                elevation: 0,
-                currentIndex: _currentIndex,
-                iconSize: 20.0,
-                selectedFontSize: 12.0,
-                unselectedFontSize: 12.0,
-                type: BottomNavigationBarType.fixed,
-                selectedItemColor: Theme.of(context).colorScheme.primary,
-                unselectedItemColor: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withAlpha(100),
-                onTap: _onBottomNavTap,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Ionicons.home_outline),
-                    activeIcon: Icon(Ionicons.home),
-                    label: 'Home',
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar: BottomAppBar(
+            height: kBottomNavigationBarHeight + 16,
+            shape: CircularNotchedRectangle(),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        size: 24,
+                        _currentIndex == 0
+                            ? Ionicons.home
+                            : Ionicons.home_outline,
+                      ),
+                      color:
+                          _currentIndex == 0
+                              ? Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                              : Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.8),
+                      onPressed: () => _onBottomNavTap(0),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        size: 24,
+                        _currentIndex == 1
+                            ? Ionicons.today
+                            : Ionicons.today_outline,
+                      ),
+                      color:
+                          _currentIndex == 1
+                              ? Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                              : Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.8),
+                      onPressed: () => _onBottomNavTap(1),
+                    ),
+                    SizedBox(width: 24),
+                    IconButton(
+                      icon: Icon(
+                        size: 24,
+                        _currentIndex == 2
+                            ? Ionicons.grid
+                            : Ionicons.grid_outline,
+                      ),
+                      color:
+                          _currentIndex == 2
+                              ? Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                              : Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.8),
+                      onPressed: () => _onBottomNavTap(2),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        size: 24,
+                        _currentIndex == 3
+                            ? Ionicons.person
+                            : Ionicons.person_outline,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Ionicons.today_outline),
-                    activeIcon: Icon(Ionicons.today),
-                    label: 'Calendar',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Ionicons.file_tray_outline),
-                    activeIcon: Icon(Ionicons.file_tray),
-                    label: 'Tools',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Ionicons.person_outline),
-                    activeIcon: Icon(Ionicons.person),
-                    label: 'Profile',
-                  ),
-                ],
-              ),
+                      color:
+                          _currentIndex == 3
+                              ? Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                              : Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.8),
+                      onPressed: () => _onBottomNavTap(3),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

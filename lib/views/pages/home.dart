@@ -1,9 +1,5 @@
 import 'dart:io';
 
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
@@ -14,8 +10,6 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/utils/helper.dart';
-import 'package:planora/views/pages/tools/events/add_event.dart';
-import 'package:planora/views/pages/tools/events/event_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.user});
@@ -29,6 +23,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<EventModel> events = [];
   Map<String, String> imageIdToUrl = {};
+  TextEditingController searchController = TextEditingController();
   Map<int, Map<String, int>> gridTileConstants = {
     0: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
     1: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
@@ -95,721 +90,569 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
-        actionsPadding: EdgeInsets.only(right: 32),
-        leadingWidth: 100,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 24),
-          child: GestureDetector(
-            onTap: () {},
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            // SliverAppBar for greeting/profile/notification
+            SliverAppBar(
+              floating: true,
+              snap: true,
+              pinned: false,
+              elevation: 0.0,
+              toolbarHeight: kToolbarHeight + 8,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              surfaceTintColor: Theme.of(context).colorScheme.surface,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 24,
+                    top: 8,
+                    right: 24,
+                    bottom: 0,
                   ),
-                ),
-                Icon(
-                  Ionicons.notifications_outline,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 8),
-              Text(
-                DateTime.now().hour < 12
-                    ? Constants.greetingMorning
-                    : DateTime.now().hour < 18
-                    ? Constants.greetingAfternoon
-                    : Constants.greetingEvening,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 14,
-                  fontWeight: FontWeights.regular,
-                ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                widget.user?.displayName ?? 'Guest',
-                style: TextStyle(
-                  fontFamily:
-                      Theme.of(context).textTheme.headlineLarge!.fontFamily,
-                  fontWeight: FontWeights.semiBold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-        ],
-        backgroundColor: Theme.of(context).colorScheme.surface,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 4),
-              height: MediaQuery.of(context).size.height * 0.22,
-              padding: EdgeInsets.symmetric(horizontal: 32),
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(25),
-              ),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 8.0,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      getMilestoneMessage(getCompletedEventsPercentage(events)),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeights.medium,
-                      ),
-                      maxLines: 3,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            strokeWidth: 6,
-                            strokeAlign: 8,
-                            value:
-                                double.tryParse(
-                                  getCompletedEventsPercentage(
-                                    events,
-                                  ).replaceAll('%', ''),
-                                ) ??
-                                0,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.surface.withValues(alpha: 0.4),
-                          ),
-                          Text(
-                            getCompletedEventsPercentage(events),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeights.semiBold,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${DateTime.now().hour < 12
+                                  ? Constants.greetingMorning
+                                  : DateTime.now().hour < 18
+                                  ? Constants.greetingAfternoon
+                                  : Constants.greetingEvening},',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 14,
+                                fontWeight: FontWeights.regular,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Today\'s Schedule',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeights.semiBold,
-                  ),
-                ),
-                if (events.length == 2)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
-                    child: InkWell(
-                      onTap:
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AddEvent(),
+                            SizedBox(height: 2),
+                            Text(
+                              widget.user?.displayName ?? 'Guest',
+                              style: TextStyle(
+                                fontFamily:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.headlineLarge!.fontFamily,
+                                fontWeight: FontWeights.semiBold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                      child: DottedBorder(
-                        options: CircularDottedBorderOptions(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          padding: const EdgeInsets.all(6.0),
-                          dashPattern: const [2, 2],
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          size: 16,
+                          ],
                         ),
                       ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (events.isEmpty)
-              InkWell(
-                onTap:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AddEvent()),
-                    ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 100.0,
-                  child: DottedBorder(
-                    options: RoundedRectDottedBorderOptions(
-                      radius: Radius.circular(8.0),
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withAlpha(180),
-                      padding: EdgeInsets.all(16.0),
-                      stackFit: StackFit.expand,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withAlpha(180),
-                        ),
-                        Text(
-                          "Create Event or Schedule a Meeting",
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withAlpha(180),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            if (events.isNotEmpty)
-              StaggeredGrid.count(
-                crossAxisCount: 3,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                children: List.generate(
-                  events.length < 3 ? events.length + 1 : 4,
-                  (index) {
-                    if (events.length > 3 && index == 3) {
-                      return StaggeredGridTile.count(
-                        crossAxisCellCount:
-                            gridTileConstants[3]!['crossAxisCellCount']!,
-                        mainAxisCellCount:
-                            gridTileConstants[3]!['mainAxisCellCount']!,
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "View More",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context).colorScheme.surface,
-                                  fontFamily:
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium!.fontFamily,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "+${events.length - 3} schedule",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Theme.of(context).colorScheme.surface,
-                                  fontFamily:
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium!.fontFamily,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    if (events.length == 1 && index == 1) {
-                      return StaggeredGridTile.count(
-                        crossAxisCellCount:
-                            gridTileConstants[1]!['crossAxisCellCount']!,
-                        mainAxisCellCount:
-                            gridTileConstants[1]!['mainAxisCellCount']!,
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: DottedBorder(
-                            options: RoundedRectDottedBorderOptions(
-                              radius: Radius.circular(8.0),
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withAlpha(180),
-                              padding: EdgeInsets.all(16.0),
-                              stackFit: StackFit.expand,
-                            ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                spacing: 4.0,
-                                children: [
-                                  Icon(
-                                    Icons.add,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.9),
-                                  ),
-                                  Text(
-                                    "Add Event",
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.9),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
-                    if (events.length == 2 && index == 2) {
-                      return Container();
-                    }
-
-                    if (events.length == 3 && index == 3) {
-                      return StaggeredGridTile.count(
-                        crossAxisCellCount:
-                            gridTileConstants[3]!['crossAxisCellCount']!,
-                        mainAxisCellCount:
-                            gridTileConstants[3]!['mainAxisCellCount']!,
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: DottedBorder(
-                            options: RoundedRectDottedBorderOptions(
-                              radius: Radius.circular(8.0),
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withAlpha(180),
-                              padding: EdgeInsets.all(16.0),
-                              stackFit: StackFit.expand,
-                            ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                spacing: 4.0,
-                                children: [
-                                  Icon(
-                                    Icons.add,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.9),
-                                  ),
-                                  Text(
-                                    "Add Event/Meeting",
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.9),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
-                    final event = events.asMap().entries.elementAt(index).value;
-
-                    return StaggeredGridTile.count(
-                      crossAxisCellCount:
-                          gridTileConstants[index]!['crossAxisCellCount']!,
-                      mainAxisCellCount:
-                          gridTileConstants[index]!['mainAxisCellCount']!,
-                    child: GestureDetector(
-                      onTap:
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder:
-                                    (context) => EventPage(
-                                      event: event,
-                                      imageUrl: imageIdToUrl[event.id]!,
-                                    ),
-                            ),
-                          ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
+                      GestureDetector(
+                        onTap: () {},
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                              if (event.eventTileImage.isNotEmpty)
-                                FutureBuilder<File?>(
-                                  future: CustomImageCacheManager()
-                                      .getCachedImageByEventId(event.id),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                            ConnectionState.done &&
-                                        snapshot.hasData) {
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          8.0,
-                                        ),
-                                        child: Image.file(
-                                          snapshot.data!,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        ),
-                                      );
-                                    } else {
-                                      final imagePathOrUrl =
-                                          imageIdToUrl[event.id];
-                                      if (imagePathOrUrl != null &&
-                                          File(imagePathOrUrl).existsSync()) {
-                                        // It's a file path
-                                        return ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            8.0,
-                                          ),
-                                          child: Image.file(
-                                            File(imagePathOrUrl),
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                        );
-                                      } else {
-                                        // It's a network URL or null
-                                        return ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            8.0,
-                                          ),
-                                          child: Image.network(
-                                            imagePathOrUrl ?? '',
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                                ),
                             Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                                decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                                padding: EdgeInsets.only(bottom: 12),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceContainer
-                                            .withValues(alpha: 0.9),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              event.name,
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
-                                                    .withValues(alpha: 0.85),
-                                                fontSize: 14,
-                                                fontWeight: FontWeights.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              '${DateFormat('jm').format(DateTime.parse(event.startDate))} ${event.endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(event.endDate!))}' : ''}',
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
-                                                    .withValues(alpha: 0.85),
-                                                fontSize: 12,
-                                                fontWeight:
-                                                    FontWeights.semiBold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  style: BorderStyle.solid,
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.8),
                                 ),
+                              ),
+                            ),
+                            Icon(
+                              Ionicons.notifications_outline,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.8),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: Icon(
+                          Ionicons.person,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        
+            // SliverPersistentHeader for sticky search bar
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SearchBarDelegate(
+                minExtent: 80,
+                maxExtent: 80,
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0.0,
+                  ),
+                  alignment: Alignment.center,
+                  child: TextField(
+                    controller: searchController,
+                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    maxLines: 1,
+                    minLines: 1,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeights.regular,
+                    ),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      prefixIcon: Container(
+                        margin: EdgeInsets.only(left: 16.0, right: 8.0),
+                        child: Icon(
+                          Ionicons.search_outline,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      prefixIconColor: Theme.of(context).colorScheme.primary,
+                      suffixIcon: Container(
+                        margin: EdgeInsets.only(right: 4.0),
+                        width: MediaQuery.of(context).size.width * 0.15,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              height: 24,
+                              width: 1,
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Ionicons.mic_outline,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                      ),
+                      suffixIconColor: Theme.of(context).colorScheme.primary,
+                      hintText: 'Search your tasks, events, notes...',
+                      hintStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontSize: 14,
+                        fontWeight: FontWeights.regular,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Main content as a sliver
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.0,
+                        horizontal: 16.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "Task Progress",
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeights.semiBold,
+                                ),
+                              ),
+                              Spacer(),
+                              Icon(
+                                Ionicons.chevron_forward,
+                                color: Theme.of(context).colorScheme.onPrimary,
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            const SizedBox(height: 24),
-            Text(
-              'Recent Activity',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 18,
-                fontWeight: FontWeights.semiBold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Container(
-            //   width: double.infinity,
-            //   height: 60.0,
-            //   alignment: Alignment.center,
-            //   child: Text(
-            //     'Start by completing your first event!',
-            //     style: TextStyle(
-            //       color: Theme.of(
-            //         context,
-            //       ).colorScheme.onSurface.withValues(alpha: 0.8),
-            //     ),
-            //   ),
-            // ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.125,
-              child: CarouselSlider(
-                options: CarouselOptions(
-                  height: MediaQuery.of(context).size.height * 0.125,
-                  viewportFraction: 0.35,
-                  padEnds: false,
-                  enableInfiniteScroll: false,
-                  reverse: false,
-                  autoPlay: false,
-                  autoPlayInterval: const Duration(seconds: 3),
-                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  pauseAutoPlayOnTouch: false,
-                  onPageChanged: (index, reason) {},
-                  scrollDirection: Axis.horizontal,
-                ),
-                items: List.generate(events.length + 1, (index) {
-                  if (events.length == index) {
-                    return Container(
-                      height: MediaQuery.of(context).size.height * 0.125,
-                      width: MediaQuery.of(context).size.width * 0.35,
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_forward,
-                            size: 24,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                          onPressed: () {},
-                        ),
-                      ),
-                    );
-                  }
-
-                  return Container(
-                    height: MediaQuery.of(context).size.height * 0.125,
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    margin: EdgeInsets.only(right: index < 3 ? 16.0 : 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        if (events[index].eventTileImage.isNotEmpty)
-                          FutureBuilder<File?>(
-                            future: CustomImageCacheManager()
-                                .getCachedImageByEventId(events[index].id),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  snapshot.hasData) {
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.file(
-                                    snapshot.data!,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                );
-                              } else {
-                                final imagePathOrUrl =
-                                    imageIdToUrl[events[index].id];
-                                if (imagePathOrUrl != null &&
-                                    File(imagePathOrUrl).existsSync()) {
-                                  // It's a file path
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.file(
-                                      File(imagePathOrUrl),
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  );
-                                } else {
-                                  // It's a network URL or null
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      imagePathOrUrl ?? '',
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                        Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainer
-                                .withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 8.0,
                             children: [
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  events[index].name,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.8),
-                                    fontSize: 14,
-                                    fontWeight: FontWeights.bold,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    spacing: 16.0,
+                                    children: [
+                                      Text(
+                                        getCompletedEventsPercentage(events),
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary,
+                                          fontSize: 32,
+                                          fontWeight: FontWeights.semiBold,
+                                        ),
+                                      ),
+                                      // Padding(
+                                      //   padding: const EdgeInsets.only(top: 4.0),
+                                      //   child: Row(
+                                      //     children: [
+                                      //       Text(
+                                      //         "up 12%",
+                                      //         style: TextStyle(
+                                      //           color:
+                                      //               Theme.of(
+                                      //                 context,
+                                      //               ).colorScheme.onPrimary,
+                                      //           fontSize: 14,
+                                      //           fontWeight: FontWeights.semiBold,
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                    ],
                                   ),
-                                ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4.0),
+                                    child: Text(
+                                      "4 of 12 completed",
+                                      style: TextStyle(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
+                                        fontSize: 16,
+                                        fontWeight: FontWeights.semiBold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
+                              LinearProgressIndicator(
+                                value: 0.3,
+                                color: Theme.of(context).colorScheme.tertiary,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.onTertiary,
+                                borderRadius: BorderRadius.circular(25),
+                                minHeight: 8,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
                                 child: Text(
-                                  '${DateFormat('jm').format(DateTime.parse(events[index].startDate))} ${events[index].endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(events[index].endDate!))}' : ''}',
+                                  getMilestoneMessage(
+                                    getCompletedEventsPercentage(events),
+                                  ),
                                   style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.8),
-                                    fontSize: 12,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: 16,
                                     fontWeight: FontWeights.semiBold,
                                   ),
                                 ),
                               ),
                             ],
                           ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Today\'s Schedule',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 18,
+                            fontWeight: FontWeights.semiBold,
+                          ),
                         ),
                       ],
                     ),
-                  );
-                }),
-              ),
-            ),
-
-            const SizedBox(height: 32.0),
-            Container(
-              margin: EdgeInsets.only(top: 8.0),
-              child: Text(
-                'Made with ❤️\nby Noel Pinto',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                    SizedBox(height: 16),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 16);
+                      },
+                      itemCount: events.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          tileColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.9),
+                          contentPadding: EdgeInsets.only(
+                            left: 8.0,
+                            right: 16.0,
+                          ),
+                          minVerticalPadding: 0.0,
+                          title: Text(
+                            events[index].name,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeights.semiBold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${DateFormat("jm").format(DateTime.parse(events[index].startTime))} - ${DateFormat("jm").format(DateTime.parse(events[index].endTime))}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeights.semiBold,
+                            ),
+                          ),
+                          minTileHeight: 72,
+                          leading: AspectRatio(
+                            aspectRatio: 1,
+                            child: FutureBuilder<File?>(
+                              future: CustomImageCacheManager()
+                                  .getCachedImageByEventId(events[index].id),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    snapshot.hasData) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.file(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                } else {
+                                  final imagePathOrUrl =
+                                      imageIdToUrl[events[index].id];
+                                  if (imagePathOrUrl != null) {
+                                    if (File(imagePathOrUrl).existsSync()) {
+                                      // It's a file path
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
+                                        child: Image.file(
+                                          File(imagePathOrUrl),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    } else {
+                                      // It's a network URL
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
+                                        child: Image.network(
+                                          imagePathOrUrl,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    // No image found
+                                    return Container(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          trailing: Checkbox(
+                            value: false,
+                            onChanged: (value) {},
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            side: BorderSide(
+                              width: 1.5,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Past Events',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 18,
+                            fontWeight: FontWeights.semiBold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 16);
+                      },
+                      itemCount: events.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          tileColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.9),
+                          contentPadding: EdgeInsets.only(
+                            left: 8.0,
+                            right: 16.0,
+                          ),
+                          minVerticalPadding: 0.0,
+                          title: Text(
+                            events[index].name,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeights.semiBold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${DateFormat("jm").format(DateTime.parse(events[index].startTime))} - ${DateFormat("jm").format(DateTime.parse(events[index].endTime))}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeights.semiBold,
+                            ),
+                          ),
+                          minTileHeight: 72,
+                          leading: AspectRatio(
+                            aspectRatio: 1,
+                            child: FutureBuilder<File?>(
+                              future: CustomImageCacheManager()
+                                  .getCachedImageByEventId(events[index].id),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    snapshot.hasData) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.file(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                } else {
+                                  final imagePathOrUrl =
+                                      imageIdToUrl[events[index].id];
+                                  if (imagePathOrUrl != null) {
+                                    if (File(imagePathOrUrl).existsSync()) {
+                                      // It's a file path
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
+                                        child: Image.file(
+                                          File(imagePathOrUrl),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    } else {
+                                      // It's a network URL
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
+                                        child: Image.network(
+                                          imagePathOrUrl,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    // No image found
+                                    return Container(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          trailing: Checkbox(
+                            value: false,
+                            onChanged: (value) {},
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            side: BorderSide(
+                              width: 1.5,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          )
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24.0),
+                    Container(
+                      margin: EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Made with ❤️\nby Noel Pinto',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -817,5 +660,35 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+}
+
+// SliverPersistentHeaderDelegate for sticky search bar
+class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
+  @override
+  final double minExtent;
+  @override
+  final double maxExtent;
+  final Widget child;
+  _SearchBarDelegate({
+    required this.minExtent,
+    required this.maxExtent,
+    required this.child,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(_SearchBarDelegate oldDelegate) {
+    return oldDelegate.child != child ||
+        oldDelegate.minExtent != minExtent ||
+        oldDelegate.maxExtent != maxExtent;
   }
 }
