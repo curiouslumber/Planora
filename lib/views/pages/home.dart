@@ -31,8 +31,18 @@ class _HomeState extends State<Home> {
     3: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
   };
 
+  DateTime now = DateTime.now();
+  List<EventModel> todayUpcomingEvents = [];
+
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
+    todayUpcomingEvents =
+        events.where((event) {
+          final start = DateTime.parse(event.startTime);
+          return start.year == now.year &&
+              start.month == now.month &&
+              start.day == now.day;
+        }).toList();
     for (var event in events) {
       if (event.eventTileImage.isNotEmpty) {
         // Try to get the cached file
@@ -329,7 +339,7 @@ class _HomeState extends State<Home> {
                                     spacing: 16.0,
                                     children: [
                                       Text(
-                                        getCompletedEventsPercentage(events),
+                                        "15%",
                                         style: TextStyle(
                                           color:
                                               Theme.of(
@@ -339,24 +349,6 @@ class _HomeState extends State<Home> {
                                           fontWeight: FontWeights.semiBold,
                                         ),
                                       ),
-                                      // Padding(
-                                      //   padding: const EdgeInsets.only(top: 4.0),
-                                      //   child: Row(
-                                      //     children: [
-                                      //       Text(
-                                      //         "up 12%",
-                                      //         style: TextStyle(
-                                      //           color:
-                                      //               Theme.of(
-                                      //                 context,
-                                      //               ).colorScheme.onPrimary,
-                                      //           fontSize: 14,
-                                      //           fontWeight: FontWeights.semiBold,
-                                      //         ),
-                                      //       ),
-                                      //     ],
-                                      //   ),
-                                      // ),
                                     ],
                                   ),
                                   Padding(
@@ -377,6 +369,7 @@ class _HomeState extends State<Home> {
                               ),
                               // 24-hour timeline with event checkpoints
                               StepProgressIndicator(
+                                height: 8.0,
                                 currentStep: DateTime.now().hour,
                                 progressColor:
                                     Theme.of(context).colorScheme.tertiary,
@@ -384,7 +377,7 @@ class _HomeState extends State<Home> {
                                     Theme.of(context).colorScheme.onPrimary,
                                 checkpointColor:
                                     Theme.of(context).colorScheme.primary,
-                                checkpointDiameter: 9.0,
+                                checkpointDiameter: 6.0,
                                 checkpointHours:
                                     events
                                         .where((e) {
@@ -401,23 +394,18 @@ class _HomeState extends State<Home> {
                                         )
                                         .toSet(),
                               ),
-                              // LinearProgressIndicator(
-                              //   value: 0.3,
-                              //   color: Theme.of(context).colorScheme.tertiary,
-                              //   backgroundColor:
-                              //       Theme.of(context).colorScheme.onTertiary,
-                              //   borderRadius: BorderRadius.circular(25),
-                              //   minHeight: 8,
-                              // ),
-                              Text(
-                                getMilestoneMessage(
-                                  getCompletedEventsPercentage(events),
-                                ),
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeights.semiBold,
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: Text(
+                                  getMilestoneMessage(
+                                    getCompletedEventsPercentage(events),
+                                  ),
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeights.semiBold,
+                                  ),
                                 ),
                               ),
                             ],
@@ -446,8 +434,9 @@ class _HomeState extends State<Home> {
                       separatorBuilder: (context, index) {
                         return SizedBox(height: 16);
                       },
-                      itemCount: events.length,
+                      itemCount: todayUpcomingEvents.length,
                       itemBuilder: (context, index) {
+                        final event = todayUpcomingEvents[index];
                         return ListTile(
                           tileColor: Theme.of(
                             context,
@@ -458,7 +447,7 @@ class _HomeState extends State<Home> {
                           ),
                           minVerticalPadding: 0.0,
                           title: Text(
-                            events[index].name,
+                            event.name,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 16,
@@ -466,7 +455,7 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                           subtitle: Text(
-                            '${DateFormat("jm").format(DateTime.parse(events[index].startTime))} - ${DateFormat("jm").format(DateTime.parse(events[index].endTime))}',
+                            '${DateFormat("jm").format(DateTime.parse(event.startTime))} - ${DateFormat("jm").format(DateTime.parse(event.endTime))}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 14,
@@ -478,7 +467,7 @@ class _HomeState extends State<Home> {
                             aspectRatio: 1,
                             child: FutureBuilder<File?>(
                               future: CustomImageCacheManager()
-                                  .getCachedImageByEventId(events[index].id),
+                                  .getCachedImageByEventId(event.id),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                         ConnectionState.done &&
@@ -492,7 +481,7 @@ class _HomeState extends State<Home> {
                                   );
                                 } else {
                                   final imagePathOrUrl =
-                                      imageIdToUrl[events[index].id];
+                                      imageIdToUrl[event.id];
                                   if (imagePathOrUrl != null) {
                                     if (File(imagePathOrUrl).existsSync()) {
                                       // It's a file path
@@ -532,7 +521,11 @@ class _HomeState extends State<Home> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           trailing: Checkbox(
-                            value: false,
+                            value: event.eventStatus == "completed",
+                            checkColor: Theme.of(context).colorScheme.onPrimary,
+                            fillColor: WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
                             onChanged: (value) {},
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4.0),
@@ -652,8 +645,12 @@ class _HomeState extends State<Home> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           trailing: Checkbox(
-                            value: false,
+                            value: true,
                             onChanged: (value) {},
+                            checkColor: Theme.of(context).colorScheme.onPrimary,
+                            fillColor: WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4.0),
                             ),
@@ -773,6 +770,9 @@ class StepProgressIndicator extends StatelessWidget {
                 if (hour == 0) {
                   // Place the first dot just inside the left border
                   positionX = checkpointDiameter / 2;
+                } else if (hour == _totalHours) {
+                  // Place the last dot just inside the right border
+                  positionX = barWidth - checkpointDiameter / 2;
                 } else {
                   positionX = hour * (barWidth / (_totalHours - 1));
                 }
@@ -786,7 +786,6 @@ class StepProgressIndicator extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isPast ? progressColor : checkpointColor,
-                      border: Border.all(color: progressColor, width: 1),
                     ),
                   ),
                 );
