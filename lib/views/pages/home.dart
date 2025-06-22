@@ -40,23 +40,20 @@ class _HomeState extends State<Home> {
     events = await HiveEvents.getEventsFromHive();
     todayUpcomingEvents =
         events.where((event) {
-          final start = DateTime.parse(event.startTime);
-          final end = DateTime.parse(event.endTime);
-          return isRangeInFuture(start, end, now);
+          return isRangeInFuture(event, now);
         }).toList();
+
     todayPastEvents =
         events.where((event) {
-          final start = DateTime.parse(event.startTime);
-          final end = DateTime.parse(event.endTime);
-          return isRangeInPast(start, end, now);
+          return isRangeInPast(event, now);
         }).toList();
+
     completedEvents =
         events.where((event) {
-          final start = DateTime.parse(event.startTime);
-          final end = DateTime.parse(event.endTime);
-          return isRangeInPast(start, end, now) &&
+          return isRangeInPast(event, now) &&
               event.eventStatus == Constants.eventStatus[2];
         }).toList();
+
     for (var event in events) {
       if (event.eventTileImage.isNotEmpty) {
         // Try to get the cached file
@@ -95,10 +92,13 @@ class _HomeState extends State<Home> {
   }
 
   String getCompletedEventsPercentage(List<EventModel> events) {
-    if (events.isEmpty) return '-';
+    final todayEvents = events.where((e) => isRangeInPast(e, now)).toList();
+    if (todayEvents.isEmpty) return '-';
     final completedCount =
-        events.where((e) => e.eventStatus == Constants.eventStatus[2]).length;
-    final percent = (completedCount / events.length * 100).round();
+        todayEvents
+            .where((e) => e.eventStatus == Constants.eventStatus[2])
+            .length;
+    final percent = (completedCount / todayEvents.length * 100).round();
     return '$percent%';
   }
 
@@ -113,28 +113,52 @@ class _HomeState extends State<Home> {
     return Constants.milestoneMessages[100]!;
   }
 
-  bool isRangeInPast(DateTime start, DateTime end, DateTime now) {
-    final today = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      now.hour,
-      now.minute,
-      now.second,
+  bool isRangeInPast(EventModel event, DateTime now) {
+    final eventLocalStartDate = DateTime.parse(event.startDate);
+    DateTime eventLocalEndDate =
+        event.endDate != null
+            ? DateTime.parse(event.endDate!)
+            : eventLocalStartDate;
+    final eventLocalEndTime = DateTime.parse(event.endTime);
+
+    final eventLocalEndDateTime = DateTime(
+      eventLocalEndDate.year,
+      eventLocalEndDate.month,
+      eventLocalEndDate.day,
+      eventLocalEndTime.hour,
+      eventLocalEndTime.minute,
+      eventLocalEndTime.second,
     );
-    return end.isBefore(today);
+
+    // Is the event's end before now, and does it occur today?
+    final isToday =
+        now.year == eventLocalEndDate.year &&
+        now.month == eventLocalEndDate.month &&
+        now.day == eventLocalEndDate.day;
+
+    return eventLocalEndDateTime.isBefore(now) && isToday;
   }
 
-  bool isRangeInFuture(DateTime start, DateTime end, DateTime now) {
-    final today = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      now.hour,
-      now.minute,
-      now.second,
+  bool isRangeInFuture(EventModel event, DateTime now) {
+    final eventLocalStartDate = DateTime.parse(event.startDate);
+    final eventLocalStartTime = DateTime.parse(event.startTime);
+
+    DateTime eventLocalStartDateTime = DateTime(
+      eventLocalStartDate.year,
+      eventLocalStartDate.month,
+      eventLocalStartDate.day,
+      eventLocalStartTime.hour,
+      eventLocalStartTime.minute,
+      eventLocalStartTime.second,
     );
-    return start.isAfter(today);
+
+    // Is the event's start after now, and does it occur today?
+    final isToday =
+        now.year == eventLocalStartDate.year &&
+        now.month == eventLocalStartDate.month &&
+        now.day == eventLocalStartDate.day;
+
+    return isToday && eventLocalStartDateTime.isAfter(now);
   }
 
   @override
@@ -593,6 +617,20 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
+                    if (todayPastEvents.isEmpty)
+                      Container(
+                        alignment: Alignment.center,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: Text(
+                          "No past events.",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16,
+                            fontWeight: FontWeights.regular,
+                          ),
+                        ),
+                      )
+                    else
                     ListView.separated(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
