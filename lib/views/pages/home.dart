@@ -620,7 +620,7 @@ class _HomeState extends State<Home> {
                     if (todayPastEvents.isEmpty)
                       Container(
                         alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.1,
+                        height: MediaQuery.of(context).size.height * 0.05,
                         child: Text(
                           "No past events.",
                           style: TextStyle(

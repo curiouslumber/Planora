@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:date_field/date_field.dart';
@@ -446,6 +447,7 @@ class _AddEventState extends State<AddEvent> {
                         ),
                       ],
                     ),
+                    if (Platform.isLinux)
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -474,6 +476,7 @@ class _AddEventState extends State<AddEvent> {
                         ),
                       ],
                     ),
+                    if (Platform.isLinux)
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
