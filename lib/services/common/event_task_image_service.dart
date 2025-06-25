@@ -9,6 +9,7 @@ import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/services/firebase/firebase_storage_service.dart';
 import 'package:planora/services/pinecone/pinecone_vector_service.dart';
 import 'package:planora/utils/cache_manager.dart';
+import 'package:planora/utils/helper.dart';
 
 class EventTaskImageService {
   // Handle event image tile generation and processing
@@ -29,7 +30,7 @@ class EventTaskImageService {
           event.copyWith(
             eventTileImage: event.eventTileImage,
             eventStatus: event.eventStatus,
-            eventTileImageLocalUrl: cachedFile.path, // Use the local file path
+            eventTileImageLocalUrl: cachedFile.path,
             isImageProcessing: false,
           ),
         );
@@ -49,33 +50,11 @@ class EventTaskImageService {
         event.name + event.description,
       );
 
-      String imageUrl;
       if (semanticSearchResponse != null) {
-        imageUrl = semanticSearchResponse;
+        await _updateEventWithImage(processingEvent, semanticSearchResponse);
       } else {
         await _generateAndUploadImageForEvent(processingEvent);
-        imageUrl = processingEvent.eventTileImage;
       }
-
-      // Download and cache the image
-      File? cachedImage = await CustomImageCacheManager().cacheImageByEventId(
-        imageUrl,
-        event.id,
-      );
-
-      if (cachedImage == null) {
-        throw Exception('Failed to cache image');
-      }
-
-      // Update with new image URL and cache path
-      await HiveEvents.updateEventInHive(
-        processingEvent.copyWith(
-          eventTileImage: imageUrl,
-          eventStatus: event.eventStatus,
-          eventTileImageLocalUrl: cachedImage.path, // Store the local file path
-          isImageProcessing: false,
-        ),
-      );
     } catch (e) {
       if (kDebugMode) {
         print('Error processing event image: $e');
@@ -121,33 +100,11 @@ class EventTaskImageService {
         task.name + task.description,
       );
 
-      String imageUrl;
       if (semanticSearchResponse != null) {
-        imageUrl = semanticSearchResponse;
+        await _updateTaskWithImage(processingTask, semanticSearchResponse);
       } else {
         await _generateAndUploadImageForTask(processingTask);
-        imageUrl = processingTask.taskTileImage;
       }
-
-      // Download and cache the image
-      File? cachedImage = await CustomImageCacheManager().cacheImageByEventId(
-        imageUrl,
-        task.id,
-      );
-
-      if (cachedImage == null) {
-        throw Exception('Failed to cache image');
-      }
-
-      // Update with new image URL and cache path
-      await HiveEvents.updateTaskInHive(
-        processingTask.copyWith(
-          taskTileImage: imageUrl,
-          taskStatus: task.taskStatus,
-          taskTileImageLocalUrl: cachedImage.path,
-          isImageProcessing: false,
-        ),
-      );
     } catch (e) {
       if (kDebugMode) {
         print('Error processing task image: $e');
@@ -162,35 +119,83 @@ class EventTaskImageService {
 
   static Future<void> _updateEventWithImage(
     EventModel event,
-    String imageUrl,
+    String gsUrl,
   ) async {
-    final updatedEvent = event.copyWith(
-      eventTileImage: imageUrl,
-      eventStatus: event.eventStatus,
-      eventTileImageLocalUrl: event.eventTileImageLocalUrl,
-      isImageProcessing: false,
-    );
+    try {
+      // Get a download URL for caching
+      final downloadUrl = await Helper.getDownloadUrl(gsUrl);
 
-    await HiveEvents.updateEventInHive(updatedEvent);
-    await FirebaseFirestoreService().updateEventDocument(
-      event.id,
-      updatedEvent,
-    );
+      // Cache the image using the download URL
+      File? cachedImage = await CustomImageCacheManager().cacheImageByEventId(
+        downloadUrl,
+        event.id,
+      );
+
+      if (cachedImage == null) {
+        throw Exception('Failed to cache image');
+      }
+
+      // Create updated event with local cache path
+      final updatedEvent = event.copyWith(
+        eventTileImage: gsUrl,
+        eventStatus: event.eventStatus,
+        eventTileImageLocalUrl: cachedImage.path,
+        isImageProcessing: false,
+      );
+
+      // Update local storage
+      await HiveEvents.updateEventInHive(updatedEvent);
+      
+      // Update remote storage
+      await FirebaseFirestoreService().updateEventDocument(
+        event.id,
+        updatedEvent,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error in _updateEventWithImage: $e');
+      }
+      rethrow;
+    }
   }
 
   static Future<void> _updateTaskWithImage(
     TaskModel task,
-    String imageUrl,
+    String gsUrl,
   ) async {
-    final updatedTask = task.copyWith(
-      taskTileImage: imageUrl,
-      taskStatus: task.taskStatus,
-      taskTileImageLocalUrl: task.taskTileImageLocalUrl,
-      isImageProcessing: false,
-    );
+    try {
+      // Then get a download URL for caching
+      final downloadUrl = await Helper.getDownloadUrl(gsUrl);
 
-    await HiveEvents.updateTaskInHive(updatedTask);
-    await FirebaseFirestoreService().updateTaskDocument(task.id, updatedTask);
+      // Cache the image using the download URL
+      File? cachedImage = await CustomImageCacheManager().cacheImageByEventId(
+        downloadUrl,
+        task.id,
+      );
+
+      if (cachedImage == null) {
+        throw Exception('Failed to cache image');
+      }
+
+      // Create updated task with local cache path
+      final updatedTask = task.copyWith(
+        taskTileImage: gsUrl,
+        taskStatus: task.taskStatus,
+        taskTileImageLocalUrl: cachedImage.path,
+        isImageProcessing: false,
+      );
+
+      // Update local storage
+      await HiveEvents.updateTaskInHive(updatedTask);
+      
+      // Update remote storage
+      await FirebaseFirestoreService().updateTaskDocument(task.id, updatedTask);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error in _updateTaskWithImage: $e');
+      }
+      rethrow;
+    }
   }
 
   static Future<void> _generateAndUploadImageForEvent(EventModel event) async {

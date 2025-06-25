@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:planora/utils/helper.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CustomImageCacheManager extends CacheManager {
@@ -32,16 +31,9 @@ class CustomImageCacheManager extends CacheManager {
         return fileInfo.file;
       }
 
-      String downloadUrl = imageUrl;
-
-      // Convert GS URL to download URL if needed
-      if (imageUrl.startsWith('gs://')) {
-        downloadUrl = await Helper.getDownloadUrl(imageUrl);
-      }
-
       // Download and cache the file using the download URL
       final file = await getSingleFile(
-        downloadUrl,
+        imageUrl,
         key: eventId,
         headers: {'Cache-Control': 'max-age=2592000'}, // 30 days cache
       );
