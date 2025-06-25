@@ -1,20 +1,16 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/models/task_model.dart';
 import 'package:planora/models/user_model.dart';
-import 'package:planora/services/firebase/firebase_ai_service.dart';
-import 'package:planora/services/firebase/firebase_firestore_service.dart';
-import 'package:planora/services/firebase/firebase_storage_service.dart';
-import 'package:planora/services/pinecone/pinecone_vector_service.dart';
+import 'package:planora/services/common/event_task_image_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
-import 'package:planora/utils/helper.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 
 class Home extends StatefulWidget {
@@ -28,7 +24,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<EventModel> events = [];
-  Map<String, String> imageIdToUrl = {};
   TextEditingController searchController = TextEditingController();
   Map<int, Map<String, int>> gridTileConstants = {
     0: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
@@ -42,9 +37,12 @@ class _HomeState extends State<Home> {
   List<EventModel> todayPastEvents = [];
   List<EventModel> todayCompletedEvents = [];
   List<EventModel> todayEvents = [];
+  List<TaskModel> tasks = [];
 
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
+    tasks = await HiveEvents.getTasksFromHive();
+
     todayEvents =
         events.where((event) {
           return isRangeInToday(event, now);
@@ -52,8 +50,8 @@ class _HomeState extends State<Home> {
 
     todayUpcomingEvents =
         events.where((event) {
-          return isRangeInFuture(event, now) &&
-              event.eventStatus != Constants.eventStatus[2];
+            return isRangeInFuture(event, now) &&
+                event.eventStatus != Constants.eventStatus[2];
           }).toList()
           ..sort(
             (a, b) =>
@@ -78,91 +76,17 @@ class _HomeState extends State<Home> {
         }).toList();
 
     for (var event in events) {
-      if (event.eventTileImage.isNotEmpty) {
-        // Try to get the cached file
-        final cachedFile = await CustomImageCacheManager()
-            .getCachedImageByEventId(event.id);
-
-        if (cachedFile != null) {
-          // Store the local file path for the event
-          imageIdToUrl[event.id] = cachedFile.path;
-        } else {
-          // Fallback: get the download URL if not cached
-          String downloadUrl = await Helper.getDownloadUrl(
-            event.eventTileImage,
-          );
-
-          // Cache the image
-          File? cachedFile = await CustomImageCacheManager()
-              .cacheImageByEventId(downloadUrl, event.id);
-          if (cachedFile != null) {
-            imageIdToUrl[event.id] = cachedFile.path;
-          }
-        }
-      } else {
-        // Semantic search in pinecone
-        String? semanticSearchResponse =
-            await PineconeVectorService.semanticSearch(event.name);
-        if (semanticSearchResponse != null) {
-          EventModel updatedEvent = event.copyWith(
-            eventTileImage: semanticSearchResponse,
-            eventStatus: event.eventStatus,
-          );
-          await HiveEvents.updateEventInHive(updatedEvent);
-          await FirebaseFirestoreService().updateEventDocument(event.id, event);
-          if (mounted) {
-            setState(() {});
-          }
-        } else {
-          generateImageTileAsync(event, event.name, event.description);
-        }
-      }
+      if (event.isImageProcessing) continue;
+      EventTaskImageService.handleImageTileForEvent(event);
     }
+
+    for (var task in tasks) {
+      if (task.isImageProcessing) continue;
+      EventTaskImageService.handleImageTileForTask(task);
+    }
+
     if (mounted) {
       setState(() {});
-    }
-  }
-
-  void generateImageTileAsync(
-    EventModel event,
-    String eventName,
-    String eventDescription,
-  ) async {
-    String imagePrompt = eventName + eventDescription;
-    String? semanticSearchResponse = await PineconeVectorService.semanticSearch(
-      imagePrompt,
-    );
-
-    // If semantic search response is not null, update the event
-    if (semanticSearchResponse == null) {
-      // If semantic search response is null, generate the image
-      Uint8List? imageBytes = await FirebaseAiService().generateImage(
-        imagePrompt,
-      );
-      if (imageBytes != null) {
-        String? gsUrl = await FirebaseStorageService().uploadImageUsingBytes(
-          '${eventName.replaceAll(' ', '_')}.png',
-          'event_images',
-          imageBytes,
-        );
-        if (gsUrl != null) {
-          EventModel updatedEvent = event.copyWith(
-            eventTileImage: gsUrl,
-            eventStatus: event.eventStatus,
-          );
-          await HiveEvents.updateEventInHive(updatedEvent);
-          await FirebaseFirestoreService().updateEventDocument(
-            event.id,
-            updatedEvent,
-          );
-          // Create the new index in pinecone
-          await PineconeVectorService.upsertNewIndex(imagePrompt, gsUrl);
-          getEvents();
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      }
     }
   }
 
@@ -170,6 +94,8 @@ class _HomeState extends State<Home> {
     EventModel updatedEvent = event.copyWith(
       eventStatus: Constants.eventStatus[2],
       eventTileImage: event.eventTileImage,
+      eventTileImageLocalUrl: event.eventTileImageLocalUrl,
+      isImageProcessing: false,
     );
     HiveEvents.updateEventInHive(updatedEvent);
     getEvents();
@@ -632,16 +558,16 @@ class _HomeState extends State<Home> {
                         ),
                       )
                     else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      separatorBuilder: (context, index) {
-                        return SizedBox(height: 16);
-                      },
-                      itemCount: todayUpcomingEvents.length,
-                      itemBuilder: (context, index) {
-                        final event = todayUpcomingEvents[index];
-                        return ListTile(
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: 16);
+                        },
+                        itemCount: todayUpcomingEvents.length,
+                        itemBuilder: (context, index) {
+                          final event = todayUpcomingEvents[index];
+                          return ListTile(
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -650,96 +576,186 @@ class _HomeState extends State<Home> {
                                 ),
                               );
                             },
-                          tileColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.9),
-                          contentPadding: EdgeInsets.only(
-                            left: 8.0,
-                            right: 16.0,
-                          ),
-                          minVerticalPadding: 0.0,
-                          title: Text(
-                            event.name,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeights.semiBold,
+                            tileColor: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.9),
+                            contentPadding: EdgeInsets.only(
+                              left: 8.0,
+                              right: 16.0,
                             ),
-                          ),
-                          subtitle: Text(
+                            minVerticalPadding: 0.0,
+                            title: Text(
+                              event.name,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeights.semiBold,
+                              ),
+                            ),
+                            subtitle: Text(
                               '${DateFormat("jm").format(DateTime.parse(event.startTime))} ${event.endTime != event.startTime ? '- ${DateFormat("jm").format(DateTime.parse(event.endTime))}' : ''}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 14,
-                              fontWeight: FontWeights.semiBold,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeights.semiBold,
+                              ),
                             ),
-                          ),
-                          minTileHeight: 72,
-                          leading: AspectRatio(
-                            aspectRatio: 1,
-                            child: FutureBuilder<File?>(
-                              future: CustomImageCacheManager()
-                                  .getCachedImageByEventId(event.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.done &&
-                                    snapshot.hasData) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.file(
-                                      snapshot.data!,
-                                      fit: BoxFit.cover,
-                                    ),
+                            minTileHeight: 72,
+                            leading: AspectRatio(
+                              aspectRatio: 1,
+                              child: FutureBuilder<File?>(
+                                future: CustomImageCacheManager()
+                                    .getCachedImageByEventId(event.id),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.file(
+                                        snapshot.data!,
+                                        fit: BoxFit.cover,
+                                      ),
                                     );
                                   } else {
-                                    return Container(
-                                      color: Colors.transparent,
-                                    );
+                                    return Container(color: Colors.transparent);
                                   }
-                              },
+                                },
+                              ),
                             ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          trailing: Checkbox(
-                            value: event.eventStatus == "completed",
-                            checkColor: Theme.of(context).colorScheme.onPrimary,
-                            fillColor: WidgetStateProperty.all(
-                              Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
+                            trailing: Checkbox(
+                              value: event.eventStatus == "completed",
+                              checkColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              fillColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
                               onChanged: (value) {
                                 if (value != null) {
                                   EventModel updatedEvent = event.copyWith(
                                     eventStatus: Constants.eventStatus[2],
                                     eventTileImage: event.eventTileImage,
+                                    eventTileImageLocalUrl:
+                                        event.eventTileImageLocalUrl,
+                                    isImageProcessing: false,
                                   );
-                                  HiveEvents.updateEventInHive(
-                                    updatedEvent,
-                                  );
+                                  HiveEvents.updateEventInHive(updatedEvent);
                                   getEvents();
                                   if (mounted) {
                                     setState(() {});
                                   }
                                 }
                               },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              side: BorderSide(
+                                width: 1.5,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    SizedBox(height: 16),
+                    if (todayPastEvents.isNotEmpty)
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: 16);
+                        },
+                        itemCount: todayPastEvents.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            tileColor: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.9),
+                            contentPadding: EdgeInsets.only(
+                              left: 8.0,
+                              right: 16.0,
+                            ),
+                            minVerticalPadding: 0.0,
+                            title: Text(
+                              todayPastEvents[index].name,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeights.semiBold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].startTime))} ${todayPastEvents[index].endTime != todayPastEvents[index].startTime ? '- ${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].endTime))}' : ''}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 14,
+                                fontWeight: FontWeights.semiBold,
+                              ),
+                            ),
+                            minTileHeight: 72,
+                            leading: AspectRatio(
+                              aspectRatio: 1,
+                              child: FutureBuilder<File?>(
+                                future: CustomImageCacheManager()
+                                    .getCachedImageByEventId(
+                                      todayPastEvents[index].id,
+                                    ),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.file(
+                                        snapshot.data!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    );
+                                  } else {
+                                    return Container(color: Colors.transparent);
+                                  }
+                                },
+                              ),
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4.0),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            side: BorderSide(
-                              width: 1.5,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                            trailing: Checkbox(
+                              value:
+                                  todayPastEvents[index].eventStatus ==
+                                  Constants.eventStatus[2],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  markEventComplete(
+                                    todayPastEvents[index],
+                                    index,
+                                  );
+                                }
+                              },
+                              checkColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              fillColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              side: BorderSide(
+                                width: 1.5,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 24),
+                          );
+                        },
+                      ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Past Events',
+                          'Todos',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
@@ -749,12 +765,12 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    if (todayPastEvents.isEmpty)
+                    if (tasks.isEmpty)
                       Container(
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.055,
                         child: Text(
-                          "No past events.",
+                          "No tasks.",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
@@ -763,96 +779,80 @@ class _HomeState extends State<Home> {
                         ),
                       )
                     else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      separatorBuilder: (context, index) {
-                        return SizedBox(height: 16);
-                      },
-                      itemCount: todayPastEvents.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          tileColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.9),
-                          contentPadding: EdgeInsets.only(
-                            left: 8.0,
-                            right: 16.0,
-                          ),
-                          minVerticalPadding: 0.0,
-                          title: Text(
-                            todayPastEvents[index].name,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeights.semiBold,
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: 16);
+                        },
+                        itemCount: tasks.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            tileColor: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.9),
+                            contentPadding: EdgeInsets.only(
+                              left: 8.0,
+                              right: 16.0,
                             ),
-                          ),
-                          subtitle: Text(
-                              '${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].startTime))} ${todayPastEvents[index].endTime != todayPastEvents[index].startTime ? '- ${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].endTime))}' : ''}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 14,
-                              fontWeight: FontWeights.semiBold,
+                            minVerticalPadding: 0.0,
+                            title: Text(
+                              tasks[index].name,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeights.semiBold,
+                              ),
                             ),
-                          ),
-                          minTileHeight: 72,
-                          leading: AspectRatio(
-                            aspectRatio: 1,
-                            child: FutureBuilder<File?>(
-                              future: CustomImageCacheManager()
-                                  .getCachedImageByEventId(
-                                    todayPastEvents[index].id,
-                                  ),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.done &&
-                                    snapshot.hasData) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.file(
-                                      snapshot.data!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                } else {
-                                  return Container(
-                                    color: Colors.transparent,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          trailing: Checkbox(
-                            value:
-                                todayPastEvents[index].eventStatus ==
-                                Constants.eventStatus[2],
-                            onChanged: (value) {
-                              if (value != null) {
-                                markEventComplete(
-                                  todayPastEvents[index],
-                                  index,
-                                );
-                              }
-                            },
-                            checkColor: Theme.of(context).colorScheme.onPrimary,
-                            fillColor: WidgetStateProperty.all(
-                              Colors.transparent,
+                            minTileHeight: 72,
+                            leading: AspectRatio(
+                              aspectRatio: 1,
+                              child: FutureBuilder<File?>(
+                                future: CustomImageCacheManager()
+                                    .getCachedImageByEventId(tasks[index].id),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.file(
+                                        snapshot.data!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    );
+                                  } else {
+                                    return Container(color: Colors.transparent);
+                                  }
+                                },
+                              ),
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4.0),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            side: BorderSide(
-                              width: 1.5,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                            trailing: Checkbox(
+                              value:
+                                  tasks[index].taskStatus ==
+                                  Constants.taskStatus[1],
+                              onChanged: (value) {
+                                if (value != null) {}
+                              },
+                              checkColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              fillColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              side: BorderSide(
+                                width: 1.5,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
                     const SizedBox(height: 24.0),
                     Container(
                       margin: EdgeInsets.only(top: 8.0),
@@ -870,28 +870,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-    );
-  }
-}
-
-extension on EventModel {
-  EventModel copyWith({
-    required String eventStatus,
-    required String eventTileImage,
-  }) {
-    return EventModel(
-      id: id,
-      eventTileImageId: eventTileImageId,
-      name: name,
-      description: description,
-      eventTileImage: eventTileImage,
-      eventStatus: eventStatus,
-      startDate: startDate,
-      endDate: endDate,
-      startTime: startTime,
-      endTime: endTime,
-      people: people,
-      meeting: meeting,
     );
   }
 }

@@ -1,49 +1,43 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'event_model.dart';
+part of 'task_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class EventModelAdapter extends TypeAdapter<EventModel> {
+class TaskModelAdapter extends TypeAdapter<TaskModel> {
   @override
-  final int typeId = 0;
+  final int typeId = 4;
 
   @override
-  EventModel read(BinaryReader reader) {
+  TaskModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return EventModel(
+    return TaskModel(
       id: fields[0] as String,
-      eventTileImage: fields[1] as String,
-      eventTileImageLocalUrl: fields[2] as String,
+      taskTileImage: fields[1] as String,
       isImageProcessing: fields[3] as bool,
+      taskTileImageLocalUrl: fields[2] as String,
       name: fields[4] as String,
       description: fields[5] as String,
-      startDate: fields[6] as String,
-      endDate: fields[7] as String?,
-      startTime: fields[8] as String,
-      endTime: fields[9] as String,
-      people: (fields[10] as List?)?.cast<String>(),
-      meeting: fields[11] as String?,
-      eventStatus: fields[12] as String,
-      createdAt: fields[13] as DateTime,
+      taskStatus: fields[6] as String,
+      createdAt: fields[7] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, EventModel obj) {
+  void write(BinaryWriter writer, TaskModel obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.eventTileImage)
+      ..write(obj.taskTileImage)
       ..writeByte(2)
-      ..write(obj.eventTileImageLocalUrl)
+      ..write(obj.taskTileImageLocalUrl)
       ..writeByte(3)
       ..write(obj.isImageProcessing)
       ..writeByte(4)
@@ -51,20 +45,8 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       ..writeByte(5)
       ..write(obj.description)
       ..writeByte(6)
-      ..write(obj.startDate)
+      ..write(obj.taskStatus)
       ..writeByte(7)
-      ..write(obj.endDate)
-      ..writeByte(8)
-      ..write(obj.startTime)
-      ..writeByte(9)
-      ..write(obj.endTime)
-      ..writeByte(10)
-      ..write(obj.people)
-      ..writeByte(11)
-      ..write(obj.meeting)
-      ..writeByte(12)
-      ..write(obj.eventStatus)
-      ..writeByte(13)
       ..write(obj.createdAt);
   }
 
@@ -74,7 +56,7 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EventModelAdapter &&
+      other is TaskModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

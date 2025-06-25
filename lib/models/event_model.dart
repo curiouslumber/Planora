@@ -9,30 +9,35 @@ class EventModel {
   @HiveField(1)
   final String eventTileImage;
   @HiveField(2)
-  final String? eventTileImageId;
+  final String eventTileImageLocalUrl;
   @HiveField(3)
-  final String name;
+  final bool isImageProcessing;
   @HiveField(4)
-  final String description;
+  final String name;
   @HiveField(5)
-  final String startDate;
+  final String description;
   @HiveField(6)
-  final String? endDate;
+  final String startDate;
   @HiveField(7)
-  final String startTime;
+  final String? endDate;
   @HiveField(8)
-  final String endTime;
+  final String startTime;
   @HiveField(9)
-  final List<String>? people;
+  final String endTime;
   @HiveField(10)
-  final String? meeting;
+  final List<String>? people;
   @HiveField(11)
+  final String? meeting;
+  @HiveField(12)
   final String eventStatus;
+  @HiveField(13)
+  final DateTime createdAt;
 
   EventModel({
     required this.id,
-    this.eventTileImage = '',
-    this.eventTileImageId,
+    required this.eventTileImage,
+    this.eventTileImageLocalUrl = "",
+    this.isImageProcessing = false,
     required this.name,
     required this.description,
     required this.startDate,
@@ -42,13 +47,14 @@ class EventModel {
     this.people = const [],
     this.meeting,
     this.eventStatus = "upcoming",
+    required this.createdAt,
   });
 
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'eventTileImage': eventTileImage,
-      'eventTileImageId': eventTileImageId,
+      'eventTileImageLocalUrl': eventTileImageLocalUrl,
       'name': name,
       'description': description,
       'startDate': startDate,
@@ -58,6 +64,31 @@ class EventModel {
       'people': people,
       'meeting': meeting,
       'eventStatus': eventStatus,
+      'createdAt': createdAt,
     };
+  }
+
+  EventModel copyWith({
+    required String eventTileImage,
+    required String eventStatus,
+    required String eventTileImageLocalUrl,
+    required bool isImageProcessing,
+  }) {
+    return EventModel(
+      id: id,
+      eventTileImage: eventTileImage,
+      eventTileImageLocalUrl: eventTileImageLocalUrl,
+      isImageProcessing: isImageProcessing,
+      name: name,
+      description: description,
+      startDate: startDate,
+      endDate: endDate,
+      startTime: startTime,
+      endTime: endTime,
+      people: people,
+      meeting: meeting,
+      eventStatus: eventStatus,
+      createdAt: createdAt,
+    );
   }
 }

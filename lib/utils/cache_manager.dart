@@ -1,5 +1,8 @@
+// In cache_manager.dart
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:planora/utils/helper.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CustomImageCacheManager extends CacheManager {
@@ -20,15 +23,47 @@ class CustomImageCacheManager extends CacheManager {
         ),
       );
 
+  // Handles downloading and caching an image, converting GS URLs to download URLs if needed
   Future<File?> cacheImageByEventId(String imageUrl, String eventId) async {
-    return await CustomImageCacheManager().getSingleFile(
-      imageUrl,
-      key: eventId,
-    );
+    try {
+      // First check if we already have this cached
+      final fileInfo = await getFileFromCache(eventId);
+      if (fileInfo != null) {
+        return fileInfo.file;
+      }
+
+      String downloadUrl = imageUrl;
+
+      // Convert GS URL to download URL if needed
+      if (imageUrl.startsWith('gs://')) {
+        downloadUrl = await Helper.getDownloadUrl(imageUrl);
+      }
+
+      // Download and cache the file using the download URL
+      final file = await getSingleFile(
+        downloadUrl,
+        key: eventId,
+        headers: {'Cache-Control': 'max-age=2592000'}, // 30 days cache
+      );
+      
+      return file;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error caching image for event $eventId: $e');
+      }
+      return null;
+    }
   }
 
   Future<File?> getCachedImageByEventId(String eventId) async {
-    final fileInfo = await CustomImageCacheManager().getFileFromCache(eventId);
-    return fileInfo?.file;
+    try {
+      final fileInfo = await getFileFromCache(eventId);
+      return fileInfo?.file;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting cached image: $e');
+      }
+      return null;
+    }
   }
 }

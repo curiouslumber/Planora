@@ -1,11 +1,13 @@
 class Constants {
   static const List<String> eventStatus = [
     "upcoming",
-    "inProgress",
+    "ongoing",
     "completed",
     "missed",
     "cancelled",
   ];
+
+  static const List<String> taskStatus = ["ongoing", "completed"];
 
   static const String greetingMorning = "Good Morning";
   static const String greetingAfternoon = "Good Afternoon";

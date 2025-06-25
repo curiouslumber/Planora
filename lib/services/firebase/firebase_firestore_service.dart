@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/image_model.dart';
+import 'package:planora/models/task_model.dart';
 import 'package:planora/models/user_model.dart';
 
 class FirebaseFirestoreService {
@@ -14,6 +15,9 @@ class FirebaseFirestoreService {
 
   // Reference to the 'events' collection
   CollectionReference get _eventsCollection => _firestore.collection('events');
+
+  // Reference to the 'tasks' collection
+  CollectionReference get _tasksCollection => _firestore.collection('tasks');
 
   // Reference to the 'images' collection
   CollectionReference get _imagesCollection => _firestore.collection('images');
@@ -69,5 +73,15 @@ class FirebaseFirestoreService {
       return ImageModel.fromFirestore(doc);
     }
     return null;
+  }
+
+  // Create a new task document in Firestore
+  Future<void> createTaskDocument({required TaskModel task}) async {
+    await _tasksCollection.doc(task.id).set(task.toFirestore());
+  }
+
+  // Update task document in Firestore
+  Future<void> updateTaskDocument(String id, TaskModel updatedTask) async {
+    await _tasksCollection.doc(id).update(updatedTask.toFirestore());
   }
 }

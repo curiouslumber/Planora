@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:planora/models/meetings_model.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/models/people_model.dart';
+import 'package:planora/models/task_model.dart';
 
 class HiveEvents {
   static const String eventsBox = 'eventsBox';
@@ -10,6 +11,7 @@ class HiveEvents {
   static const String meetingsBox = 'meetingsBox';
   static const String peopleBox = 'peopleBox';
   static const String imageBox = 'imageBox';
+  static const String tasksBox = 'tasksBox';
 
 // Events CRUD
   static Future<void> addEventToHive(EventModel event) async {
@@ -132,6 +134,34 @@ class HiveEvents {
   ) async {
     var box = await Hive.openBox<PeopleModel>(peopleBox);
     final keysToDelete = selectedPeopleIndices.map((index) => box.keyAt(index));
+    await box.deleteAll(keysToDelete);
+  }
+
+  // Tasks CRUD
+  static Future<void> addTaskToHive(TaskModel task) async {
+    var box = await Hive.openBox<TaskModel>(tasksBox);
+    await box.add(task);
+  }
+
+  static Future<List<TaskModel>> getTasksFromHive() async {
+    var box = await Hive.openBox<TaskModel>(tasksBox);
+    return box.values.toList();
+  }
+
+  static Future<void> updateTaskInHive(TaskModel task) async {
+    var box = await Hive.openBox<TaskModel>(tasksBox);
+    int index = box.values.toList().indexWhere((e) => e.id == task.id);
+    await box.putAt(index, task);
+  }
+
+  static Future<void> deleteTaskFromHive(int index) async {
+    var box = await Hive.openBox<TaskModel>(tasksBox);
+    await box.deleteAt(index);
+  }
+
+  static Future<void> deleteTasksFromHive(Set<int> selectedTaskIndices) async {
+    var box = await Hive.openBox<TaskModel>(tasksBox);
+    final keysToDelete = selectedTaskIndices.map((index) => box.keyAt(index));
     await box.deleteAll(keysToDelete);
   }
 }

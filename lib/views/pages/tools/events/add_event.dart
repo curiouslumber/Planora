@@ -1,17 +1,14 @@
-import 'dart:io';
-import 'dart:typed_data';
-
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/people_model.dart';
+import 'package:planora/models/task_model.dart';
 import 'package:planora/models/user_model.dart';
-import 'package:planora/services/firebase/firebase_ai_service.dart';
+import 'package:planora/services/common/event_task_image_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
-import 'package:planora/services/firebase/firebase_storage_service.dart';
-import 'package:planora/services/pinecone/pinecone_vector_service.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
@@ -34,6 +31,7 @@ class _AddEventState extends State<AddEvent> {
   DateTime? startTime;
   DateTime? endTime;
   Set<PeopleModel> addedPeople = {};
+  String taskOrEvent = "task";
 
   void addPeople(PeopleModel people) {
     setState(() {
@@ -46,63 +44,17 @@ class _AddEventState extends State<AddEvent> {
     await HiveEvents.addEventToHive(event);
   }
 
-  void generateImageTileAsync(
-    EventModel event,
-    String eventName,
-    String eventDescription,
-  ) async {
-    String imagePrompt = eventName + eventDescription;
-    String? semanticSearchResponse = await PineconeVectorService.semanticSearch(
-      imagePrompt,
-    );
-
-    // If semantic search response is not null, update the event
-    if (semanticSearchResponse != null) {
-      EventModel updatedEvent = event.copyWith(
-        eventTileImage: semanticSearchResponse,
-      );
-
-      await HiveEvents.updateEventInHive(updatedEvent);
-      await FirebaseFirestoreService().updateEventDocument(
-        event.id,
-        updatedEvent,
-      );
-      if (mounted) {
-        setState(() {});
-      }
-      return;
-    }
-
-    // If semantic search response is null, generate the image
-    Uint8List? imageBytes = await FirebaseAiService().generateImage(
-      imagePrompt,
-    );
-    if (imageBytes != null) {
-      String? gsUrl = await FirebaseStorageService().uploadImageUsingBytes(
-        '${eventName.replaceAll(' ', '_')}.png',
-        'event_images',
-        imageBytes,
-      );
-      if (gsUrl != null) {
-        EventModel updatedEvent = event.copyWith(eventTileImage: gsUrl);
-        await HiveEvents.updateEventInHive(updatedEvent);
-        await FirebaseFirestoreService().updateEventDocument(
-          event.id,
-          updatedEvent,
-        );
-        // Create the new index in pinecone
-        await PineconeVectorService.upsertNewIndex(imagePrompt, gsUrl);
-        if (mounted) {
-          setState(() {});
-        }
-      }
-    }
+  Future<void> addTask(TaskModel task) async {
+    await FirebaseFirestoreService().createTaskDocument(task: task);
+    await HiveEvents.addTaskToHive(task);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Create New Event")),
+      appBar: AppBar(
+        title: Text("Create New ${taskOrEvent == 'task' ? 'Task' : 'Event'}"),
+      ),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -117,16 +69,86 @@ class _AddEventState extends State<AddEvent> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   spacing: 24.0,
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Task',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight:
+                                  taskOrEvent == "task"
+                                      ? FontWeights.bold
+                                      : FontWeights.regular,
+                              color:
+                                  taskOrEvent == "task"
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withAlpha(128),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          AnimatedToggleSwitch.rolling(
+                            onTap: (props) {
+                              setState(() {
+                                if (taskOrEvent == "task") {
+                                  taskOrEvent = "event";
+                                } else {
+                                  taskOrEvent = "task";
+                                }
+                              });
+                            },
+                            current: taskOrEvent,
+                            values: const ["task", "event"],
+                            style: ToggleStyle(
+                              indicatorColor:
+                                  Theme.of(context).colorScheme.primary,
+                              borderColor:
+                                  Theme.of(context).colorScheme.primary,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            height: 40,
+                            indicatorSize: Size.fromWidth(36),
+                            onChanged: (value) {
+                              setState(() {
+                                taskOrEvent = value;
+                              });
+                            },
+                          ),
+                          SizedBox(width: 16),
+                          Text(
+                            'Event',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight:
+                                  taskOrEvent == "event"
+                                      ? FontWeights.bold
+                                      : FontWeights.regular,
+                              color:
+                                  taskOrEvent == "event"
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withAlpha(128),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 8.0,
                       children: [
                         Text(
-                          'Event Name',
+                          taskOrEvent == "event" ? 'Event Name' : 'Task Name',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
@@ -173,7 +195,9 @@ class _AddEventState extends State<AddEvent> {
                       spacing: 8.0,
                       children: [
                         Text(
-                          'Event Description',
+                          taskOrEvent == "event"
+                              ? 'Event Description'
+                              : 'Task Description',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
@@ -214,292 +238,313 @@ class _AddEventState extends State<AddEvent> {
                         ),
                       ],
                     ),
-                    Row(
-                      spacing: 16.0,
-                      children: [
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 8.0,
-                            children: [
-                              Text(
-                                'Start Date',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                              DateTimeField(
-                                dateFormat: DateFormat('dd/MM/yyyy'),
-                                firstDate: DateTime.now(),
-                                value: startDate,
-                                onChanged: (value) {
-                                  setState(() {
-                                    startDate = value;
-                                  });
-                                },
-                                mode: DateTimeFieldPickerMode.date,
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: '',
-                                  hintStyle: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeights.regular,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withAlpha(100),
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInOut,
+                      switchOutCurve: Curves.easeInOut,
+                      child:
+                          taskOrEvent == "event"
+                              ? Column(
+                                spacing: 24.0,
+                                children: [
+                                  Row(
+                                    spacing: 16.0,
+                                    children: [
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          spacing: 8.0,
+                                          children: [
+                                            Text(
+                                              'Start Date',
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                            ),
+                                            DateTimeField(
+                                              dateFormat: DateFormat(
+                                                'dd/MM/yyyy',
+                                              ),
+                                              firstDate: DateTime.now(),
+                                              value: startDate,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  startDate = value;
+                                                });
+                                              },
+                                              mode:
+                                                  DateTimeFieldPickerMode.date,
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                              decoration: InputDecoration(
+                                                hintText: '',
+                                                hintStyle: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeights.regular,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withAlpha(100),
+                                                ),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 16.0,
+                                                      horizontal: 24.0,
+                                                    ),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        32.0,
+                                                      ),
+                                                  borderSide: BorderSide(
+                                                    color:
+                                                        Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          spacing: 8.0,
+                                          children: [
+                                            Text(
+                                              'End Date (Optional)',
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                            ),
+                                            DateTimeField(
+                                              value: endDate,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  endDate = value;
+                                                });
+                                              },
+                                              dateFormat: DateFormat(
+                                                'dd/MM/yyyy',
+                                              ),
+                                              mode:
+                                                  DateTimeFieldPickerMode.date,
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                              decoration: InputDecoration(
+                                                hintText: '',
+                                                hintStyle: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeights.regular,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withAlpha(100),
+                                                ),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 16.0,
+                                                      horizontal: 24.0,
+                                                    ),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        32.0,
+                                                      ),
+                                                  borderSide: BorderSide(
+                                                    color:
+                                                        Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
-                                    horizontal: 24.0,
+                                  Row(
+                                    spacing: 16.0,
+                                    children: [
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          spacing: 8.0,
+                                          children: [
+                                            Text(
+                                              'Start Time',
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                            ),
+                                            DateTimeField(
+                                              value: startTime,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  startTime = value;
+                                                });
+                                              },
+                                              mode:
+                                                  DateTimeFieldPickerMode.time,
+                                              initialPickerDateTime:
+                                                  DateTime.now(),
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                              decoration: InputDecoration(
+                                                hintText: '',
+                                                hintStyle: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeights.regular,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withAlpha(100),
+                                                ),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 16.0,
+                                                      horizontal: 24.0,
+                                                    ),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        32.0,
+                                                      ),
+                                                  borderSide: BorderSide(
+                                                    color:
+                                                        Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          spacing: 8.0,
+                                          children: [
+                                            Text(
+                                              'End Time',
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                            ),
+                                            DateTimeField(
+                                              value: endTime,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  endTime = value;
+                                                });
+                                              },
+                                              mode:
+                                                  DateTimeFieldPickerMode.time,
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeights.regular,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                              ),
+                                              decoration: InputDecoration(
+                                                hintText: '',
+                                                hintStyle: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeights.regular,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withAlpha(100),
+                                                ),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 16.0,
+                                                      horizontal: 24.0,
+                                                    ),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        32.0,
+                                                      ),
+                                                  borderSide: BorderSide(
+                                                    color:
+                                                        Theme.of(
+                                                          context,
+                                                        ).colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(32.0),
-                                    borderSide: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 8.0,
-                            children: [
-                              Text(
-                                'End Date (Optional)',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                              DateTimeField(
-                                value: endDate,
-                                onChanged: (value) {
-                                  setState(() {
-                                    endDate = value;
-                                  });
-                                },
-                                dateFormat: DateFormat('dd/MM/yyyy'),
-                                mode: DateTimeFieldPickerMode.date,
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: '',
-                                  hintStyle: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeights.regular,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withAlpha(100),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
-                                    horizontal: 24.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(32.0),
-                                    borderSide: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      spacing: 16.0,
-                      children: [
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 8.0,
-                            children: [
-                              Text(
-                                'Start Time',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                              DateTimeField(
-                                value: startTime,
-                                onChanged: (value) {
-                                  setState(() {
-                                    startTime = value;
-                                  });
-                                },
-                                mode: DateTimeFieldPickerMode.time,
-                                initialPickerDateTime: DateTime.now(),
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: '',
-                                  hintStyle: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeights.regular,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withAlpha(100),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
-                                    horizontal: 24.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(32.0),
-                                    borderSide: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 8.0,
-                            children: [
-                              Text(
-                                'End Time',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                              DateTimeField(
-                                value: endTime,
-                                onChanged: (value) {
-                                  setState(() {
-                                    endTime = value;
-                                  });
-                                },
-                                mode: DateTimeFieldPickerMode.time,
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeights.regular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: '',
-                                  hintStyle: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeights.regular,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withAlpha(100),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16.0,
-                                    horizontal: 24.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(32.0),
-                                    borderSide: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (Platform.isLinux)
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 8.0,
-                      children: [
-                        Text(
-                          'People',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeights.regular,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        Wrap(
-                          spacing: 8.0,
-                          runSpacing: 4.0,
-                          children: [
-                            for (var person in addedPeople)
-                              Chip(label: Text(person.name), onDeleted: () {}),
-                            if (addedPeople.length < 5)
-                              Chip(
-                                avatar: Icon(Icons.add),
-                                label: Text("Add People"),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    if (Platform.isLinux)
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 8.0,
-                      children: [
-                        Text(
-                          'Meeting Details',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeights.regular,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            spacing: 8.0,
-                            children: [
-                              Chip(label: Text("Create new")),
-                              Text("or"),
-                              Chip(label: Text("Add Existing")),
-                            ],
-                          ),
-                        ),
-                      ],
+                                ],
+                              )
+                              : Container(),
                     ),
                   ],
                 ),
@@ -514,35 +559,47 @@ class _AddEventState extends State<AddEvent> {
           borderRadius: BorderRadius.circular(32.0),
         ),
         onPressed: () async {
-
           if (_eventNameController.text.isEmpty) {
             return;
           }
 
-          EventModel event = EventModel(
-            id: Uuid().v4(),
-            eventTileImage: '',
-            name: _eventNameController.text,
-            description: _eventDescriptionController.text,
-            startDate: startDate!.toString(),
-            endDate: endDate?.toString(),
-            startTime: startTime!.toString(),
-            endTime:
-                endTime != null ? endTime!.toString() : startTime!.toString(),
-            eventStatus: Constants.eventStatus[0],
-            people: addedPeople.map((e) => e.id).toList(),
-          );
+          if (taskOrEvent == "event") {
+            EventModel event = EventModel(
+              id: Uuid().v4(),
+              eventTileImage: '',
+              name: _eventNameController.text,
+              description: _eventDescriptionController.text,
+              startDate: startDate!.toString(),
+              endDate: endDate?.toString(),
+              startTime: startTime!.toString(),
+              endTime:
+                  endTime != null ? endTime!.toString() : startTime!.toString(),
+              eventStatus: Constants.eventStatus[0],
+              people: addedPeople.map((e) => e.id).toList(),
+              createdAt: DateTime.now(),
+            );
 
-          // Add event to Hive
-          await addEvent(event);
+            // Add event to Hive
+            await addEvent(event);
 
-          // Asynchronously function to generate event image tile
-          generateImageTileAsync(
-            event,
-            _eventNameController.text,
-            _eventDescriptionController.text,
-          );
+            // Asynchronously function to generate event image tile
+            EventTaskImageService.handleImageTileForEvent(event);
+          } else {
+            TaskModel task = TaskModel(
+              id: Uuid().v4(),
+              taskTileImage: '',
+              name: _eventNameController.text,
+              description: _eventDescriptionController.text,
+              createdAt: DateTime.now(),
+              taskStatus: Constants.taskStatus[0],
+            );
 
+            // Add task to Hive
+            await addTask(task);
+
+            // Asynchronously function to generate task image tile
+            EventTaskImageService.handleImageTileForTask(task);
+          }
 
           // ignore: use_build_context_synchronously
           Navigator.pop(context);
@@ -557,25 +614,6 @@ class _AddEventState extends State<AddEvent> {
           ),
         ),
       ),
-    );
-  }
-}
-
-extension on EventModel {
-  EventModel copyWith({required String eventTileImage}) {
-    return EventModel(
-      id: id,
-      eventTileImage: eventTileImage,
-      eventTileImageId: eventTileImageId,
-      name: name,
-      description: description,
-      startDate: startDate,
-      endDate: endDate,
-      startTime: startTime,
-      endTime: endTime,
-      people: people,
-      meeting: meeting,
-      eventStatus: eventStatus,
     );
   }
 }
