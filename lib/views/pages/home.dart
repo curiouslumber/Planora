@@ -1,10 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/user_model.dart';
+import 'package:planora/services/firebase/firebase_ai_service.dart';
+import 'package:planora/services/firebase/firebase_firestore_service.dart';
+import 'package:planora/services/firebase/firebase_storage_service.dart';
+import 'package:planora/services/pinecone/pinecone_vector_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
@@ -34,7 +39,7 @@ class _HomeState extends State<Home> {
   DateTime now = DateTime.now();
   List<EventModel> todayUpcomingEvents = [];
   List<EventModel> todayPastEvents = [];
-  List<EventModel> completedEvents = [];
+  List<EventModel> todayCompletedEvents = [];
   List<EventModel> todayEvents = [];
 
   void getEvents() async {
@@ -57,7 +62,7 @@ class _HomeState extends State<Home> {
                   isRangeInToday(event, now));
         }).toList();
 
-    completedEvents =
+    todayCompletedEvents =
         events.where((event) {
           return event.eventStatus == Constants.eventStatus[2] &&
               isRangeInToday(event, now);
@@ -85,6 +90,26 @@ class _HomeState extends State<Home> {
             imageIdToUrl[event.id] = cachedFile.path;
           }
         }
+      } else {
+        // Semantic search in pinecone
+        String? semanticSearchResponse =
+            await PineconeVectorService.semanticSearch(event.name);
+        if (semanticSearchResponse != null) {
+          EventModel updatedEvent = event.copyWith(
+            eventTileImage: semanticSearchResponse,
+            eventStatus: event.eventStatus,
+          );
+          await HiveEvents.updateEventToHive(
+            events.indexWhere((e) => e.id == event.id),
+            updatedEvent,
+          );
+          await FirebaseFirestoreService().updateEventDocument(event.id, event);
+          if (mounted) {
+            setState(() {});
+          }
+        } else {
+          generateImageTileAsync(event, event.name, event.description);
+        }
       }
     }
     if (mounted) {
@@ -92,36 +117,87 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void generateImageTileAsync(
+    EventModel event,
+    String eventName,
+    String eventDescription,
+  ) async {
+    String imagePrompt = eventName + eventDescription;
+    String? semanticSearchResponse = await PineconeVectorService.semanticSearch(
+      imagePrompt,
+    );
+
+    List<EventModel> events = await HiveEvents.getEventsFromHive();
+    int selectedIndex = events.indexWhere((e) => e.id == event.id);
+
+    // If semantic search response is not null, update the event
+    if (semanticSearchResponse == null) {
+      // If semantic search response is null, generate the image
+      Uint8List? imageBytes = await FirebaseAiService().generateImage(
+        imagePrompt,
+      );
+      if (imageBytes != null) {
+        String? gsUrl = await FirebaseStorageService().uploadImageUsingBytes(
+          '${eventName.replaceAll(' ', '_')}.png',
+          'event_images',
+          imageBytes,
+        );
+        if (gsUrl != null) {
+          EventModel updatedEvent = event.copyWith(
+            eventTileImage: gsUrl,
+            eventStatus: event.eventStatus,
+          );
+          await HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+          await FirebaseFirestoreService().updateEventDocument(
+            event.id,
+            updatedEvent,
+          );
+          // Create the new index in pinecone
+          await PineconeVectorService.upsertNewIndex(imagePrompt, gsUrl);
+          getEvents();
+          if (mounted) {
+            setState(() {});
+          }
+        }
+      }
+    }
+  }
+
   void markEventComplete(EventModel event, int selectedIndex) {
     EventModel updatedEvent = event.copyWith(
       eventStatus: Constants.eventStatus[2],
+      eventTileImage: event.eventTileImage,
     );
     HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
     getEvents();
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  String getCompletedEventsPercentage(List<EventModel> events) {
+  String getCompletedEventsPercentage() {
     if (todayEvents.isEmpty) return '-';
-    final completedCount =
-        todayEvents
-            .where(
-              (e) =>
-                  e.eventStatus == Constants.eventStatus[2] &&
-                  isRangeInToday(e, now),
-            )
-            .length;
-    final percent = (completedCount / todayEvents.length * 100).round();
+    final percent =
+        (todayCompletedEvents.length / todayEvents.length * 100).round();
     return '$percent%';
   }
 
   String getMilestoneMessage(String percent) {
     if (percent == "-") return "Start planning events to get started!";
     final int percentInt = int.parse(percent.replaceAll('%', ''));
-    if (percentInt <= 0) return Constants.milestoneMessages[0]!;
-    if (percentInt <= 1) return Constants.milestoneMessages[1]!;
-    if (percentInt <= 26) return Constants.milestoneMessages[26]!;
-    if (percentInt <= 50) return Constants.milestoneMessages[50]!;
-    if (percentInt <= 75) return Constants.milestoneMessages[75]!;
+    if (percentInt == 0) return Constants.milestoneMessages[0]!;
+    if (percentInt >= 1 && percentInt < 26) {
+      return Constants.milestoneMessages[1]!;
+    }
+    if (percentInt >= 26 && percentInt < 50) {
+      return Constants.milestoneMessages[26]!;
+    }
+    if (percentInt >= 50 && percentInt < 75) {
+      return Constants.milestoneMessages[50]!;
+    }
+    if (percentInt >= 75 && percentInt < 100) {
+      return Constants.milestoneMessages[75]!;
+    }
     return Constants.milestoneMessages[100]!;
   }
 
@@ -456,9 +532,7 @@ class _HomeState extends State<Home> {
                                     spacing: 16.0,
                                     children: [
                                       Text(
-                                        getCompletedEventsPercentage(
-                                          completedEvents,
-                                        ),
+                                        getCompletedEventsPercentage(),
                                         style: TextStyle(
                                           color:
                                               Theme.of(
@@ -473,7 +547,7 @@ class _HomeState extends State<Home> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4.0),
                                     child: Text(
-                                      "${completedEvents.length} of ${todayEvents.length} completed",
+                                      "${todayCompletedEvents.length} of ${todayEvents.length} completed",
                                       style: TextStyle(
                                         color:
                                             Theme.of(
@@ -507,7 +581,7 @@ class _HomeState extends State<Home> {
                                   fit: BoxFit.scaleDown,
                                   child: Text(
                                     getMilestoneMessage(
-                                      getCompletedEventsPercentage(events),
+                                      getCompletedEventsPercentage(),
                                     ),
                                     maxLines: 1,
                                     style: TextStyle(
@@ -582,7 +656,7 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                           subtitle: Text(
-                            '${DateFormat("jm").format(DateTime.parse(event.startTime))} - ${DateFormat("jm").format(DateTime.parse(event.endTime))}',
+                              '${DateFormat("jm").format(DateTime.parse(event.startTime))} ${event.endTime != event.startTime ? '- ${DateFormat("jm").format(DateTime.parse(event.endTime))}' : ''}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 14,
@@ -627,6 +701,7 @@ class _HomeState extends State<Home> {
                                 if (value != null) {
                                   EventModel updatedEvent = event.copyWith(
                                     eventStatus: Constants.eventStatus[2],
+                                    eventTileImage: event.eventTileImage,
                                   );
                                   HiveEvents.updateEventToHive(
                                     index,
@@ -787,7 +862,10 @@ class _HomeState extends State<Home> {
 }
 
 extension on EventModel {
-  EventModel copyWith({required String eventStatus}) {
+  EventModel copyWith({
+    required String eventStatus,
+    required String eventTileImage,
+  }) {
     return EventModel(
       id: id,
       eventTileImageId: eventTileImageId,
