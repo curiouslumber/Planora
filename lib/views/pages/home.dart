@@ -170,19 +170,22 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     // Calculate snapped progress for the day (0-24 scale)
-    final int snappedStep =
-        (getSnappedDayProgress(todayUpcomingEvents + todayPastEvents) * 24)
-            .round();
+    final now = DateTime.now();
+    final int currentMinute = now.hour * 60 + now.minute;
 
-    // Calculate checkpoint hours for current month events
-    final Set<int> checkpointHours =
+    // Calculate checkpoint times for current day events
+    final Set<TimeOfDay> checkpointTimes =
         events
             .where((e) {
               final eventDate = DateTime.parse(e.startTime);
-              final now = DateTime.now();
-              return eventDate.year == now.year && eventDate.month == now.month;
+              return eventDate.year == now.year &&
+                  eventDate.month == now.month &&
+                  eventDate.day == now.day;
             })
-            .map((e) => DateTime.parse(e.startTime).hour)
+            .map((e) {
+              final eventDate = DateTime.parse(e.startTime);
+              return TimeOfDay(hour: eventDate.hour, minute: eventDate.minute);
+            })
             .toSet();
 
     return Scaffold(
@@ -455,7 +458,7 @@ class _HomeState extends State<Home> {
                               ),
                               StepProgressIndicator(
                                 height: 8.0,
-                                currentStep: snappedStep,
+                                currentMinute: currentMinute,
                                 progressColor:
                                     Theme.of(context).colorScheme.tertiary,
                                 trackColor:
@@ -463,7 +466,7 @@ class _HomeState extends State<Home> {
                                 checkpointColor:
                                     Theme.of(context).colorScheme.primary,
                                 checkpointDiameter: 6.0,
-                                checkpointHours: checkpointHours,
+                                checkpointTimes: checkpointTimes,
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 2.0),
@@ -572,10 +575,7 @@ class _HomeState extends State<Home> {
                                     );
                                   } else {
                                     return Container(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.9),
+                                      color: Colors.transparent,
                                     );
                                   }
                               },
@@ -685,8 +685,7 @@ class _HomeState extends State<Home> {
                                   );
                                 } else {
                                   return Container(
-                                    color: Theme.of(context).colorScheme.primary
-                                        .withValues(alpha: 0.9),
+                                    color: Colors.transparent,
                                   );
                                 }
                               },
@@ -793,26 +792,25 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class StepProgressIndicator extends StatelessWidget {
-  final int currentStep;
+  final int currentMinute; // minute of the day: 0-1439
   final Color progressColor;
   final Color trackColor;
   final Color checkpointColor;
   final double checkpointDiameter;
   final double height;
-  final Set<int> checkpointHours;
+  final Set<TimeOfDay> checkpointTimes;
 
-  static const int _totalHours = 24;
-  
+  static const int _totalMinutes = 24 * 60;
 
   const StepProgressIndicator({
     super.key,
-    required this.currentStep,
+    required this.currentMinute,
     this.progressColor = Colors.blue,
     this.trackColor = Colors.grey,
     this.checkpointColor = Colors.white,
     this.checkpointDiameter = 8.0,
     this.height = 10.0,
-    this.checkpointHours = const {},
+    this.checkpointTimes = const {},
   });
 
   @override
@@ -838,25 +836,25 @@ class StepProgressIndicator extends StatelessWidget {
               // Filled progress
               Container(
                 height: height,
-                width: barWidth * (currentStep / _totalHours),
+                width: barWidth * (currentMinute / _totalMinutes),
                 decoration: BoxDecoration(
                   color: progressColor,
                   borderRadius: BorderRadius.circular(height / 2),
                 ),
               ),
-              // Spots only at event hours
-              ...checkpointHours.map((hour) {
+              // Spots at event times (hours and minutes)
+              ...checkpointTimes.map((time) {
+                int minuteOfDay = time.hour * 60 + time.minute;
                 double positionX;
-                if (hour == 0) {
+                if (minuteOfDay == 0) {
                   // Place the first dot just inside the left border
                   positionX = checkpointDiameter / 2;
-                } else if (hour == _totalHours) {
+                } else if (minuteOfDay == _totalMinutes) {
                   // Place the last dot just inside the right border
                   positionX = barWidth - checkpointDiameter / 2;
                 } else {
-                  positionX = hour * (barWidth / (_totalHours - 1));
+                  positionX = minuteOfDay * (barWidth / _totalMinutes);
                 }
-                final bool isPast = hour < currentStep;
                 return Positioned(
                   left: positionX - checkpointDiameter / 2,
                   top: (height / 2) - checkpointDiameter / 2,
@@ -865,7 +863,7 @@ class StepProgressIndicator extends StatelessWidget {
                     height: checkpointDiameter,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isPast ? progressColor : checkpointColor,
+                      color: checkpointColor,
                     ),
                   ),
                 );

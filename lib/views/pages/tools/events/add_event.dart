@@ -530,7 +530,8 @@ class _AddEventState extends State<AddEvent> {
             startDate: startDate!.toString(),
             endDate: endDate?.toString(),
             startTime: startTime!.toString(),
-            endTime: endTime!.toString(),
+            endTime:
+                endTime != null ? endTime!.toString() : startTime!.toString(),
             eventStatus: Constants.eventStatus[0],
             people: addedPeople.map((e) => e.id).toList(),
           );
