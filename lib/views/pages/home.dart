@@ -35,23 +35,32 @@ class _HomeState extends State<Home> {
   List<EventModel> todayUpcomingEvents = [];
   List<EventModel> todayPastEvents = [];
   List<EventModel> completedEvents = [];
+  List<EventModel> todayEvents = [];
 
   void getEvents() async {
     events = await HiveEvents.getEventsFromHive();
+    todayEvents =
+        events.where((event) {
+          return isRangeInToday(event, now);
+        }).toList();
+
     todayUpcomingEvents =
         events.where((event) {
-          return isRangeInFuture(event, now);
+          return isRangeInFuture(event, now) &&
+              event.eventStatus != Constants.eventStatus[2];
         }).toList();
 
     todayPastEvents =
         events.where((event) {
-          return isRangeInPast(event, now);
+          return isRangeInPast(event, now) ||
+              (event.eventStatus == Constants.eventStatus[2] &&
+                  isRangeInToday(event, now));
         }).toList();
 
     completedEvents =
         events.where((event) {
-          return isRangeInPast(event, now) &&
-              event.eventStatus == Constants.eventStatus[2];
+          return event.eventStatus == Constants.eventStatus[2] &&
+              isRangeInToday(event, now);
         }).toList();
 
     for (var event in events) {
@@ -92,11 +101,14 @@ class _HomeState extends State<Home> {
   }
 
   String getCompletedEventsPercentage(List<EventModel> events) {
-    final todayEvents = events.where((e) => isRangeInPast(e, now)).toList();
     if (todayEvents.isEmpty) return '-';
     final completedCount =
         todayEvents
-            .where((e) => e.eventStatus == Constants.eventStatus[2])
+            .where(
+              (e) =>
+                  e.eventStatus == Constants.eventStatus[2] &&
+                  isRangeInToday(e, now),
+            )
             .length;
     final percent = (completedCount / todayEvents.length * 100).round();
     return '$percent%';
@@ -159,6 +171,22 @@ class _HomeState extends State<Home> {
         now.day == eventLocalStartDate.day;
 
     return isToday && eventLocalStartDateTime.isAfter(now);
+  }
+
+  bool isRangeInToday(EventModel event, DateTime now) {
+    final eventLocalStartDate = DateTime.parse(event.startDate);
+    DateTime eventLocalEndDate =
+        event.endDate != null
+            ? DateTime.parse(event.endDate!)
+            : eventLocalStartDate;
+
+    // Is the event's end before now, and does it occur today?
+    final isToday =
+        now.year == eventLocalEndDate.year &&
+        now.month == eventLocalEndDate.month &&
+        now.day == eventLocalEndDate.day;
+
+    return isToday;
   }
 
   @override
@@ -428,7 +456,9 @@ class _HomeState extends State<Home> {
                                     spacing: 16.0,
                                     children: [
                                       Text(
-                                        getCompletedEventsPercentage(events),
+                                        getCompletedEventsPercentage(
+                                          completedEvents,
+                                        ),
                                         style: TextStyle(
                                           color:
                                               Theme.of(
@@ -443,7 +473,7 @@ class _HomeState extends State<Home> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4.0),
                                     child: Text(
-                                      "${completedEvents.length} of ${events.length} completed",
+                                      "${completedEvents.length} of ${todayEvents.length} completed",
                                       style: TextStyle(
                                         color:
                                             Theme.of(
@@ -459,6 +489,9 @@ class _HomeState extends State<Home> {
                               StepProgressIndicator(
                                 height: 8.0,
                                 currentMinute: currentMinute,
+                                snappedProgress: getSnappedDayProgress(
+                                  todayEvents,
+                                ),
                                 progressColor:
                                     Theme.of(context).colorScheme.tertiary,
                                 trackColor:
@@ -590,7 +623,18 @@ class _HomeState extends State<Home> {
                             fillColor: WidgetStateProperty.all(
                               Colors.transparent,
                             ),
-                            onChanged: (value) {},
+                              onChanged: (value) {
+                                if (value != null) {
+                                  EventModel updatedEvent = event.copyWith(
+                                    eventStatus: Constants.eventStatus[2],
+                                  );
+                                  HiveEvents.updateEventToHive(
+                                    index,
+                                    updatedEvent,
+                                  );
+                                  getEvents();
+                                }
+                              },
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4.0),
                             ),
@@ -799,6 +843,7 @@ class StepProgressIndicator extends StatelessWidget {
   final double checkpointDiameter;
   final double height;
   final Set<TimeOfDay> checkpointTimes;
+  final double? snappedProgress;
 
   static const int _totalMinutes = 24 * 60;
 
@@ -811,6 +856,7 @@ class StepProgressIndicator extends StatelessWidget {
     this.checkpointDiameter = 8.0,
     this.height = 10.0,
     this.checkpointTimes = const {},
+    this.snappedProgress,
   });
 
   @override
@@ -836,7 +882,9 @@ class StepProgressIndicator extends StatelessWidget {
               // Filled progress
               Container(
                 height: height,
-                width: barWidth * (currentMinute / _totalMinutes),
+                width:
+                    barWidth *
+                    (snappedProgress ?? (currentMinute / _totalMinutes)),
                 decoration: BoxDecoration(
                   color: progressColor,
                   borderRadius: BorderRadius.circular(height / 2),
