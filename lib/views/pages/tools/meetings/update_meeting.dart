@@ -3,9 +3,14 @@ import 'package:planora/models/meetings_model.dart';
 import 'package:planora/utils/font_weights.dart';
 
 class UpdateMeeting extends StatefulWidget {
-  const UpdateMeeting({super.key, required this.updateMeetingToHive, required this.meeting, required this.selectedMeetingIndex});
+  const UpdateMeeting({
+    super.key,
+    required this.updateMeetingInHive,
+    required this.meeting,
+    required this.selectedMeetingIndex,
+  });
 
-  final Future<void> Function(int selectedMeetingIndex, MeetingsModel meeting) updateMeetingToHive;
+  final Future<void> Function(MeetingsModel meeting) updateMeetingInHive;
   final MeetingsModel meeting;
   final int selectedMeetingIndex;
 
@@ -123,7 +128,7 @@ class _UpdateMeetingState extends State<UpdateMeeting> {
                     startTime: widget.meeting.startTime,
                     endTime: widget.meeting.endTime,
                   );
-                  widget.updateMeetingToHive(widget.selectedMeetingIndex, meeting);
+                  widget.updateMeetingInHive(meeting);
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },

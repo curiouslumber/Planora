@@ -56,16 +56,13 @@ class _AddEventState extends State<AddEvent> {
       imagePrompt,
     );
 
-    List<EventModel> events = await HiveEvents.getEventsFromHive();
-    int selectedIndex = events.indexWhere((e) => e.id == event.id);
-
     // If semantic search response is not null, update the event
     if (semanticSearchResponse != null) {
       EventModel updatedEvent = event.copyWith(
         eventTileImage: semanticSearchResponse,
       );
 
-      await HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+      await HiveEvents.updateEventInHive(updatedEvent);
       await FirebaseFirestoreService().updateEventDocument(
         event.id,
         updatedEvent,
@@ -88,7 +85,7 @@ class _AddEventState extends State<AddEvent> {
       );
       if (gsUrl != null) {
         EventModel updatedEvent = event.copyWith(eventTileImage: gsUrl);
-        await HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+        await HiveEvents.updateEventInHive(updatedEvent);
         await FirebaseFirestoreService().updateEventDocument(
           event.id,
           updatedEvent,
@@ -547,6 +544,7 @@ class _AddEventState extends State<AddEvent> {
           );
 
 
+          // ignore: use_build_context_synchronously
           Navigator.pop(context);
         },
         backgroundColor: Theme.of(context).colorScheme.primary,

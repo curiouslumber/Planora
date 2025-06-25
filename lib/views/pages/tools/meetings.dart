@@ -46,11 +46,10 @@ class _MeetingsState extends State<Meetings> {
     });
   }
 
-  Future<void> updateMeetingToHive(
-    int selectedMeetingIndex,
+  Future<void> updateMeetingInHive(
     MeetingsModel meeting,
   ) async {
-    await HiveEvents.updateMeetingToHive(selectedMeetingIndex, meeting);
+    await HiveEvents.updateMeetingInHive(meeting);
     HiveEvents.getMeetingsFromHive().then((value) {
       setState(() {
         meetings = value;
@@ -133,7 +132,7 @@ class _MeetingsState extends State<Meetings> {
       context: context,
       builder:
           (context) => UpdateMeeting(
-            updateMeetingToHive: updateMeetingToHive,
+            updateMeetingInHive: updateMeetingInHive,
             selectedMeetingIndex: index,
             meeting: meeting,
           ),

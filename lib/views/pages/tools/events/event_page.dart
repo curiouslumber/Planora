@@ -1,17 +1,18 @@
+import 'dart:io';
+
 import 'package:action_slider/action_slider.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'dart:math';
 
 class EventPage extends StatefulWidget {
-  const EventPage({super.key, required this.event, required this.imageUrl});
+  const EventPage({super.key, required this.event});
 
   final EventModel event;
-  final String imageUrl;
 
   @override
   State<EventPage> createState() => _EventPageState();
@@ -71,9 +72,21 @@ class _EventPageState extends State<EventPage> {
                 pinned: true,
                 floating: false,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: CachedNetworkImage(
-                    imageUrl: widget.imageUrl,
-                    fit: BoxFit.cover,
+                  background: FutureBuilder<File?>(
+                    future: CustomImageCacheManager().getCachedImageByEventId(
+                      widget.event.id,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.file(snapshot.data!, fit: BoxFit.cover),
+                        );
+                      } else {
+                        return Container(color: Colors.transparent);
+                      }
+                    },
                   ),
                   title: LayoutBuilder(
                     builder: (context, constraints) {

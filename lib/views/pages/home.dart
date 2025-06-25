@@ -15,6 +15,7 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/utils/helper.dart';
+import 'package:planora/views/pages/tools/events/event_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.user});
@@ -53,14 +54,22 @@ class _HomeState extends State<Home> {
         events.where((event) {
           return isRangeInFuture(event, now) &&
               event.eventStatus != Constants.eventStatus[2];
-        }).toList();
+          }).toList()
+          ..sort(
+            (a, b) =>
+                DateTime.parse(a.endTime).compareTo(DateTime.parse(b.endTime)),
+          );
 
     todayPastEvents =
         events.where((event) {
-          return isRangeInPast(event, now) ||
-              (event.eventStatus == Constants.eventStatus[2] &&
-                  isRangeInToday(event, now));
-        }).toList();
+            return isRangeInPast(event, now) ||
+                (event.eventStatus == Constants.eventStatus[2] &&
+                    isRangeInToday(event, now));
+          }).toList()
+          ..sort(
+            (a, b) =>
+                DateTime.parse(b.endTime).compareTo(DateTime.parse(a.endTime)),
+          );
 
     todayCompletedEvents =
         events.where((event) {
@@ -99,10 +108,7 @@ class _HomeState extends State<Home> {
             eventTileImage: semanticSearchResponse,
             eventStatus: event.eventStatus,
           );
-          await HiveEvents.updateEventToHive(
-            events.indexWhere((e) => e.id == event.id),
-            updatedEvent,
-          );
+          await HiveEvents.updateEventInHive(updatedEvent);
           await FirebaseFirestoreService().updateEventDocument(event.id, event);
           if (mounted) {
             setState(() {});
@@ -127,9 +133,6 @@ class _HomeState extends State<Home> {
       imagePrompt,
     );
 
-    List<EventModel> events = await HiveEvents.getEventsFromHive();
-    int selectedIndex = events.indexWhere((e) => e.id == event.id);
-
     // If semantic search response is not null, update the event
     if (semanticSearchResponse == null) {
       // If semantic search response is null, generate the image
@@ -147,7 +150,7 @@ class _HomeState extends State<Home> {
             eventTileImage: gsUrl,
             eventStatus: event.eventStatus,
           );
-          await HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+          await HiveEvents.updateEventInHive(updatedEvent);
           await FirebaseFirestoreService().updateEventDocument(
             event.id,
             updatedEvent,
@@ -168,7 +171,7 @@ class _HomeState extends State<Home> {
       eventStatus: Constants.eventStatus[2],
       eventTileImage: event.eventTileImage,
     );
-    HiveEvents.updateEventToHive(selectedIndex, updatedEvent);
+    HiveEvents.updateEventInHive(updatedEvent);
     getEvents();
     if (mounted) {
       setState(() {});
@@ -639,6 +642,14 @@ class _HomeState extends State<Home> {
                       itemBuilder: (context, index) {
                         final event = todayUpcomingEvents[index];
                         return ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EventPage(event: event),
+                                ),
+                              );
+                            },
                           tileColor: Theme.of(
                             context,
                           ).colorScheme.primary.withValues(alpha: 0.9),
@@ -703,11 +714,13 @@ class _HomeState extends State<Home> {
                                     eventStatus: Constants.eventStatus[2],
                                     eventTileImage: event.eventTileImage,
                                   );
-                                  HiveEvents.updateEventToHive(
-                                    index,
+                                  HiveEvents.updateEventInHive(
                                     updatedEvent,
                                   );
                                   getEvents();
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
                                 }
                               },
                             shape: RoundedRectangleBorder(
@@ -739,7 +752,7 @@ class _HomeState extends State<Home> {
                     if (todayPastEvents.isEmpty)
                       Container(
                         alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.05,
+                        height: MediaQuery.of(context).size.height * 0.055,
                         child: Text(
                           "No past events.",
                           style: TextStyle(
@@ -776,7 +789,7 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                           subtitle: Text(
-                            '${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].startTime))} - ${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].endTime))}',
+                              '${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].startTime))} ${todayPastEvents[index].endTime != todayPastEvents[index].startTime ? '- ${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].endTime))}' : ''}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 14,
@@ -1004,7 +1017,6 @@ class StepProgressIndicator extends StatelessWidget {
 
 double getSnappedDayProgress(List<EventModel> todayEvents) {
   final now = DateTime.now();
-  // Normal progress by time of day
   double timeProgress = (now.hour + now.minute / 60) / 24;
 
   if (todayEvents.isEmpty) return timeProgress;
@@ -1014,28 +1026,32 @@ double getSnappedDayProgress(List<EventModel> todayEvents) {
     return 1.0;
   }
 
-  // Find latest completed event whose end time is after now
-  DateTime? latestCompletedEnd;
-  for (final event in todayEvents) {
-    if (event.eventStatus == Constants.eventStatus[2]) {
-      final eventEnd = DateTime.parse(event.endTime);
-      if (eventEnd.isAfter(now)) {
-        if (latestCompletedEnd == null ||
-            eventEnd.isAfter(latestCompletedEnd)) {
-          latestCompletedEnd = eventEnd;
-        }
-      }
+  // Sort events by end time
+  List<EventModel> sortedEvents = List.from(todayEvents)..sort(
+    (a, b) => DateTime.parse(a.endTime).compareTo(DateTime.parse(b.endTime)),
+  );
+
+  DateTime? latestSnappableEnd;
+
+  // Track if all previous events are completed
+  bool allPrevCompleted = true;
+  for (final event in sortedEvents) {
+    final isCompleted = event.eventStatus == Constants.eventStatus[2];
+    final eventEnd = DateTime.parse(event.endTime);
+
+    if (isCompleted && allPrevCompleted && eventEnd.isAfter(now)) {
+      latestSnappableEnd = eventEnd;
+    }
+    if (!isCompleted) {
+      allPrevCompleted = false;
     }
   }
 
-  // If such a completed event exists, snap progress to its scheduled end time
-  if (latestCompletedEnd != null) {
+  if (latestSnappableEnd != null) {
     double snappedProgress =
-        (latestCompletedEnd.hour + latestCompletedEnd.minute / 60) / 24;
-    // Only snap forward if snappedProgress > timeProgress
+        (latestSnappableEnd.hour + latestSnappableEnd.minute / 60) / 24;
     return snappedProgress > timeProgress ? snappedProgress : timeProgress;
   }
 
-  // Default: progress by current time
   return timeProgress;
 }

@@ -50,7 +50,7 @@ class EventDetailPage extends StatelessWidget {
                 fit: BoxFit.cover, // Ensures the image covers the entire space
                 // Apply a color filter to darken the image for better text readability
                 colorBlendMode: BlendMode.darken,
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 // Error handling for image loading
                 errorBuilder: (context, error, stackTrace) {
                   return Container(

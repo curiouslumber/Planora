@@ -72,9 +72,7 @@ class _EventsState extends State<Events> {
   Future<void> deleteEvents() async {
     await HiveEvents.deleteEventsFromHive(checkedEvents);
     await getEvents();
-    setState(() {
-      checkedEvents.clear();
-    });
+    setState(() {});
   }
 
   void toggleCheckedEvent(int index) {
@@ -131,7 +129,6 @@ class _EventsState extends State<Events> {
                       builder:
                           (context) => EventPage(
                             event: event,
-                            imageUrl: imageIdToUrl[event.id]!,
                           ),
                     ),
                   );

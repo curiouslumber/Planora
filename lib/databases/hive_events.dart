@@ -22,12 +22,12 @@ class HiveEvents {
     return box.values.toList();
   }
 
-  static Future<void> updateEventToHive(
-    int selectedIndex,
+  static Future<void> updateEventInHive(
     EventModel event,
   ) async {
     var box = await Hive.openBox<EventModel>(eventsBox);
-    await box.putAt(selectedIndex, event);
+    int index = box.values.toList().indexWhere((e) => e.id == event.id);
+    await box.putAt(index, event);
   }
 
   static Future<void> deleteEventFromHive(int index) async {
@@ -54,12 +54,12 @@ class HiveEvents {
     return box.values.toList();
   }
 
-  static Future<void> updateNoteToHive(
+  static Future<void> updateNoteInHive(
     NotesModel note,
-    int selectedIndex,
   ) async {
     var box = await Hive.openBox<NotesModel>(notesBox);
-    await box.putAt(selectedIndex, note);
+    int index = box.values.toList().indexWhere((e) => e.id == note.id);
+    await box.putAt(index, note);
   }
 
   static Future<void> deleteNoteFromHive(int index) async {
@@ -84,12 +84,12 @@ class HiveEvents {
     return box.values.toList();
   }
 
-  static Future<void> updateMeetingToHive(
-    int selectedIndex,
+  static Future<void> updateMeetingInHive(
     MeetingsModel meeting
   ) async {
     var box = await Hive.openBox<MeetingsModel>(meetingsBox);
-    await box.putAt(selectedIndex, meeting);
+    int index = box.values.toList().indexWhere((e) => e.id == meeting.id);
+    await box.putAt(index, meeting);
   }
 
   static Future<void> deleteMeetingFromHive(int index) async {
@@ -114,12 +114,12 @@ class HiveEvents {
     return box.values.toList();
   }
 
-  static Future<void> updatePeopleToHive(
-    int selectedIndex,
+  static Future<void> updatePeopleInHive(
     PeopleModel people,
   ) async {
     var box = await Hive.openBox<PeopleModel>(peopleBox);
-    await box.putAt(selectedIndex, people);
+    int index = box.values.toList().indexWhere((e) => e.id == people.id);
+    await box.putAt(index, people);
   }
 
   static Future<void> deletePeopleFromHive(int index) async {

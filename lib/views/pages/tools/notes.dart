@@ -105,7 +105,7 @@ class _NotesState extends State<Notes> {
           text: text,
           createdAt: oldNote.createdAt,
         );
-        await HiveEvents.updateNoteToHive(newNote, selectedIndex!);
+        await HiveEvents.updateNoteInHive(newNote);
         setState(() {
           // Update note with the new data
           notes[selectedIndex!] = newNote;
