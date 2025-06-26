@@ -63,7 +63,7 @@ class _TaskPageState extends State<TaskPage> {
 
             return Scaffold(
               appBar: AppBar(
-                title: Text(widget.task.name),
+                title: Text("Task"),
                 actionsPadding: const EdgeInsets.only(right: 8.0),
                 actions: [
                   IconButton(icon: const Icon(Icons.copy), onPressed: () => {}),

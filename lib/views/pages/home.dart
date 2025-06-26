@@ -13,9 +13,11 @@ import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 import 'package:planora/views/pages/tools/tasks/task_page.dart';
+import 'package:planora/widgets/search_bar_delegate.dart';
+import 'package:planora/widgets/step_progress_indicator.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key, required this.user});
+  const Home({super.key, this.user});
 
   final UserModel? user;
 
@@ -24,68 +26,91 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<EventModel> events = [];
-  TextEditingController searchController = TextEditingController();
-  Map<int, Map<String, int>> gridTileConstants = {
-    0: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
-    1: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
-    2: {'crossAxisCellCount': 1, 'mainAxisCellCount': 1},
-    3: {'crossAxisCellCount': 2, 'mainAxisCellCount': 1},
-  };
+  // STATE VARIABLES
+  final TextEditingController _searchController = TextEditingController();
+  final DateTime _now = DateTime.now();
+  
+  // Event lists
+  List<EventModel> _events = [];
+  List<EventModel> _todayUpcomingEvents = [];
+  List<EventModel> _todayPastEvents = [];
+  List<EventModel> _todayCompletedEvents = [];
+  List<EventModel> _todayEvents = [];
+  List<TaskModel> _tasks = [];
 
-  DateTime now = DateTime.now();
-  List<EventModel> todayUpcomingEvents = [];
-  List<EventModel> todayPastEvents = [];
-  List<EventModel> todayCompletedEvents = [];
-  List<EventModel> todayEvents = [];
-  List<TaskModel> tasks = [];
+  // LIFECYCLE METHODS
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
-  void getEvents() async {
-    events = await HiveEvents.getEventsFromHive();
-    tasks = await HiveEvents.getTasksFromHive();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        _loadData();
+      }
+    });
+  }
 
-    todayEvents =
-        events.where((event) {
-          return isRangeInToday(event, now);
-        }).toList();
+  // DATA LOADING
+  Future<void> _loadData() async {
+    await _fetchEventsAndTasks();
+    if (mounted) setState(() {});
+  }
 
-    todayUpcomingEvents =
-        events.where((event) {
-            return isRangeInFuture(event, now) &&
-                event.eventStatus != Constants.eventStatus[2];
-          }).toList()
-          ..sort(
-            (a, b) =>
-                DateTime.parse(a.endTime).compareTo(DateTime.parse(b.endTime)),
-          );
+  Future<void> _fetchEventsAndTasks() async {
+    _events = await HiveEvents.getEventsFromHive();
+    _tasks = await HiveEvents.getTasksFromHive();
+    _processEvents();
+  }
 
-    todayPastEvents =
-        events.where((event) {
-            return isRangeInPast(event, now) ||
-                (event.eventStatus == Constants.eventStatus[2] &&
-                    isRangeInToday(event, now));
-          }).toList()
-          ..sort(
-            (a, b) =>
-                DateTime.parse(b.endTime).compareTo(DateTime.parse(a.endTime)),
-          );
+  void _processEvents() {
+    _todayEvents = _events.where((e) => _isRangeInToday(e, _now)).toList();
 
-    todayCompletedEvents =
-        events.where((event) {
-          return event.eventStatus == Constants.eventStatus[2] &&
-              isRangeInToday(event, now);
-        }).toList();
+    _todayUpcomingEvents =
+        _events
+            .where(
+              (e) =>
+                  _isRangeInFuture(e, _now) &&
+                  e.eventStatus != Constants.eventStatus[2],
+            )
+            .toList()
+          ..sort((a, b) => a.endTime.compareTo(b.endTime));
 
-    for (var event in events) {
+    _todayPastEvents =
+        _events
+            .where(
+              (e) =>
+                  _isRangeInPast(e, _now) ||
+                  (e.eventStatus == Constants.eventStatus[2] &&
+                      _isRangeInToday(e, _now)),
+            )
+            .toList()
+          ..sort((a, b) => b.endTime.compareTo(a.endTime));
+
+    _todayCompletedEvents =
+        _events
+            .where(
+              (e) =>
+                  e.eventStatus == Constants.eventStatus[2] &&
+                  _isRangeInToday(e, _now),
+            )
+            .toList();
+
+    _processEventImages();
+  }
+
+  void _processEventImages() {
+    for (var event in _events) {
       if (event.isImageProcessing) continue;
       EventTaskImageService.handleImageTileForEvent(event);
     }
-
-    if (mounted) {
-      setState(() {});
-    }
   }
 
+  // EVENT HANDLERS
   void markEventComplete(EventModel event, int selectedIndex) {
     EventModel updatedEvent = event.copyWith(
       eventStatus: Constants.eventStatus[2],
@@ -96,7 +121,7 @@ class _HomeState extends State<Home> {
       updatedAt: DateTime.now(),
     );
     HiveEvents.updateEventInHive(updatedEvent);
-    getEvents();
+    _loadData();
     if (mounted) {
       setState(() {});
     }
@@ -112,39 +137,14 @@ class _HomeState extends State<Home> {
       updatedAt: DateTime.now(),
     );
     HiveEvents.updateTaskInHive(updatedTask);
-    getEvents();
+    _loadData();
     if (mounted) {
       setState(() {});
     }
   }
 
-  String getCompletedEventsPercentage() {
-    if (todayEvents.isEmpty) return '-';
-    final percent =
-        (todayCompletedEvents.length / todayEvents.length * 100).round();
-    return '$percent%';
-  }
-
-  String getMilestoneMessage(String percent) {
-    if (percent == "-") return "Start planning events to get started!";
-    final int percentInt = int.parse(percent.replaceAll('%', ''));
-    if (percentInt == 0) return Constants.milestoneMessages[0]!;
-    if (percentInt >= 1 && percentInt < 26) {
-      return Constants.milestoneMessages[1]!;
-    }
-    if (percentInt >= 26 && percentInt < 50) {
-      return Constants.milestoneMessages[26]!;
-    }
-    if (percentInt >= 50 && percentInt < 75) {
-      return Constants.milestoneMessages[50]!;
-    }
-    if (percentInt >= 75 && percentInt < 100) {
-      return Constants.milestoneMessages[75]!;
-    }
-    return Constants.milestoneMessages[100]!;
-  }
-
-  bool isRangeInPast(EventModel event, DateTime now) {
+  // HELPER METHODS
+  bool _isRangeInPast(EventModel event, DateTime now) {
     final eventLocalStartDate = DateTime.parse(event.startDate);
     DateTime eventLocalEndDate =
         event.endDate != null
@@ -170,7 +170,7 @@ class _HomeState extends State<Home> {
     return eventLocalEndDateTime.isBefore(now) && isToday;
   }
 
-  bool isRangeInFuture(EventModel event, DateTime now) {
+  bool _isRangeInFuture(EventModel event, DateTime now) {
     final eventLocalStartDate = DateTime.parse(event.startDate);
     final eventLocalStartTime = DateTime.parse(event.startTime);
 
@@ -192,7 +192,7 @@ class _HomeState extends State<Home> {
     return isToday && eventLocalStartDateTime.isAfter(now);
   }
 
-  bool isRangeInToday(EventModel event, DateTime now) {
+  bool _isRangeInToday(EventModel event, DateTime now) {
     final eventLocalStartDate = DateTime.parse(event.startDate);
     DateTime eventLocalEndDate =
         event.endDate != null
@@ -208,10 +208,30 @@ class _HomeState extends State<Home> {
     return isToday;
   }
 
-  @override
-  void initState() {
-    getEvents();
-    super.initState();
+  String getCompletedEventsPercentage() {
+    if (_todayEvents.isEmpty) return '-';
+    final percent =
+        (_todayCompletedEvents.length / _todayEvents.length * 100).round();
+    return '$percent%';
+  }
+
+  String getMilestoneMessage(String percent) {
+    if (percent == "-") return "Start planning events to get started!";
+    final int percentInt = int.parse(percent.replaceAll('%', ''));
+    if (percentInt == 0) return Constants.milestoneMessages[0]!;
+    if (percentInt >= 1 && percentInt < 26) {
+      return Constants.milestoneMessages[1]!;
+    }
+    if (percentInt >= 26 && percentInt < 50) {
+      return Constants.milestoneMessages[26]!;
+    }
+    if (percentInt >= 50 && percentInt < 75) {
+      return Constants.milestoneMessages[50]!;
+    }
+    if (percentInt >= 75 && percentInt < 100) {
+      return Constants.milestoneMessages[75]!;
+    }
+    return Constants.milestoneMessages[100]!;
   }
 
   @override
@@ -222,7 +242,7 @@ class _HomeState extends State<Home> {
 
     // Calculate checkpoint times for current day events
     final Set<TimeOfDay> checkpointTimes =
-        events
+        _events
             .where((e) {
               final eventDate = DateTime.parse(e.startTime);
               return eventDate.year == now.year &&
@@ -337,7 +357,7 @@ class _HomeState extends State<Home> {
             // SliverPersistentHeader for sticky search bar
             SliverPersistentHeader(
               pinned: true,
-              delegate: _SearchBarDelegate(
+              delegate: SearchBarDelegate(
                 minExtent: 80,
                 maxExtent: 80,
                 child: Container(
@@ -348,7 +368,7 @@ class _HomeState extends State<Home> {
                   ),
                   alignment: Alignment.center,
                   child: TextField(
-                    controller: searchController,
+                    controller: _searchController,
                     cursorColor: Theme.of(context).colorScheme.onSurface,
                     maxLines: 1,
                     minLines: 1,
@@ -490,7 +510,7 @@ class _HomeState extends State<Home> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4.0),
                                     child: Text(
-                                      "${todayCompletedEvents.length} of ${todayEvents.length} completed",
+                                      "${_todayCompletedEvents.length} of ${_todayEvents.length} completed",
                                       style: TextStyle(
                                         color:
                                             Theme.of(
@@ -507,7 +527,7 @@ class _HomeState extends State<Home> {
                                 height: 8.0,
                                 currentMinute: currentMinute,
                                 snappedProgress: getSnappedDayProgress(
-                                  todayEvents,
+                                  _todayEvents,
                                 ),
                                 progressColor:
                                     Theme.of(context).colorScheme.tertiary,
@@ -558,7 +578,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    if (todayUpcomingEvents.isEmpty)
+                    if (_todayUpcomingEvents.isEmpty)
                       Container(
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.1,
@@ -578,9 +598,9 @@ class _HomeState extends State<Home> {
                         separatorBuilder: (context, index) {
                           return SizedBox(height: 16);
                         },
-                        itemCount: todayUpcomingEvents.length,
+                        itemCount: _todayUpcomingEvents.length,
                         itemBuilder: (context, index) {
-                          final event = todayUpcomingEvents[index];
+                          final event = _todayUpcomingEvents[index];
                           return ListTile(
                             onTap: () {
                               Navigator.push(
@@ -659,7 +679,7 @@ class _HomeState extends State<Home> {
                                     updatedAt: DateTime.now(),
                                   );
                                   HiveEvents.updateEventInHive(updatedEvent);
-                                  getEvents();
+                                  _loadData();
                                   if (mounted) {
                                     setState(() {});
                                   }
@@ -677,14 +697,14 @@ class _HomeState extends State<Home> {
                         },
                       ),
                     SizedBox(height: 16),
-                    if (todayPastEvents.isNotEmpty)
+                    if (_todayPastEvents.isNotEmpty)
                       ListView.separated(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         separatorBuilder: (context, index) {
                           return SizedBox(height: 16);
                         },
-                        itemCount: todayPastEvents.length,
+                        itemCount: _todayPastEvents.length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             tileColor: Theme.of(
@@ -696,7 +716,7 @@ class _HomeState extends State<Home> {
                             ),
                             minVerticalPadding: 0.0,
                             title: Text(
-                              todayPastEvents[index].name,
+                              _todayPastEvents[index].name,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 16,
@@ -704,7 +724,7 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             subtitle: Text(
-                              '${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].startTime))} ${todayPastEvents[index].endTime != todayPastEvents[index].startTime ? '- ${DateFormat("jm").format(DateTime.parse(todayPastEvents[index].endTime))}' : ''}',
+                              '${DateFormat("jm").format(DateTime.parse(_todayPastEvents[index].startTime))} ${_todayPastEvents[index].endTime != _todayPastEvents[index].startTime ? '- ${DateFormat("jm").format(DateTime.parse(_todayPastEvents[index].endTime))}' : ''}',
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 14,
@@ -717,7 +737,7 @@ class _HomeState extends State<Home> {
                               child: FutureBuilder<File?>(
                                 future: CustomImageCacheManager()
                                     .getCachedImageByEventId(
-                                      todayPastEvents[index].id,
+                                      _todayPastEvents[index].id,
                                     ),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
@@ -741,12 +761,12 @@ class _HomeState extends State<Home> {
                             ),
                             trailing: Checkbox(
                               value:
-                                  todayPastEvents[index].eventStatus ==
+                                  _todayPastEvents[index].eventStatus ==
                                   Constants.eventStatus[2],
                               onChanged: (value) {
                                 if (value != null) {
                                   markEventComplete(
-                                    todayPastEvents[index],
+                                    _todayPastEvents[index],
                                     index,
                                   );
                                 }
@@ -781,7 +801,7 @@ class _HomeState extends State<Home> {
                         Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Text(
-                            '${tasks.length} ${tasks.length == 1 ? "task" : "tasks"}',
+                            '${_tasks.length} ${_tasks.length == 1 ? "task" : "tasks"}',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14,
@@ -792,7 +812,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    if (tasks.isEmpty)
+                    if (_tasks.isEmpty)
                       Container(
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.055,
@@ -812,7 +832,7 @@ class _HomeState extends State<Home> {
                         separatorBuilder: (context, index) {
                           return SizedBox(height: 16);
                         },
-                        itemCount: tasks.length,
+                        itemCount: _tasks.length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             onTap: () {
@@ -820,7 +840,8 @@ class _HomeState extends State<Home> {
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (context) => TaskPage(task: tasks[index]),
+                                      (context) =>
+                                          TaskPage(task: _tasks[index]),
                                 ),
                               );
                             },
@@ -833,7 +854,7 @@ class _HomeState extends State<Home> {
                             ),
                             minVerticalPadding: 0.0,
                             title: Text(
-                              tasks[index].name,
+                              _tasks[index].name,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 14,
@@ -845,9 +866,9 @@ class _HomeState extends State<Home> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             subtitle:
-                                tasks[index].notes.isNotEmpty
+                                _tasks[index].notes.isNotEmpty
                                     ? Text(
-                                      tasks[index].notes,
+                                      _tasks[index].notes,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -862,11 +883,11 @@ class _HomeState extends State<Home> {
                                     : null,
                             trailing: Checkbox(
                               value:
-                                  tasks[index].taskStatus ==
+                                  _tasks[index].taskStatus ==
                                   Constants.taskStatus[1],
                               onChanged: (value) {
                                 if (value != null) {
-                                  markTaskComplete(tasks[index], index);
+                                  markTaskComplete(_tasks[index], index);
                                 }
                               },
                               checkColor:
@@ -904,164 +925,4 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-}
-
-// SliverPersistentHeaderDelegate for sticky search bar
-class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
-  @override
-  final double minExtent;
-  @override
-  final double maxExtent;
-  final Widget child;
-  _SearchBarDelegate({
-    required this.minExtent,
-    required this.maxExtent,
-    required this.child,
-  });
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return child;
-  }
-
-  @override
-  bool shouldRebuild(_SearchBarDelegate oldDelegate) {
-    return oldDelegate.child != child ||
-        oldDelegate.minExtent != minExtent ||
-        oldDelegate.maxExtent != maxExtent;
-  }
-}
-
-class StepProgressIndicator extends StatelessWidget {
-  final int currentMinute; // minute of the day: 0-1439
-  final Color progressColor;
-  final Color trackColor;
-  final Color checkpointColor;
-  final double checkpointDiameter;
-  final double height;
-  final Set<TimeOfDay> checkpointTimes;
-  final double? snappedProgress;
-
-  static const int _totalMinutes = 24 * 60;
-
-  const StepProgressIndicator({
-    super.key,
-    required this.currentMinute,
-    this.progressColor = Colors.blue,
-    this.trackColor = Colors.grey,
-    this.checkpointColor = Colors.white,
-    this.checkpointDiameter = 8.0,
-    this.height = 10.0,
-    this.checkpointTimes = const {},
-    this.snappedProgress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double barWidth = constraints.maxWidth;
-
-        return Container(
-          height: height + checkpointDiameter / 2,
-          alignment: Alignment.centerLeft,
-          child: Stack(
-            children: [
-              // Background track
-              Container(
-                height: height,
-                width: barWidth,
-                decoration: BoxDecoration(
-                  color: trackColor,
-                  borderRadius: BorderRadius.circular(height / 2),
-                ),
-              ),
-              // Filled progress
-              Container(
-                height: height,
-                width:
-                    barWidth *
-                    (snappedProgress ?? (currentMinute / _totalMinutes)),
-                decoration: BoxDecoration(
-                  color: progressColor,
-                  borderRadius: BorderRadius.circular(height / 2),
-                ),
-              ),
-              // Spots at event times (hours and minutes)
-              ...checkpointTimes.map((time) {
-                int minuteOfDay = time.hour * 60 + time.minute;
-                double positionX;
-                if (minuteOfDay == 0) {
-                  // Place the first dot just inside the left border
-                  positionX = checkpointDiameter / 2;
-                } else if (minuteOfDay == _totalMinutes) {
-                  // Place the last dot just inside the right border
-                  positionX = barWidth - checkpointDiameter / 2;
-                } else {
-                  positionX = minuteOfDay * (barWidth / _totalMinutes);
-                }
-                return Positioned(
-                  left: positionX - checkpointDiameter / 2,
-                  top: (height / 2) - checkpointDiameter / 2,
-                  child: Container(
-                    width: checkpointDiameter,
-                    height: checkpointDiameter,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: checkpointColor,
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-double getSnappedDayProgress(List<EventModel> todayEvents) {
-  final now = DateTime.now();
-  double timeProgress = (now.hour + now.minute / 60) / 24;
-
-  if (todayEvents.isEmpty) return timeProgress;
-
-  // If all events are completed, fill the bar
-  if (todayEvents.every((e) => e.eventStatus == Constants.eventStatus[2])) {
-    return 1.0;
-  }
-
-  // Sort events by end time
-  List<EventModel> sortedEvents = List.from(todayEvents)..sort(
-    (a, b) => DateTime.parse(a.endTime).compareTo(DateTime.parse(b.endTime)),
-  );
-
-  DateTime? latestSnappableEnd;
-
-  // Track if all previous events are completed
-  bool allPrevCompleted = true;
-  for (final event in sortedEvents) {
-    final isCompleted = event.eventStatus == Constants.eventStatus[2];
-    final eventEnd = DateTime.parse(event.endTime);
-
-    if (isCompleted && allPrevCompleted && eventEnd.isAfter(now)) {
-      latestSnappableEnd = eventEnd;
-    }
-    if (!isCompleted) {
-      allPrevCompleted = false;
-    }
-  }
-
-  if (latestSnappableEnd != null) {
-    double snappedProgress =
-        (latestSnappableEnd.hour + latestSnappableEnd.minute / 60) / 24;
-    return snappedProgress > timeProgress ? snappedProgress : timeProgress;
-  }
-
-  return timeProgress;
 }
