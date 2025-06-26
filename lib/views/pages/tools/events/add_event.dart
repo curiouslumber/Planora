@@ -78,7 +78,7 @@ class _AddEventState extends State<AddEvent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Task',
+                            'Todo',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight:
@@ -148,7 +148,7 @@ class _AddEventState extends State<AddEvent> {
                       spacing: 8.0,
                       children: [
                         Text(
-                          taskOrEvent == "event" ? 'Event Name' : 'Task Name',
+                          taskOrEvent == "event" ? 'Title' : 'Task',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
@@ -196,8 +196,7 @@ class _AddEventState extends State<AddEvent> {
                       children: [
                         Text(
                           taskOrEvent == "event"
-                              ? 'Event Description'
-                              : 'Task Description',
+                              ? 'Description' : 'Notes',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
@@ -208,13 +207,15 @@ class _AddEventState extends State<AddEvent> {
                           controller: _eventDescriptionController,
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.none,
-                          autocorrect: false,
+                          autocorrect: true,
+                          maxLines: null,
+                          minLines: taskOrEvent == "task" ? 8 : 3,
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeights.regular,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          keyboardType: TextInputType.emailAddress,
+                          keyboardType: TextInputType.multiline,
                           decoration: InputDecoration(
                             hintText: '',
                             hintStyle: TextStyle(
@@ -225,11 +226,11 @@ class _AddEventState extends State<AddEvent> {
                               ).colorScheme.onSurface.withAlpha(100),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16.0,
-                              horizontal: 24.0,
+                              vertical: 24.0,
+                              horizontal: 16.0,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32.0),
+                              borderRadius: BorderRadius.circular(16.0),
                               borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.primary,
                               ),
