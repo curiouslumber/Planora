@@ -31,6 +31,8 @@ class EventTaskImageService {
             eventStatus: event.eventStatus,
             eventTileImageLocalUrl: cachedFile.path,
             isImageProcessing: false,
+            createdAt: event.createdAt,
+            updatedAt: event.updatedAt,
           ),
         );
         return;
@@ -42,6 +44,8 @@ class EventTaskImageService {
         eventStatus: event.eventStatus,
         eventTileImageLocalUrl: event.eventTileImageLocalUrl,
         isImageProcessing: true,
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt,
       );
       await HiveEvents.updateEventInHive(processingEvent);
 
@@ -90,6 +94,8 @@ class EventTaskImageService {
         eventStatus: event.eventStatus,
         eventTileImageLocalUrl: cachedImage.path,
         isImageProcessing: false,
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt,
       );
 
       // Update local storage

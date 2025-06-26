@@ -92,6 +92,8 @@ class _HomeState extends State<Home> {
       eventTileImage: event.eventTileImage,
       eventTileImageLocalUrl: event.eventTileImageLocalUrl,
       isImageProcessing: false,
+      createdAt: event.createdAt,
+      updatedAt: DateTime.now(),
     );
     HiveEvents.updateEventInHive(updatedEvent);
     getEvents();
@@ -105,6 +107,9 @@ class _HomeState extends State<Home> {
       name: task.name,
       notes: task.notes,
       taskStatus: Constants.taskStatus[1],
+      attachments: task.attachments,
+      createdAt: task.createdAt,
+      updatedAt: DateTime.now(),
     );
     HiveEvents.updateTaskInHive(updatedTask);
     getEvents();
@@ -650,6 +655,8 @@ class _HomeState extends State<Home> {
                                     eventTileImageLocalUrl:
                                         event.eventTileImageLocalUrl,
                                     isImageProcessing: false,
+                                    createdAt: event.createdAt,
+                                    updatedAt: DateTime.now(),
                                   );
                                   HiveEvents.updateEventInHive(updatedEvent);
                                   getEvents();
@@ -837,18 +844,22 @@ class _HomeState extends State<Home> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            subtitle: Text(
-                              "dummy description here and extra text for checking overflow",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onPrimary.withValues(alpha: 0.7),
-                                fontSize: 12,
-                                fontWeight: FontWeights.regular,
-                              ),
-                            ),
+                            subtitle:
+                                tasks[index].notes.isNotEmpty
+                                    ? Text(
+                                      tasks[index].notes,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary
+                                            .withValues(alpha: 0.7),
+                                        fontSize: 12,
+                                        fontWeight: FontWeights.regular,
+                                      ),
+                                    )
+                                    : null,
                             trailing: Checkbox(
                               value:
                                   tasks[index].taskStatus ==

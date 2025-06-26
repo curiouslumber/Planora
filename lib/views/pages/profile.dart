@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:planora/bloc/auth_bloc.dart';
+import 'package:planora/bloc/auth_bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/utils/app_theme.dart';

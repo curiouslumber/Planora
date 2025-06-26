@@ -580,6 +580,7 @@ class _AddEventState extends State<AddEvent> {
               eventStatus: Constants.eventStatus[0],
               people: addedPeople.map((e) => e.id).toList(),
               createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
             );
 
             // Add event to Hive
@@ -593,6 +594,7 @@ class _AddEventState extends State<AddEvent> {
               name: _nameController.text,
               notes: _descriptionController.text,
               createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
               taskStatus: Constants.taskStatus[0],
             );
 

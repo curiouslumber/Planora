@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:hive/hive.dart';
 
 part 'task_model.g.dart';
@@ -13,14 +15,20 @@ class TaskModel {
   @HiveField(3)
   final String taskStatus;
   @HiveField(4)
+  final List<File> attachments;
+  @HiveField(5)
   final DateTime createdAt;
+  @HiveField(6)
+  final DateTime updatedAt;
 
   TaskModel({
     required this.id,
     required this.name,
     required this.notes,
     this.taskStatus = "ongoing",
+    this.attachments = const [],
     required this.createdAt,
+    required this.updatedAt,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -29,7 +37,9 @@ class TaskModel {
       'name': name,
       'notes': notes,
       'taskStatus': taskStatus,
+      'attachments': attachments,
       'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -37,13 +47,30 @@ class TaskModel {
     required String name,
     required String notes,
     required String taskStatus,
+    required List<File> attachments,
+    required DateTime createdAt,
+    required DateTime updatedAt,
   }) {
     return TaskModel(
       id: id,
       name: name,
       notes: notes,
       taskStatus: taskStatus,
+      attachments: attachments,
       createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  static TaskModel? fromMap(Map<String, dynamic> map) {
+    return TaskModel(
+      id: map['id'],
+      name: map['name'],
+      notes: map['notes'],
+      taskStatus: map['taskStatus'],
+      attachments: map['attachments'] as List<File>,
+      createdAt: map['createdAt'],
+      updatedAt: map['updatedAt'],
     );
   }
 }

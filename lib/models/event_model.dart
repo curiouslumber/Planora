@@ -32,6 +32,8 @@ class EventModel {
   final String eventStatus;
   @HiveField(13)
   final DateTime createdAt;
+  @HiveField(14)
+  final DateTime updatedAt;
 
   EventModel({
     required this.id,
@@ -48,6 +50,7 @@ class EventModel {
     this.meeting,
     this.eventStatus = "upcoming",
     required this.createdAt,
+    required this.updatedAt,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -65,6 +68,7 @@ class EventModel {
       'meeting': meeting,
       'eventStatus': eventStatus,
       'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -73,6 +77,8 @@ class EventModel {
     required String eventStatus,
     required String eventTileImageLocalUrl,
     required bool isImageProcessing,
+    required DateTime createdAt,
+    required DateTime updatedAt,
   }) {
     return EventModel(
       id: id,
@@ -89,6 +95,7 @@ class EventModel {
       meeting: meeting,
       eventStatus: eventStatus,
       createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }

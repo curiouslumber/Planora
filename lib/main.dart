@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:planora/bloc/auth_bloc.dart';
+import 'package:planora/bloc/auth_bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/databases/shared_preferences_helper.dart';
 import 'package:planora/firebase_options.dart';

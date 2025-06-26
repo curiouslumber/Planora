@@ -21,14 +21,16 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
       name: fields[1] as String,
       notes: fields[2] as String,
       taskStatus: fields[3] as String,
-      createdAt: fields[4] as DateTime,
+      attachments: (fields[4] as List).cast<File>(),
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, TaskModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +40,11 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
       ..writeByte(3)
       ..write(obj.taskStatus)
       ..writeByte(4)
-      ..write(obj.createdAt);
+      ..write(obj.attachments)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt);
   }
 
   @override
