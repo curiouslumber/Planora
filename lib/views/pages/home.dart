@@ -482,7 +482,7 @@ class _HomeState extends State<Home> {
                           Row(
                             children: [
                               Text(
-                                "Task Progress",
+                                "Event Progress",
                                 style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.onPrimary,
@@ -809,7 +809,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Todo',
+                          'Tasks',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,

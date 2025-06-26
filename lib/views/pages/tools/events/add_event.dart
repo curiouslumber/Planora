@@ -78,7 +78,7 @@ class _AddEventState extends State<AddEvent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Todo',
+                            'Task',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight:
