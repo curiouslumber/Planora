@@ -559,7 +559,7 @@ class _AddEventState extends State<AddEvent> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),
-        onPressed: () async {
+        onPressed: () {
           if (_nameController.text.isEmpty) {
             return;
           }
@@ -584,7 +584,7 @@ class _AddEventState extends State<AddEvent> {
             );
 
             // Add event to Hive
-            await addEvent(event);
+            addEvent(event);
 
             // Asynchronously function to generate event image tile
             EventTaskImageService.handleImageTileForEvent(event);
@@ -599,10 +599,9 @@ class _AddEventState extends State<AddEvent> {
             );
 
             // Add task to Hive
-            await addTask(task);
+            addTask(task);
           }
 
-          // ignore: use_build_context_synchronously
           Navigator.pop(context);
         },
         backgroundColor: Theme.of(context).colorScheme.primary,

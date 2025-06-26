@@ -7,6 +7,7 @@ import 'package:planora/models/event_model.dart';
 import 'package:planora/models/task_model.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/services/common/event_task_image_service.dart';
+import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
@@ -64,7 +65,21 @@ class _HomeState extends State<Home> {
   Future<void> _fetchEventsAndTasks() async {
     _events = await HiveEvents.getEventsFromHive();
     _tasks = await HiveEvents.getTasksFromHive();
+    _processTasks();
     _processEvents();
+  }
+
+  void _processTasks() {
+    _tasks.sort((a, b) {
+      final aIsOngoing = a.taskStatus != Constants.taskStatus[1];
+      final bIsOngoing = b.taskStatus != Constants.taskStatus[1];
+      if (aIsOngoing != bIsOngoing) {
+        return aIsOngoing ? -1 : 1;
+      }
+      final updatedAtComparison = b.updatedAt.compareTo(a.updatedAt);
+      if (updatedAtComparison != 0) return updatedAtComparison;
+      return b.createdAt.compareTo(a.createdAt);
+    });
   }
 
   void _processEvents() {
@@ -121,6 +136,7 @@ class _HomeState extends State<Home> {
       updatedAt: DateTime.now(),
     );
     HiveEvents.updateEventInHive(updatedEvent);
+    FirebaseFirestoreService().updateEventDocument(event.id, updatedEvent);
     _loadData();
     if (mounted) {
       setState(() {});
@@ -137,6 +153,7 @@ class _HomeState extends State<Home> {
       updatedAt: DateTime.now(),
     );
     HiveEvents.updateTaskInHive(updatedTask);
+    FirebaseFirestoreService().updateTaskDocument(task.id, updatedTask);
     _loadData();
     if (mounted) {
       setState(() {});
@@ -789,6 +806,7 @@ class _HomeState extends State<Home> {
                       ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           'Todo',
@@ -801,7 +819,7 @@ class _HomeState extends State<Home> {
                         Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Text(
-                            '${_tasks.length} ${_tasks.length == 1 ? "task" : "tasks"}',
+                            '${_tasks.where((t) => t.taskStatus == Constants.taskStatus[1]).length} of ${_tasks.length} ${_tasks.length == 1 ? "task" : "tasks"} completed',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14,
