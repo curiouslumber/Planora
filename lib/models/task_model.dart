@@ -7,27 +7,18 @@ class TaskModel {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String taskTileImage;
-  @HiveField(2)
-  final String taskTileImageLocalUrl;
-  @HiveField(3)
-  final bool isImageProcessing;
-  @HiveField(4)
   final String name;
-  @HiveField(5)
-  final String description;
-  @HiveField(6)
+  @HiveField(2)
+  final String notes;
+  @HiveField(3)
   final String taskStatus;
-  @HiveField(7)
+  @HiveField(4)
   final DateTime createdAt;
 
   TaskModel({
     required this.id,
-    required this.taskTileImage,
-    this.isImageProcessing = false,
-    this.taskTileImageLocalUrl = "",
     required this.name,
-    required this.description,
+    required this.notes,
     this.taskStatus = "ongoing",
     required this.createdAt,
   });
@@ -35,30 +26,24 @@ class TaskModel {
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
-      'taskTileImage': taskTileImage,
-      'taskTileImageLocalUrl': taskTileImageLocalUrl,
       'name': name,
-      'description': description,
+      'notes': notes,
       'taskStatus': taskStatus,
       'createdAt': createdAt,
     };
   }
 
   TaskModel copyWith({
-    required String taskTileImage,
+    required String name,
+    required String notes,
     required String taskStatus,
-    required String taskTileImageLocalUrl,
-    required bool isImageProcessing,
   }) {
     return TaskModel(
       id: id,
-      taskTileImage: taskTileImage,
-      taskTileImageLocalUrl: taskTileImageLocalUrl,
       name: name,
-      description: description,
-      createdAt: createdAt,
+      notes: notes,
       taskStatus: taskStatus,
-      isImageProcessing: isImageProcessing,
+      createdAt: createdAt,
     );
   }
 }

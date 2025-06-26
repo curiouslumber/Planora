@@ -18,35 +18,26 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
     };
     return TaskModel(
       id: fields[0] as String,
-      taskTileImage: fields[1] as String,
-      isImageProcessing: fields[3] as bool,
-      taskTileImageLocalUrl: fields[2] as String,
-      name: fields[4] as String,
-      description: fields[5] as String,
-      taskStatus: fields[6] as String,
-      createdAt: fields[7] as DateTime,
+      name: fields[1] as String,
+      notes: fields[2] as String,
+      taskStatus: fields[3] as String,
+      createdAt: fields[4] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, TaskModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.taskTileImage)
-      ..writeByte(2)
-      ..write(obj.taskTileImageLocalUrl)
-      ..writeByte(3)
-      ..write(obj.isImageProcessing)
-      ..writeByte(4)
       ..write(obj.name)
-      ..writeByte(5)
-      ..write(obj.description)
-      ..writeByte(6)
+      ..writeByte(2)
+      ..write(obj.notes)
+      ..writeByte(3)
       ..write(obj.taskStatus)
-      ..writeByte(7)
+      ..writeByte(4)
       ..write(obj.createdAt);
   }
 

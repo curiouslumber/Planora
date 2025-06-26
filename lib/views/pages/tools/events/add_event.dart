@@ -23,8 +23,8 @@ class AddEvent extends StatefulWidget {
 }
 
 class _AddEventState extends State<AddEvent> {
-  final TextEditingController _eventNameController = TextEditingController();
-  final TextEditingController _eventDescriptionController =
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController =
       TextEditingController();
   DateTime? startDate;
   DateTime? endDate;
@@ -156,7 +156,7 @@ class _AddEventState extends State<AddEvent> {
                           ),
                         ),
                         TextField(
-                          controller: _eventNameController,
+                          controller: _nameController,
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.none,
                           autocorrect: false,
@@ -204,7 +204,7 @@ class _AddEventState extends State<AddEvent> {
                           ),
                         ),
                         TextField(
-                          controller: _eventDescriptionController,
+                          controller: _descriptionController,
                           textInputAction: TextInputAction.next,
                           textCapitalization: TextCapitalization.none,
                           autocorrect: true,
@@ -560,16 +560,18 @@ class _AddEventState extends State<AddEvent> {
           borderRadius: BorderRadius.circular(32.0),
         ),
         onPressed: () async {
-          if (_eventNameController.text.isEmpty) {
+          if (_nameController.text.isEmpty) {
             return;
           }
 
           if (taskOrEvent == "event") {
             EventModel event = EventModel(
               id: Uuid().v4(),
+              name: _nameController.text,
+              description: _descriptionController.text,
               eventTileImage: '',
-              name: _eventNameController.text,
-              description: _eventDescriptionController.text,
+              eventTileImageLocalUrl: '',
+              isImageProcessing: false,
               startDate: startDate!.toString(),
               endDate: endDate?.toString(),
               startTime: startTime!.toString(),
@@ -588,18 +590,14 @@ class _AddEventState extends State<AddEvent> {
           } else {
             TaskModel task = TaskModel(
               id: Uuid().v4(),
-              taskTileImage: '',
-              name: _eventNameController.text,
-              description: _eventDescriptionController.text,
+              name: _nameController.text,
+              notes: _descriptionController.text,
               createdAt: DateTime.now(),
               taskStatus: Constants.taskStatus[0],
             );
 
             // Add task to Hive
             await addTask(task);
-
-            // Asynchronously function to generate task image tile
-            EventTaskImageService.handleImageTileForTask(task);
           }
 
           // ignore: use_build_context_synchronously

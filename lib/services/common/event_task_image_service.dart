@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
-import 'package:planora/models/task_model.dart';
 import 'package:planora/services/firebase/firebase_ai_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/services/firebase/firebase_storage_service.dart';
@@ -62,56 +61,6 @@ class EventTaskImageService {
     }
   }
 
-  static Future<void> handleImageTileForTask(TaskModel task) async {
-    // If already has an image or is already being processed, return
-    if ((task.taskTileImage.isNotEmpty &&
-            task.taskTileImageLocalUrl.isNotEmpty) ||
-        task.isImageProcessing) {
-      return;
-    }
-
-    try {
-      // First check if we have a cached image
-      File? cachedFile = await CustomImageCacheManager()
-          .getCachedImageByEventId(task.id);
-
-      if (cachedFile != null) {
-        await HiveEvents.updateTaskInHive(
-          task.copyWith(
-            taskTileImage: task.taskTileImage,
-            taskStatus: task.taskStatus,
-            taskTileImageLocalUrl: cachedFile.path,
-            isImageProcessing: false,
-          ),
-        );
-        return;
-      }
-
-      // Mark as processing
-      var processingTask = task.copyWith(
-        taskTileImage: task.taskTileImage,
-        taskStatus: task.taskStatus,
-        taskTileImageLocalUrl: task.taskTileImageLocalUrl,
-        isImageProcessing: true,
-      );
-      await HiveEvents.updateTaskInHive(processingTask);
-
-      String? semanticSearchResponse = await _trySemanticSearch(
-        task.name + task.description,
-      );
-
-      if (semanticSearchResponse != null) {
-        await _updateTaskWithImage(processingTask, semanticSearchResponse);
-      } else {
-        await _generateAndUploadImageForTask(processingTask);
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error processing task image: $e');
-      }
-    }
-  }
-
   // Private helper methods
   static Future<String?> _trySemanticSearch(String query) async {
     return await PineconeVectorService.semanticSearch(query);
@@ -159,45 +108,6 @@ class EventTaskImageService {
     }
   }
 
-  static Future<void> _updateTaskWithImage(
-    TaskModel task,
-    String gsUrl,
-  ) async {
-    try {
-      // Then get a download URL for caching
-      final downloadUrl = await Helper.getDownloadUrl(gsUrl);
-
-      // Cache the image using the download URL
-      File? cachedImage = await CustomImageCacheManager().cacheImageByEventId(
-        downloadUrl,
-        task.id,
-      );
-
-      if (cachedImage == null) {
-        throw Exception('Failed to cache image');
-      }
-
-      // Create updated task with local cache path
-      final updatedTask = task.copyWith(
-        taskTileImage: gsUrl,
-        taskStatus: task.taskStatus,
-        taskTileImageLocalUrl: cachedImage.path,
-        isImageProcessing: false,
-      );
-
-      // Update local storage
-      await HiveEvents.updateTaskInHive(updatedTask);
-      
-      // Update remote storage
-      await FirebaseFirestoreService().updateTaskDocument(task.id, updatedTask);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error in _updateTaskWithImage: $e');
-      }
-      rethrow;
-    }
-  }
-
   static Future<void> _generateAndUploadImageForEvent(EventModel event) async {
     final imageBytes = await FirebaseAiService().generateImage(
       event.name + event.description,
@@ -209,22 +119,6 @@ class EventTaskImageService {
       await _updateEventWithImage(event, gsUrl);
       await PineconeVectorService.upsertNewIndex(
         event.name + event.description,
-        gsUrl,
-      );
-    }
-  }
-
-  static Future<void> _generateAndUploadImageForTask(TaskModel task) async {
-    final imageBytes = await FirebaseAiService().generateImage(
-      task.name + task.description,
-    );
-    if (imageBytes == null) return;
-
-    final gsUrl = await _uploadImage(imageBytes, task.name);
-    if (gsUrl != null) {
-      await _updateTaskWithImage(task, gsUrl);
-      await PineconeVectorService.upsertNewIndex(
-        task.name + task.description,
         gsUrl,
       );
     }

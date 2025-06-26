@@ -12,6 +12,7 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
+import 'package:planora/views/pages/tools/tasks/task_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.user});
@@ -80,11 +81,6 @@ class _HomeState extends State<Home> {
       EventTaskImageService.handleImageTileForEvent(event);
     }
 
-    for (var task in tasks) {
-      if (task.isImageProcessing) continue;
-      EventTaskImageService.handleImageTileForTask(task);
-    }
-
     if (mounted) {
       setState(() {});
     }
@@ -98,6 +94,19 @@ class _HomeState extends State<Home> {
       isImageProcessing: false,
     );
     HiveEvents.updateEventInHive(updatedEvent);
+    getEvents();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void markTaskComplete(TaskModel task, int index) {
+    TaskModel updatedTask = task.copyWith(
+      name: task.name,
+      notes: task.notes,
+      taskStatus: Constants.taskStatus[1],
+    );
+    HiveEvents.updateTaskInHive(updatedTask);
     getEvents();
     if (mounted) {
       setState(() {});
@@ -762,6 +771,17 @@ class _HomeState extends State<Home> {
                             fontWeight: FontWeights.semiBold,
                           ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(
+                            '${tasks.length} ${tasks.length == 1 ? "task" : "tasks"}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 14,
+                              fontWeight: FontWeights.regular,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     SizedBox(height: 16),
@@ -788,11 +808,20 @@ class _HomeState extends State<Home> {
                         itemCount: tasks.length,
                         itemBuilder: (context, index) {
                           return ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => TaskPage(task: tasks[index]),
+                                ),
+                              );
+                            },
                             tileColor: Theme.of(
                               context,
                             ).colorScheme.primary.withValues(alpha: 0.9),
                             contentPadding: EdgeInsets.only(
-                              left: 8.0,
+                              left: 16.0,
                               right: 16.0,
                             ),
                             minVerticalPadding: 0.0,
@@ -800,42 +829,34 @@ class _HomeState extends State<Home> {
                               tasks[index].name,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeights.semiBold,
                               ),
                             ),
                             minTileHeight: 72,
-                            leading: AspectRatio(
-                              aspectRatio: 1,
-                              child: FutureBuilder<File?>(
-                                future: CustomImageCacheManager()
-                                    .getCachedImageByEventId(tasks[index].id),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                          ConnectionState.done &&
-                                      snapshot.hasData) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.file(
-                                        snapshot.data!,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    );
-                                  } else {
-                                    return Container(color: Colors.transparent);
-                                  }
-                                },
-                              ),
-                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
+                            ),
+                            subtitle: Text(
+                              "dummy description here and extra text for checking overflow",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withValues(alpha: 0.7),
+                                fontSize: 12,
+                                fontWeight: FontWeights.regular,
+                              ),
                             ),
                             trailing: Checkbox(
                               value:
                                   tasks[index].taskStatus ==
                                   Constants.taskStatus[1],
                               onChanged: (value) {
-                                if (value != null) {}
+                                if (value != null) {
+                                  markTaskComplete(tasks[index], index);
+                                }
                               },
                               checkColor:
                                   Theme.of(context).colorScheme.onPrimary,
