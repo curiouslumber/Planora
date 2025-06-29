@@ -724,6 +724,17 @@ class _HomeState extends State<Home> {
                         itemCount: _todayPastEvents.length,
                         itemBuilder: (context, index) {
                           return ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => EventPage(
+                                        event: _todayPastEvents[index],
+                                      ),
+                                ),
+                              );
+                            },
                             tileColor: Theme.of(
                               context,
                             ).colorScheme.primary.withValues(alpha: 0.9),

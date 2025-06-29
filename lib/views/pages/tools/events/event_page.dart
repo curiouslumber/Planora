@@ -80,7 +80,7 @@ class _EventPageState extends State<EventPage> {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.hasData) {
                         return ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
+                          // borderRadius: BorderRadius.circular(8.0),
                           child: Image.file(snapshot.data!, fit: BoxFit.cover),
                         );
                       } else {

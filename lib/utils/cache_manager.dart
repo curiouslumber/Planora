@@ -49,6 +49,12 @@ class CustomImageCacheManager extends CacheManager {
 
   Future<File?> getCachedImageByEventId(String eventId) async {
     try {
+      if (eventId.isEmpty) {
+        if (kDebugMode) {
+          print('Cannot get cached image: eventId is empty');
+        }
+        return null;
+      }
       final fileInfo = await getFileFromCache(eventId);
       return fileInfo?.file;
     } catch (e) {

@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
-import 'package:planora/services/firebase/firebase_ai_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
-import 'package:planora/services/firebase/firebase_storage_service.dart';
 import 'package:planora/services/pinecone/pinecone_vector_service.dart';
+import 'package:planora/services/supabase/supabase_storage_service.dart';
+import 'package:planora/services/unsplash/unsplash_image_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/helper.dart';
 
@@ -72,15 +73,13 @@ class EventTaskImageService {
 
   static Future<void> _updateEventWithImage(
     EventModel event,
-    String gsUrl,
+    String fileUrl,
   ) async {
     try {
-      // Get a download URL for caching
-      final downloadUrl = await Helper.getDownloadUrl(gsUrl);
 
       // Cache the image using the download URL
       File? cachedImage = await CustomImageCacheManager().cacheImageByEventId(
-        downloadUrl,
+        fileUrl,
         event.id,
       );
 
@@ -90,7 +89,7 @@ class EventTaskImageService {
 
       // Create updated event with local cache path
       final updatedEvent = event.copyWith(
-        eventTileImage: gsUrl,
+        eventTileImage: fileUrl,
         eventStatus: event.eventStatus,
         eventTileImageLocalUrl: cachedImage.path,
         isImageProcessing: false,
@@ -115,26 +114,47 @@ class EventTaskImageService {
   }
 
   static Future<void> _generateAndUploadImageForEvent(EventModel event) async {
-    final imageBytes = await FirebaseAiService().generateImage(
+    final imageUrl = await UnsplashImageService.generateImage(
       event.name + event.description,
     );
-    if (imageBytes == null) return;
+    if (imageUrl == null) return;
 
-    final gsUrl = await _uploadImage(imageBytes, event.name);
-    if (gsUrl != null) {
-      await _updateEventWithImage(event, gsUrl);
-      await PineconeVectorService.upsertNewIndex(
-        event.name + event.description,
-        gsUrl,
-      );
-    }
+    // Convert image URL to bytes
+    final imageBytes = await Helper().getImageBytes(imageUrl);
+
+    var uri = Uri.parse(imageUrl);
+    var fileName =
+        '${event.name.replaceAll(' ', '_').toLowerCase()}.${uri.queryParameters['fm']}';
+    final contentType = "image/${uri.queryParameters['fm']}";
+    final headers = {'Content-Type': contentType};
+
+    String? fileUrl = await _uploadImage(
+      fileName,
+      imageBytes,
+      'event-images',
+      headers,
+    );
+    if (fileUrl == null) return;
+    fileUrl =
+        "${dotenv.env['SUPABASE_BASE_URL']!}/storage/v1/object/public/$fileUrl";
+    await _updateEventWithImage(event, fileUrl);
+    await PineconeVectorService.upsertNewIndex(
+      event.name + event.description,
+      fileUrl,
+    );
   }
 
-  static Future<String?> _uploadImage(Uint8List imageBytes, String name) {
-    return FirebaseStorageService().uploadImageUsingBytes(
-      '${name.replaceAll(' ', '_').toLowerCase()}.png',
-      'event_images',
+  static Future<String?> _uploadImage(
+    String fileName,
+    Uint8List imageBytes,
+    String bucketName,
+    Map<String, String> headers,
+  ) {
+    return SupabaseStorageService.uploadImageUsingBytes(
+      fileName,
+      bucketName,
       imageBytes,
+      headers,
     );
   }
 }

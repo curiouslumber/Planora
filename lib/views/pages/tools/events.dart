@@ -10,7 +10,6 @@ import 'package:planora/utils/dialogs.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/add_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
-import 'package:planora/utils/helper.dart';
 
 enum EventMode { none, selecting }
 
@@ -43,26 +42,8 @@ class _EventsState extends State<Events> {
         // Try to get the cached file
         final cachedFile = await CustomImageCacheManager()
             .getCachedImageByEventId(event.id);
-
         if (cachedFile != null) {
-          // Store the local file path for the event
           imageIdToUrl[event.id] = cachedFile.path;
-        } else {
-          // Fallback: get the download URL if not cached
-          String downloadUrl = await Helper.getDownloadUrl(
-            event.eventTileImage,
-          );
-          imageIdToUrl[event.id] = downloadUrl;
-
-          // Cache the image
-          File? cachedFile = await CustomImageCacheManager()
-              .cacheImageByEventId(
-            downloadUrl,
-            event.id,
-          );
-          if (cachedFile != null) {
-            imageIdToUrl[event.id] = cachedFile.path;
-          }
         }
       }
     }
