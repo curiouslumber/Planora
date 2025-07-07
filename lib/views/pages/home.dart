@@ -6,7 +6,6 @@ import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/task_model.dart';
 import 'package:planora/models/user_model.dart';
-import 'package:planora/services/common/event_task_image_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
@@ -29,14 +28,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   // STATE VARIABLES
   final TextEditingController _searchController = TextEditingController();
-  final DateTime _now = DateTime.now();
-  
+
   // Event lists
   List<EventModel> _events = [];
-  List<EventModel> _todayUpcomingEvents = [];
-  List<EventModel> _todayPastEvents = [];
-  List<EventModel> _todayCompletedEvents = [];
-  List<EventModel> _todayEvents = [];
   List<TaskModel> _tasks = [];
 
   // LIFECYCLE METHODS
@@ -83,46 +77,16 @@ class _HomeState extends State<Home> {
   }
 
   void _processEvents() {
-    _todayEvents = _events.where((e) => _isRangeInToday(e, _now)).toList();
-
-    _todayUpcomingEvents =
-        _events
-            .where(
-              (e) =>
-                  _isRangeInFuture(e, _now) &&
-                  e.eventStatus != Constants.eventStatus[2],
-            )
-            .toList()
-          ..sort((a, b) => a.endTime.compareTo(b.endTime));
-
-    _todayPastEvents =
-        _events
-            .where(
-              (e) =>
-                  _isRangeInPast(e, _now) ||
-                  (e.eventStatus == Constants.eventStatus[2] &&
-                      _isRangeInToday(e, _now)),
-            )
-            .toList()
-          ..sort((a, b) => b.endTime.compareTo(a.endTime));
-
-    _todayCompletedEvents =
-        _events
-            .where(
-              (e) =>
-                  e.eventStatus == Constants.eventStatus[2] &&
-                  _isRangeInToday(e, _now),
-            )
-            .toList();
-
-    _processEventImages();
-  }
-
-  void _processEventImages() {
-    for (var event in _events) {
-      if (event.isImageProcessing) continue;
-      EventTaskImageService.handleImageTileForEvent(event);
-    }
+    _events.sort((a, b) {
+      final aIsOngoing = a.eventStatus != Constants.eventStatus[2];
+      final bIsOngoing = b.eventStatus != Constants.eventStatus[2];
+      if (aIsOngoing != bIsOngoing) {
+        return aIsOngoing ? -1 : 1;
+      }
+      final updatedAtComparison = b.updatedAt.compareTo(a.updatedAt);
+      if (updatedAtComparison != 0) return updatedAtComparison;
+      return b.createdAt.compareTo(a.createdAt);
+    });
   }
 
   // EVENT HANDLERS
@@ -160,75 +124,15 @@ class _HomeState extends State<Home> {
     }
   }
 
-  // HELPER METHODS
-  bool _isRangeInPast(EventModel event, DateTime now) {
-    final eventLocalStartDate = DateTime.parse(event.startDate);
-    DateTime eventLocalEndDate =
-        event.endDate != null
-            ? DateTime.parse(event.endDate!)
-            : eventLocalStartDate;
-    final eventLocalEndTime = DateTime.parse(event.endTime);
-
-    final eventLocalEndDateTime = DateTime(
-      eventLocalEndDate.year,
-      eventLocalEndDate.month,
-      eventLocalEndDate.day,
-      eventLocalEndTime.hour,
-      eventLocalEndTime.minute,
-      eventLocalEndTime.second,
-    );
-
-    // Is the event's end before now, and does it occur today?
-    final isToday =
-        now.year == eventLocalEndDate.year &&
-        now.month == eventLocalEndDate.month &&
-        now.day == eventLocalEndDate.day;
-
-    return eventLocalEndDateTime.isBefore(now) && isToday;
-  }
-
-  bool _isRangeInFuture(EventModel event, DateTime now) {
-    final eventLocalStartDate = DateTime.parse(event.startDate);
-    final eventLocalStartTime = DateTime.parse(event.startTime);
-
-    DateTime eventLocalStartDateTime = DateTime(
-      eventLocalStartDate.year,
-      eventLocalStartDate.month,
-      eventLocalStartDate.day,
-      eventLocalStartTime.hour,
-      eventLocalStartTime.minute,
-      eventLocalStartTime.second,
-    );
-
-    // Is the event's start after now, and does it occur today?
-    final isToday =
-        now.year == eventLocalStartDate.year &&
-        now.month == eventLocalStartDate.month &&
-        now.day == eventLocalStartDate.day;
-
-    return isToday && eventLocalStartDateTime.isAfter(now);
-  }
-
-  bool _isRangeInToday(EventModel event, DateTime now) {
-    final eventLocalStartDate = DateTime.parse(event.startDate);
-    DateTime eventLocalEndDate =
-        event.endDate != null
-            ? DateTime.parse(event.endDate!)
-            : eventLocalStartDate;
-
-    // Is the event's end before now, and does it occur today?
-    final isToday =
-        now.year == eventLocalEndDate.year &&
-        now.month == eventLocalEndDate.month &&
-        now.day == eventLocalEndDate.day;
-
-    return isToday;
-  }
-
   String getCompletedEventsPercentage() {
-    if (_todayEvents.isEmpty) return '-';
+    if (_events.isEmpty) return '-';
     final percent =
-        (_todayCompletedEvents.length / _todayEvents.length * 100).round();
+        (_events
+                    .where((e) => e.eventStatus == Constants.eventStatus[2])
+                    .length /
+                _events.length *
+                100)
+            .round();
     return '$percent%';
   }
 
@@ -527,7 +431,7 @@ class _HomeState extends State<Home> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4.0),
                                     child: Text(
-                                      "${_todayCompletedEvents.length} of ${_todayEvents.length} completed",
+                                      "${_events.where((e) => e.eventStatus == Constants.eventStatus[2]).length} of ${_events.length} completed",
                                       style: TextStyle(
                                         color:
                                             Theme.of(
@@ -543,9 +447,7 @@ class _HomeState extends State<Home> {
                               StepProgressIndicator(
                                 height: 8.0,
                                 currentMinute: currentMinute,
-                                snappedProgress: getSnappedDayProgress(
-                                  _todayEvents,
-                                ),
+                                snappedProgress: getSnappedDayProgress(_events),
                                 progressColor:
                                     Theme.of(context).colorScheme.tertiary,
                                 trackColor:
@@ -595,7 +497,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    if (_todayUpcomingEvents.isEmpty)
+                    if (_events.isEmpty)
                       Container(
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.1,
@@ -615,9 +517,9 @@ class _HomeState extends State<Home> {
                         separatorBuilder: (context, index) {
                           return SizedBox(height: 16);
                         },
-                        itemCount: _todayUpcomingEvents.length,
+                        itemCount: _events.length,
                         itemBuilder: (context, index) {
-                          final event = _todayUpcomingEvents[index];
+                          final event = _events[index];
                           return ListTile(
                             onTap: () {
                               Navigator.push(
@@ -685,6 +587,10 @@ class _HomeState extends State<Home> {
                                 Colors.transparent,
                               ),
                               onChanged: (value) {
+                                if(event.eventStatus == "completed") {
+                                  return;
+                                }
+                                
                                 if (value != null) {
                                   EventModel updatedEvent = event.copyWith(
                                     eventStatus: Constants.eventStatus[2],
@@ -713,108 +619,7 @@ class _HomeState extends State<Home> {
                           );
                         },
                       ),
-                    SizedBox(height: 16),
-                    if (_todayPastEvents.isNotEmpty)
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) {
-                          return SizedBox(height: 16);
-                        },
-                        itemCount: _todayPastEvents.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => EventPage(
-                                        event: _todayPastEvents[index],
-                                      ),
-                                ),
-                              );
-                            },
-                            tileColor: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.9),
-                            contentPadding: EdgeInsets.only(
-                              left: 8.0,
-                              right: 16.0,
-                            ),
-                            minVerticalPadding: 0.0,
-                            title: Text(
-                              _todayPastEvents[index].name,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeights.semiBold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${DateFormat("jm").format(DateTime.parse(_todayPastEvents[index].startTime))} ${_todayPastEvents[index].endTime != _todayPastEvents[index].startTime ? '- ${DateFormat("jm").format(DateTime.parse(_todayPastEvents[index].endTime))}' : ''}',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 14,
-                                fontWeight: FontWeights.semiBold,
-                              ),
-                            ),
-                            minTileHeight: 72,
-                            leading: AspectRatio(
-                              aspectRatio: 1,
-                              child: FutureBuilder<File?>(
-                                future: CustomImageCacheManager()
-                                    .getCachedImageByEventId(
-                                      _todayPastEvents[index].id,
-                                    ),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                          ConnectionState.done &&
-                                      snapshot.hasData) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.file(
-                                        snapshot.data!,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    );
-                                  } else {
-                                    return Container(color: Colors.transparent);
-                                  }
-                                },
-                              ),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            trailing: Checkbox(
-                              value:
-                                  _todayPastEvents[index].eventStatus ==
-                                  Constants.eventStatus[2],
-                              onChanged: (value) {
-                                if (value != null) {
-                                  markEventComplete(
-                                    _todayPastEvents[index],
-                                    index,
-                                  );
-                                }
-                              },
-                              checkColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                              fillColor: WidgetStateProperty.all(
-                                Colors.transparent,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              side: BorderSide(
-                                width: 1.5,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                    SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -915,6 +720,10 @@ class _HomeState extends State<Home> {
                                   _tasks[index].taskStatus ==
                                   Constants.taskStatus[1],
                               onChanged: (value) {
+                                if (_tasks[index].taskStatus ==
+                                    Constants.taskStatus[1]) {
+                                  return;
+                                }
                                 if (value != null) {
                                   markTaskComplete(_tasks[index], index);
                                 }

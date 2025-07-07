@@ -559,7 +559,7 @@ class _AddEventState extends State<AddEvent> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),
-        onPressed: () {
+        onPressed: () async {
           if (_nameController.text.isEmpty) {
             return;
           }
@@ -584,7 +584,7 @@ class _AddEventState extends State<AddEvent> {
             );
 
             // Add event to Hive
-            addEvent(event);
+            await addEvent(event);
 
             // Asynchronously function to generate event image tile
             EventTaskImageService.handleImageTileForEvent(event);
@@ -599,7 +599,7 @@ class _AddEventState extends State<AddEvent> {
             );
 
             // Add task to Hive
-            addTask(task);
+            await addTask(task);
           }
 
           Navigator.pop(context);
