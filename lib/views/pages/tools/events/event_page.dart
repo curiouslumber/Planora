@@ -9,6 +9,8 @@ import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'dart:math';
 
+import 'package:url_launcher/url_launcher.dart';
+
 class EventPage extends StatefulWidget {
   const EventPage({super.key, required this.event});
 
@@ -126,29 +128,97 @@ class _EventPageState extends State<EventPage> {
                 ),
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 16.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.event.description.isNotEmpty)
-                        Text(
-                          widget.event.description,
-                          style: Theme.of(context).textTheme.bodyMedium!
-                              .copyWith(fontWeight: FontWeights.regular),
-                        ),
-                      Text(
-                        'Meeting Time: ${DateFormat('jm').format(DateTime.parse(widget.event.startDate))} ${widget.event.endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(widget.event.endDate!))}' : ''}',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeights.regular,
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.event.attribution != null)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Photo by ',
+                                    style: Theme.of(context).textTheme.bodyMedium!
+                                        .copyWith(fontWeight: FontWeights.regular),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    onPressed: () {
+                                      launchUrl(
+                                        Uri.parse(
+                                          widget.event.attribution!['profileUrl']!,
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      widget.event.attribution!['name']!,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.copyWith(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    ' on ',
+                                    style: Theme.of(context).textTheme.bodyMedium!
+                                        .copyWith(fontWeight: FontWeights.regular),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    onPressed: () {
+                                      launchUrl(
+                                        Uri.parse(
+                                          widget.event.attribution!['unsplashUrl']!,
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Unsplash',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.copyWith(
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 16.0,
                       ),
-                    ],
-                  ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          
+                          if (widget.event.description.isNotEmpty)
+                            Text(
+                              widget.event.description,
+                              style: Theme.of(context).textTheme.bodyMedium!
+                                  .copyWith(fontWeight: FontWeights.regular),
+                            ),
+                          Text(
+                            'Meeting Time: ${DateFormat('jm').format(DateTime.parse(widget.event.startDate))} ${widget.event.endDate != null ? ' - ${DateFormat('jm').format(DateTime.parse(widget.event.endDate!))}' : ''}',
+                            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeights.regular,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

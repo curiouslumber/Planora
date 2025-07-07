@@ -92,6 +92,8 @@ class _HomeState extends State<Home> {
   // EVENT HANDLERS
   void markEventComplete(EventModel event, int selectedIndex) {
     EventModel updatedEvent = event.copyWith(
+      userId: event.userId,
+      attribution: event.attribution,
       eventStatus: Constants.eventStatus[2],
       eventTileImage: event.eventTileImage,
       eventTileImageLocalUrl: event.eventTileImageLocalUrl,
@@ -182,6 +184,7 @@ class _HomeState extends State<Home> {
           slivers: [
             // SliverAppBar for greeting/profile/notification
             SliverAppBar(
+              automaticallyImplyLeading: false,
               floating: true,
               snap: true,
               pinned: false,
@@ -593,6 +596,8 @@ class _HomeState extends State<Home> {
                                 
                                 if (value != null) {
                                   EventModel updatedEvent = event.copyWith(
+                                    userId: event.userId,
+                                    attribution: event.attribution,
                                     eventStatus: Constants.eventStatus[2],
                                     eventTileImage: event.eventTileImage,
                                     eventTileImageLocalUrl:

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:planora/networking/dio_client.dart';
@@ -39,12 +41,17 @@ class PineconeVectorService {
   static Future<bool> upsertNewIndex(
     String imagePrompt,
     String imageUrl,
+    Map<String, String>? attribution,
   ) async {
     final url = '${dotenv.env['SUPABASE_BASE_URL']!}/functions/v1/upsertRecord';
     try {
       final response = await DioClient.dio.post(
         url,
-        data: {'image_prompt': imagePrompt, 'image_url': imageUrl},
+        data: {
+          'image_prompt': imagePrompt,
+          'image_url': imageUrl,
+          'attribution': attribution != null ? jsonEncode(attribution) : "",
+        },
         options: Options(
           headers: {
             'Authorization': 'Bearer ${dotenv.env['SUPABASE_AUTH_TOKEN']}',

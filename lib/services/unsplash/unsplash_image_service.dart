@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:planora/networking/dio_client.dart';
 
 class UnsplashImageService {
-  static Future<String?> generateImage(String imagePrompt) async {
+  static Future<Map<String, Object>?> generateImage(String imagePrompt) async {
     final url =
         '${dotenv.env['SUPABASE_BASE_URL']!}/functions/v1/unsplashImageGen';
     try {
@@ -19,13 +19,11 @@ class UnsplashImageService {
         ),
       );
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = Map<String, Object>.from(response.data as Map<String, dynamic>);
         if (kDebugMode) {
           print(data);
         }
-        if (data["image_url"] != null) {
-          return data["image_url"] as String;
-        }
+        return data;
       }
     } catch (e) {
       if (kDebugMode) {

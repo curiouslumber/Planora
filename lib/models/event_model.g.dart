@@ -18,57 +18,63 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
     };
     return EventModel(
       id: fields[0] as String,
-      eventTileImage: fields[1] as String,
-      eventTileImageLocalUrl: fields[2] as String,
-      isImageProcessing: fields[3] as bool,
-      name: fields[4] as String,
-      description: fields[5] as String,
-      startDate: fields[6] as String,
-      endDate: fields[7] as String?,
-      startTime: fields[8] as String,
-      endTime: fields[9] as String,
-      people: (fields[10] as List?)?.cast<String>(),
-      meeting: fields[11] as String?,
-      eventStatus: fields[12] as String,
-      createdAt: fields[13] as DateTime,
-      updatedAt: fields[14] as DateTime,
+      userId: fields[1] as String,
+      eventTileImage: fields[2] as String,
+      eventTileImageLocalUrl: fields[3] as String,
+      isImageProcessing: fields[4] as bool,
+      name: fields[5] as String,
+      description: fields[6] as String,
+      startDate: fields[7] as String,
+      endDate: fields[8] as String?,
+      startTime: fields[9] as String,
+      endTime: fields[10] as String,
+      people: (fields[11] as List?)?.cast<String>(),
+      meeting: fields[12] as String?,
+      eventStatus: fields[13] as String,
+      createdAt: fields[14] as DateTime,
+      updatedAt: fields[15] as DateTime,
+      attribution: (fields[16] as Map?)?.cast<String, String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, EventModel obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.eventTileImage)
+      ..write(obj.userId)
       ..writeByte(2)
-      ..write(obj.eventTileImageLocalUrl)
+      ..write(obj.eventTileImage)
       ..writeByte(3)
-      ..write(obj.isImageProcessing)
+      ..write(obj.eventTileImageLocalUrl)
       ..writeByte(4)
-      ..write(obj.name)
+      ..write(obj.isImageProcessing)
       ..writeByte(5)
-      ..write(obj.description)
+      ..write(obj.name)
       ..writeByte(6)
-      ..write(obj.startDate)
+      ..write(obj.description)
       ..writeByte(7)
-      ..write(obj.endDate)
+      ..write(obj.startDate)
       ..writeByte(8)
-      ..write(obj.startTime)
+      ..write(obj.endDate)
       ..writeByte(9)
-      ..write(obj.endTime)
+      ..write(obj.startTime)
       ..writeByte(10)
-      ..write(obj.people)
+      ..write(obj.endTime)
       ..writeByte(11)
-      ..write(obj.meeting)
+      ..write(obj.people)
       ..writeByte(12)
-      ..write(obj.eventStatus)
+      ..write(obj.meeting)
       ..writeByte(13)
-      ..write(obj.createdAt)
+      ..write(obj.eventStatus)
       ..writeByte(14)
-      ..write(obj.updatedAt);
+      ..write(obj.createdAt)
+      ..writeByte(15)
+      ..write(obj.updatedAt)
+      ..writeByte(16)
+      ..write(obj.attribution);
   }
 
   @override

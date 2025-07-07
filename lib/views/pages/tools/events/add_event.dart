@@ -567,6 +567,7 @@ class _AddEventState extends State<AddEvent> {
           if (taskOrEvent == "event") {
             EventModel event = EventModel(
               id: Uuid().v4(),
+              userId: widget.user!.uid,
               name: _nameController.text,
               description: _descriptionController.text,
               eventTileImage: '',

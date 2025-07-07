@@ -28,6 +28,8 @@ class EventTaskImageService {
       if (cachedFile != null) {
         await HiveEvents.updateEventInHive(
           event.copyWith(
+            userId: event.userId,
+            attribution: event.attribution,
             eventTileImage: event.eventTileImage,
             eventStatus: event.eventStatus,
             eventTileImageLocalUrl: cachedFile.path,
@@ -41,6 +43,8 @@ class EventTaskImageService {
 
       // Mark as processing
       var processingEvent = event.copyWith(
+        userId: event.userId,
+        attribution: event.attribution,
         eventTileImage: event.eventTileImage,
         eventStatus: event.eventStatus,
         eventTileImageLocalUrl: event.eventTileImageLocalUrl,
@@ -89,6 +93,8 @@ class EventTaskImageService {
 
       // Create updated event with local cache path
       final updatedEvent = event.copyWith(
+        userId: event.userId,
+        attribution: event.attribution,
         eventTileImage: fileUrl,
         eventStatus: event.eventStatus,
         eventTileImageLocalUrl: cachedImage.path,
@@ -114,15 +120,27 @@ class EventTaskImageService {
   }
 
   static Future<void> _generateAndUploadImageForEvent(EventModel event) async {
-    final imageUrl = await UnsplashImageService.generateImage(
+    final imageData = await UnsplashImageService.generateImage(
       event.name + event.description,
     );
-    if (imageUrl == null) return;
+    if (imageData == null) return;
+
+    // Add attribution
+    final updatedEvent = event.copyWith(
+      userId: event.userId,
+      eventTileImage: event.eventTileImage,
+      eventStatus: event.eventStatus,
+      eventTileImageLocalUrl: event.eventTileImageLocalUrl,
+      isImageProcessing: event.isImageProcessing,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+      attribution: Map<String, String>.from(imageData["attribution"] as Map<String, dynamic>),
+    );
 
     // Convert image URL to bytes
-    final imageBytes = await Helper().getImageBytes(imageUrl);
+    final imageBytes = await Helper().getImageBytes(imageData["image_url"] as String);
 
-    var uri = Uri.parse(imageUrl);
+    var uri = Uri.parse(imageData["image_url"] as String);
     var fileName =
         '${event.name.replaceAll(' ', '_').toLowerCase()}.${uri.queryParameters['fm']}';
     final contentType = "image/${uri.queryParameters['fm']}";
@@ -137,10 +155,11 @@ class EventTaskImageService {
     if (fileUrl == null) return;
     fileUrl =
         "${dotenv.env['SUPABASE_BASE_URL']!}/storage/v1/object/public/$fileUrl";
-    await _updateEventWithImage(event, fileUrl);
+    await _updateEventWithImage(updatedEvent, fileUrl);
     await PineconeVectorService.upsertNewIndex(
-      event.name + event.description,
+      updatedEvent.name + updatedEvent.description,
       fileUrl,
+      updatedEvent.attribution,
     );
   }
 

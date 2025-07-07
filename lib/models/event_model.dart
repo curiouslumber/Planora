@@ -7,36 +7,41 @@ class EventModel {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String eventTileImage;
+  final String userId;
   @HiveField(2)
-  final String eventTileImageLocalUrl;
+  final String eventTileImage;
   @HiveField(3)
-  final bool isImageProcessing;
+  final String eventTileImageLocalUrl;
   @HiveField(4)
-  final String name;
+  final bool isImageProcessing;
   @HiveField(5)
-  final String description;
+  final String name;
   @HiveField(6)
-  final String startDate;
+  final String description;
   @HiveField(7)
-  final String? endDate;
+  final String startDate;
   @HiveField(8)
-  final String startTime;
+  final String? endDate;
   @HiveField(9)
-  final String endTime;
+  final String startTime;
   @HiveField(10)
-  final List<String>? people;
+  final String endTime;
   @HiveField(11)
-  final String? meeting;
+  final List<String>? people;
   @HiveField(12)
-  final String eventStatus;
+  final String? meeting;
   @HiveField(13)
-  final DateTime createdAt;
+  final String eventStatus;
   @HiveField(14)
+  final DateTime createdAt;
+  @HiveField(15)
   final DateTime updatedAt;
+  @HiveField(16)
+  final Map<String, String>? attribution;
 
   EventModel({
     required this.id,
+    required this.userId,
     required this.eventTileImage,
     this.eventTileImageLocalUrl = "",
     this.isImageProcessing = false,
@@ -51,11 +56,13 @@ class EventModel {
     this.eventStatus = "upcoming",
     required this.createdAt,
     required this.updatedAt,
+    this.attribution,
   });
 
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
+      'userId': userId,
       'eventTileImage': eventTileImage,
       'eventTileImageLocalUrl': eventTileImageLocalUrl,
       'name': name,
@@ -69,19 +76,23 @@ class EventModel {
       'eventStatus': eventStatus,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'attribution': attribution,
     };
   }
 
   EventModel copyWith({
+    required String userId,
     required String eventTileImage,
     required String eventStatus,
     required String eventTileImageLocalUrl,
     required bool isImageProcessing,
     required DateTime createdAt,
     required DateTime updatedAt,
+    required Map<String, String>? attribution
   }) {
     return EventModel(
       id: id,
+      userId: userId,
       eventTileImage: eventTileImage,
       eventTileImageLocalUrl: eventTileImageLocalUrl,
       isImageProcessing: isImageProcessing,
@@ -96,6 +107,7 @@ class EventModel {
       eventStatus: eventStatus,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      attribution: attribution,
     );
   }
 }
