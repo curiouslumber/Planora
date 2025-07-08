@@ -1,7 +1,9 @@
-import 'package:planora/views/schedule/add_schedule.dart';
-import 'package:planora/widgets/calendar_view.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:planora/data/events_data_source.dart';
+import 'package:planora/databases/hive_events.dart';
+import 'package:planora/models/event_model.dart';
+import 'package:planora/utils/font_weights.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -11,256 +13,182 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
-  DateTime selectedDate = DateTime.now();
-  bool areEventsFetched = false;
-
-  void getEvents() {
-    void fetchEvents() async {}
-
-    fetchEvents();
-  }
+  final CalendarController _monthController = CalendarController();
+  final CalendarController _dayController = CalendarController();
+  DateTime _selectedDate = DateTime.now();
+  List<EventModel> _events = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
-    if (!areEventsFetched) {
-      getEvents();
-    }
     super.initState();
+    _loadEvents();
   }
 
-  List<DateTime> getFiveDayView() {
-    return List.generate(
-      5,
-      (index) => selectedDate.add(Duration(days: index - 2)),
-    );
+  @override
+  void dispose() {
+    _monthController.dispose();
+    _dayController.dispose();
+    super.dispose();
   }
 
-  void updateDate(int days) {
-    setState(() {
-      selectedDate = selectedDate.add(Duration(days: days));
-    });
+  Future<void> _loadEvents() async {
+    setState(() => _isLoading = true);
+    try {
+      _events = await HiveEvents.getEventsFromHive();
+    } catch (e) {
+      // Handle error
+      debugPrint('Error loading events: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  List<Event> _getEventsForDay(DateTime day) {
+    return _events
+        .where((event) {
+          final eventDate = DateTime.parse(event.startDate);
+          return eventDate.year == day.year &&
+              eventDate.month == day.month &&
+              eventDate.day == day.day;
+        })
+        .map((event) => Event(
+              event.name,
+              DateTime.parse(event.startDate),
+              event.endDate != null
+                  ? DateTime.parse(event.endDate!)
+                  : DateTime.parse(event.startDate).add(const Duration(hours: 1)),
+              Theme.of(context).colorScheme.secondary,
+              false,
+            ))
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!areEventsFetched) getEvents();
-    List<DateTime> fiveDayView = getFiveDayView();
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height / 2.7,
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 10.0,
-              right: 10.0,
-              top: 8.0,
-              bottom: 8.0,
-            ),
-            child: AppBar(
-              backgroundColor: Theme.of(
-                context,
-                // ignore: deprecated_member_use
-              ).colorScheme.primary.withOpacity(0.9),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(33.0)),
-              ),
-              centerTitle: true,
-              titleSpacing: 0, // Ensures proper spacing
-              automaticallyImplyLeading: false, // Prevents default back button
-              flexibleSpace: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(height: 16.0), // Adjust this value for top spacing
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          onPressed: () => updateDate(-5),
-                          highlightColor: Colors.transparent,
-                          icon: Icon(
-                            Icons.arrow_back_ios_rounded,
-                            size: 20,
-                            color: Theme.of(context).colorScheme.onPrimary,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  top: 0.0,
+                  bottom: 0.0,
+                ),
+                child: Column(
+                  children: [
+                    // Month View (50% of screen)
+                    Expanded(
+                      child: SfCalendar(
+                        controller: _monthController,
+                        view: CalendarView.month,
+                        initialDisplayDate: _selectedDate,
+                        initialSelectedDate: _selectedDate,
+                        showNavigationArrow: true,
+                        showDatePickerButton: true,
+                        firstDayOfWeek: 1,
+                        viewNavigationMode: ViewNavigationMode.snap,
+                        selectionDecoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16.0),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
-                        Text(
-                          DateFormat('MMMM').format(selectedDate),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        onTap: (CalendarTapDetails details) {
+                          if (details.targetElement == CalendarElement.calendarCell) {
+                            setState(() {
+                              _selectedDate = details.date!;
+                              _dayController.displayDate = _selectedDate;
+                              _dayController.selectedDate = _selectedDate;
+                            });
+                          }
+                        },
+                        headerStyle: CalendarHeaderStyle(
+                          textAlign: TextAlign.center,
+                          backgroundColor: Theme.of(context).colorScheme.surface,
                         ),
-                        IconButton(
-                          onPressed: () => updateDate(5),
-                          highlightColor: Colors.transparent,
-                          icon: Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 20,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                      ],
+                        cellBorderColor: Colors.transparent,
+                        dataSource: EventsDataSource(_getEventsForDay(_selectedDate)),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              bottom: Tab(
-                height: MediaQuery.of(context).size.height / 3.5,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 16.0,
-                    right: 16.0,
-                    bottom: 32.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 8.0,
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: Container(
-                          alignment: Alignment.topCenter,
-                          padding: const EdgeInsets.symmetric(vertical: 24.0),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              double totalWidth = constraints.maxWidth;
-                              int itemCount = 5;
-                              double spacing = 12.0;
-                              double itemWidth =
-                                  (totalWidth - (spacing * (itemCount - 1))) /
-                                  itemCount;
-
-                              return ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  DateTime day = fiveDayView[index];
-                                  bool isToday =
-                                      day.day == DateTime.now().day &&
-                                      day.month == DateTime.now().month &&
-                                      day.year == DateTime.now().year;
-
-                                  return Container(
-                                    width: itemWidth,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          isToday
-                                              ? Theme.of(
-                                                context,
-                                              ).colorScheme.surface
-                                              : null,
-                                      borderRadius: BorderRadius.circular(18.0),
-                                      border: Border.all(
-                                        color:
-                                            isToday
-                                                ? Colors.transparent
-                                                : Theme.of(
-                                                  context,
-                                                ).colorScheme.onPrimary,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          DateFormat('E').format(day),
-                                          style: TextStyle(
-                                            color:
-                                                isToday
-                                                    ? Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface
-                                                    : Theme.of(
-                                                      context,
-                                                    ).colorScheme.onPrimary
-                                                    // ignore: deprecated_member_use
-                                                    .withOpacity(0.8),
-                                          ),
-                                        ),
-                                        Text(
-                                          '${day.day}',
-                                          style: TextStyle(
-                                            color:
-                                                isToday
-                                                    ? Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface
-                                                    : Theme.of(
-                                                      context,
-                                                    ).colorScheme.onPrimary
-                                                    // ignore: deprecated_member_use
-                                                    .withOpacity(0.9),
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                separatorBuilder:
-                                    (context, index) =>
-                                        SizedBox(width: spacing),
-                                itemCount: itemCount,
-                              );
-                            },
+                    // Day View (50% of screen)
+                    Expanded(
+                      child: SfCalendar(
+                        controller: _dayController,
+                        view: CalendarView.day,
+                        initialDisplayDate: _selectedDate,
+                        initialSelectedDate: _selectedDate,
+                        showCurrentTimeIndicator: true,
+                        headerHeight: 0.0,
+                        todayHighlightColor: Theme.of(context).colorScheme.primary,
+                        todayTextStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeights.medium,
+                        ),
+                        selectionDecoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: MaterialButton(
-                          onPressed:
-                              () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddSchedule(date: ""),
-                                ),
+                        appointmentBuilder: (context, details) {
+                          final event = details.appointments.first as Event;
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: event.background.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: Border.all(
+                                color: event.background.withValues(alpha: 0.1),
+                                width: 1.5,
                               ),
-                          color: Theme.of(context).colorScheme.surface,
-                          minWidth: MediaQuery.of(context).size.width,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(
-                              color:
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.surfaceContainer,
                             ),
-                          ),
-                          elevation: 0,
-                          child: Text(
-                            'Add Schedule',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w700,
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  event.eventName,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeights.medium,
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${_formatTime(event.from)} - ${_formatTime(event.to)}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
+                          );
+                        },
+                        dataSource: EventsDataSource(_getEventsForDay(_selectedDate)),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Expanded(flex: 1, child: CalendarViewWidget())],
-        ),
-      ),
     );
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12;
+    final period = dateTime.hour < 12 ? 'AM' : 'PM';
+    return '$hour:${dateTime.minute.toString().padLeft(2, '0')} $period';
   }
 }

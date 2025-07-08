@@ -77,6 +77,16 @@ class _HomeState extends State<Home> {
   }
 
   void _processEvents() {
+    final today = DateTime.now();
+    final todayStart = DateTime(today.year, today.month, today.day);
+    final todayEnd = DateTime(today.year, today.month, today.day + 1);
+
+    _events = _events
+        .where((e) =>
+            DateTime.parse(e.startDate).isAfter(todayStart) &&
+            DateTime.parse(e.startDate).isBefore(todayEnd))
+        .toList();
+    
     _events.sort((a, b) {
       final aIsOngoing = a.eventStatus != Constants.eventStatus[2];
       final bIsOngoing = b.eventStatus != Constants.eventStatus[2];
