@@ -80,6 +80,7 @@ class _CalendarState extends State<Calendar> {
                   bottom: 0.0,
                 ),
                 child: Column(
+                  spacing: 8.0,
                   children: [
                     // Month View (50% of screen)
                     Expanded(
@@ -117,66 +118,69 @@ class _CalendarState extends State<Calendar> {
                     ),
                     // Day View (50% of screen)
                     Expanded(
-                      child: SfCalendar(
-                        controller: _dayController,
-                        view: CalendarView.day,
-                        initialDisplayDate: _selectedDate,
-                        initialSelectedDate: _selectedDate,
-                        showCurrentTimeIndicator: true,
-                        headerHeight: 0.0,
-                        todayHighlightColor: Theme.of(context).colorScheme.primary,
-                        todayTextStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontWeight: FontWeights.medium,
-                        ),
-                        selectionDecoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.secondary,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin),
+                        child: SfCalendar(
+                          controller: _dayController,
+                          view: CalendarView.day,
+                          initialDisplayDate: _selectedDate,
+                          initialSelectedDate: _selectedDate,
+                          showCurrentTimeIndicator: true,
+                          headerHeight: 0.0,
+                          todayHighlightColor: Theme.of(context).colorScheme.primary,
+                          todayTextStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontWeight: FontWeights.medium,
                           ),
-                        ),
-                        appointmentBuilder: (context, details) {
-                          final event = details.appointments.first as Event;
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: event.background.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: event.background.withValues(alpha: 0.1),
-                                width: 1.5,
+                          selectionDecoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                          appointmentBuilder: (context, details) {
+                            final event = details.appointments.first as Event;
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: event.background.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                  color: event.background.withValues(alpha: 0.1),
+                                  width: 1.5,
+                                ),
                               ),
-                            ),
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  event.eventName,
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                    fontWeight: FontWeights.medium,
-                                    fontSize: 12,
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    event.eventName,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                      fontWeight: FontWeights.medium,
+                                      fontSize: 12,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${_formatTime(event.from)} - ${_formatTime(event.to)}',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                    fontSize: 10,
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${_formatTime(event.from)} - ${_formatTime(event.to)}',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.7),
+                                      fontSize: 10,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        dataSource: EventsDataSource(_getEventsForDay(_selectedDate)),
+                                ],
+                              ),
+                            );
+                          },
+                          dataSource: EventsDataSource(_getEventsForDay(_selectedDate)),
+                        ),
                       ),
                     ),
                   ],

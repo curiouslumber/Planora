@@ -1,34 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:planora/models/user_model.dart';
-import 'package:planora/views/pages/tools/calendar_tool.dart';
 import 'package:planora/views/pages/tools/events.dart';
-import 'package:planora/views/pages/tools/meetings.dart';
-import 'package:planora/views/pages/tools/notes.dart';
 import 'package:planora/views/pages/tools/people.dart';
+import 'package:planora/views/pages/tools/tasks/tasks.dart';
+
+class ToolItem {
+  final String title;
+  final IconData icon;
+  final Widget? page;
+  final bool isComingSoon;
+
+  const ToolItem({
+    required this.title,
+    required this.icon,
+    this.page,
+    this.isComingSoon = false,
+  });
+}
 
 class Tools extends StatelessWidget {
   const Tools({super.key, this.user});
 
   final UserModel? user;
 
+  List<ToolItem> get _tools => [
+        ToolItem(
+          title: 'Events',
+          icon: Icons.event,
+          page: Events(user: user),
+        ),
+        ToolItem(
+          title: 'Tasks',
+          icon: Icons.task_alt,
+          page: const Tasks(),
+        ),
+        ToolItem(
+          title: 'People',
+          icon: Icons.people,
+          page: const People(),
+        ),
+        const ToolItem(
+          title: 'Add',
+          icon: Icons.add,
+          isComingSoon: true,
+        ),
+      ];
+
   @override
   Widget build(BuildContext context) {
-    final toolsText = ['Events', 'People', 'Calendar', 'Meetings', 'Notes'];
-    final toolsIcons = [
-      Icons.event,
-      Icons.people,
-      Icons.calendar_today,
-      Icons.meeting_room,
-      Icons.sticky_note_2_outlined,
-    ];
-    final toolPages = [
-      Events(user: user),
-      People(),
-      CalendarTool(),
-      Meetings(),
-      Notes(),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -39,104 +58,110 @@ class Tools extends StatelessWidget {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          double itemSize =
-              (constraints.maxWidth - 48) / 2; // Adjust for padding and spacing
+          final itemSize = (constraints.maxWidth - 48) / 2;
           return GridView.builder(
             padding: const EdgeInsets.all(24.0),
-            itemCount: 6,
+            itemCount: _tools.length,
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: itemSize,
               crossAxisSpacing: 24,
               mainAxisSpacing: 24,
-              childAspectRatio: 1, // Ensures square shape
+              childAspectRatio: 1,
             ),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap:
-                    () =>
-                        index == 5
-                            ? ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Coming soon!',
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                                duration: Duration(seconds: 2),
-                              ),
-                            )
-                            : Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => toolPages[index]),
-                    ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color:
-                        index == 5
-                            ? Theme.of(context).colorScheme.surfaceContainer
-                            : Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(32.0),
-                  ),
-                  child: Center(
-                    child:
-                        index != 5
-                            ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              spacing: 16.0,
-                              children: [
-                                Icon(
-                                  toolsIcons[index],
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  size: 40.0,
-                                ),
-                                Text(
-                                  toolsText[index],
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            )
-                            : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              spacing: 4.0,
-                              children: [
-                                Text(
-                                  'Add',
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSurfaceVariant,
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.add,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                  size: 20.0,
-                                  weight: 2.0,
-                                ),
-                              ],
-                            ),
-                  ),
-                ),
-              );
-            },
+            itemBuilder: (context, index) => _buildToolItem(context, _tools[index]),
           );
         },
       ),
     );
+  }
+
+  Widget _buildToolItem(BuildContext context, ToolItem tool) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isComingSoon = tool.isComingSoon;
+
+    return GestureDetector(
+      onTap: () => _handleToolTap(context, tool),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isComingSoon 
+              ? colorScheme.surfaceContainer 
+              : colorScheme.primary.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(32.0),
+        ),
+        child: Center(
+          child: isComingSoon
+              ? _buildComingSoonContent(theme, tool)
+              : _buildToolContent(theme, tool),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToolContent(ThemeData theme, ToolItem tool) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 8),
+        Icon(
+          tool.icon,
+          color: theme.colorScheme.onPrimary,
+          size: 40.0,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          tool.title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.onPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildComingSoonContent(ThemeData theme, ToolItem tool) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          tool.title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Icon(
+          tool.icon,
+          color: theme.colorScheme.onSurfaceVariant,
+          size: 20.0,
+        ),
+      ],
+    );
+  }
+
+  void _handleToolTap(BuildContext context, ToolItem tool) {
+    if (tool.isComingSoon) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          content: Text(
+            'Coming soon!',
+            style: TextStyle(
+              fontSize: 18.0,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else if (tool.page != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => tool.page!),
+      );
+    }
   }
 }
