@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
@@ -10,16 +11,16 @@ import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
-import 'package:flutter/material.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 import 'package:planora/views/pages/tools/tasks/task_page.dart';
 import 'package:planora/widgets/search_bar_delegate.dart';
 import 'package:planora/widgets/step_progress_indicator.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key, this.user});
+  const Home({super.key, this.user, this.pageController});
 
   final UserModel? user;
+  final PageController? pageController;
 
   @override
   State<Home> createState() => _HomeState();
@@ -273,13 +274,18 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       SizedBox(width: 16),
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        child: Icon(
-                          Ionicons.person,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onPrimary,
+                      GestureDetector(
+                        onTap: () {
+                         widget.pageController?.jumpToPage(3); 
+                        },
+                        child: CircleAvatar(
+                          radius: 24,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          child: Icon(
+                            Ionicons.person,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -382,7 +388,6 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.2,
                       padding: EdgeInsets.symmetric(
                         vertical: 16.0,
                         horizontal: 16.0,
@@ -664,7 +669,7 @@ class _HomeState extends State<Home> {
                     if (_tasks.isEmpty)
                       Container(
                         alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.055,
+                        height: MediaQuery.of(context).size.height * 0.06,
                         child: Text(
                           "No tasks.",
                           style: TextStyle(
@@ -765,7 +770,7 @@ class _HomeState extends State<Home> {
                       child: Text(
                         'Made with ❤️\nby Noel Pinto',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ),

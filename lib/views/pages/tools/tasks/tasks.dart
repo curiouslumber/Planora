@@ -10,8 +10,13 @@ class Tasks extends StatefulWidget {
 class _TasksState extends State<Tasks> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-       child: null,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tasks'),
+      ),
+      body: SafeArea(
+        child: Container(),
+      ),
     );
   }
 }

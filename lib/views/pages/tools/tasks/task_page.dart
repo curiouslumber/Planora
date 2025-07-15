@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:planora/bloc/task_bloc/task_bloc.dart';
 import 'package:planora/models/task_model.dart';
 import 'package:intl/intl.dart';
@@ -100,6 +99,7 @@ class _TaskPageState extends State<TaskPage> {
                                     .textTheme
                                     .headlineMedium
                                     ?.copyWith(fontWeight: FontWeight.bold),
+                                cursorColor: Theme.of(context).colorScheme.onSurface,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.zero,
@@ -121,6 +121,7 @@ class _TaskPageState extends State<TaskPage> {
                                       ),
                                     ),
                                 style: Theme.of(context).textTheme.bodyMedium,
+                                cursorColor: Theme.of(context).colorScheme.onSurface,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Add details...',
@@ -149,51 +150,52 @@ class _TaskPageState extends State<TaskPage> {
                   ),
                 ),
               ),
-              floatingActionButton: SpeedDial(
-                icon: Icons.add,
-                activeIcon: Icons.close,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                overlayOpacity: 0.4,
-                spacing: 12,
-                spaceBetweenChildren: 12,
-                childrenButtonSize: const Size(56, 56),
-                shape: const CircleBorder(),
-                children: [
-                  SpeedDialChild(
-                    shape: const CircleBorder(),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    child: Icon(Icons.videocam),
-                    label: 'Record Video',
-                    labelBackgroundColor: Colors.transparent,
-                    labelShadow: List.empty(),
-                    onTap: () {},
-                  ),
+              floatingActionButton:  null,
+              // SpeedDial(
+              //   icon: Icons.add,
+              //   activeIcon: Icons.close,
+              //   backgroundColor: Theme.of(context).colorScheme.primary,
+              //   foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              //   overlayOpacity: 0.4,
+              //   spacing: 12,
+              //   spaceBetweenChildren: 12,
+              //   childrenButtonSize: const Size(56, 56),
+              //   shape: const CircleBorder(),
+              //   children: [
+              //     SpeedDialChild(
+              //       shape: const CircleBorder(),
+              //       backgroundColor: Theme.of(context).colorScheme.primary,
+              //       foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              //       child: Icon(Icons.videocam),
+              //       label: 'Record Video',
+              //       labelBackgroundColor: Colors.transparent,
+              //       labelShadow: List.empty(),
+              //       onTap: () {},
+              //     ),
 
-                  SpeedDialChild(
-                    shape: const CircleBorder(),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    child: Icon(Icons.audiotrack),
-                    label: 'Record Audio',
-                    labelBackgroundColor: Colors.transparent,
-                    labelShadow: List.empty(),
-                    onTap: () {},
-                  ),
+              //     SpeedDialChild(
+              //       shape: const CircleBorder(),
+              //       backgroundColor: Theme.of(context).colorScheme.primary,
+              //       foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              //       child: Icon(Icons.audiotrack),
+              //       label: 'Record Audio',
+              //       labelBackgroundColor: Colors.transparent,
+              //       labelShadow: List.empty(),
+              //       onTap: () {},
+              //     ),
 
-                  SpeedDialChild(
-                    shape: const CircleBorder(),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    child: Icon(Icons.image),
-                    label: 'Add Image',
-                    labelBackgroundColor: Colors.transparent,
-                    labelShadow: List.empty(),
-                    onTap: () {},
-                  ),
-                ],
-              ),
+              //     SpeedDialChild(
+              //       shape: const CircleBorder(),
+              //       backgroundColor: Theme.of(context).colorScheme.primary,
+              //       foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              //       child: Icon(Icons.image),
+              //       label: 'Add Image',
+              //       labelBackgroundColor: Colors.transparent,
+              //       labelShadow: List.empty(),
+              //       onTap: () {},
+              //     ),
+              //   ],
+              // ),
             );
           } else if (state is TaskError) {
             return Center(child: Text(state.message));

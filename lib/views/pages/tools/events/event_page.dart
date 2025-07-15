@@ -159,7 +159,7 @@ class _EventPageState extends State<EventPage> {
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodyMedium!.copyWith(
-                                        color: Theme.of(context).colorScheme.primary,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         decoration: TextDecoration.underline,
                                       ),
                                     ),
@@ -185,7 +185,7 @@ class _EventPageState extends State<EventPage> {
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodyMedium!.copyWith(
-                                        color: Theme.of(context).colorScheme.primary,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                   ),
@@ -276,7 +276,7 @@ class _EventPageState extends State<EventPage> {
           confettiController.play();
         },
         child: Text(
-          'Complete Event',
+          'Swipe to Complete',
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
       ),

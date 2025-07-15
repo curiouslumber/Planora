@@ -71,8 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
-      Home(user: widget.user),
-      Calendar(),
+      Home(user: widget.user, pageController: _pageController),
+      Calendar(pageController: _pageController),
       Tools(user: widget.user),
       widget.user != null ? Profile(user: widget.user!) : Guest(),
     ];

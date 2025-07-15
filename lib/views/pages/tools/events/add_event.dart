@@ -603,6 +603,7 @@ class _AddEventState extends State<AddEvent> {
             await addTask(task);
           }
 
+          // ignore: use_build_context_synchronously
           Navigator.pop(context);
         },
         backgroundColor: Theme.of(context).colorScheme.primary,

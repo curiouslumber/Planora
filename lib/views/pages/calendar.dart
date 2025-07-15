@@ -6,7 +6,9 @@ import 'package:planora/utils/font_weights.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Calendar extends StatefulWidget {
-  const Calendar({super.key});
+  const Calendar({super.key, required this.pageController});
+
+  final PageController pageController;
 
   @override
   State<Calendar> createState() => _CalendarState();
@@ -18,6 +20,22 @@ class _CalendarState extends State<Calendar> {
   DateTime _selectedDate = DateTime.now();
   List<EventModel> _events = [];
   bool _isLoading = true;
+  double _dragStartX = 0.0;
+  static const double _minSwipeDistance = 25.0;
+
+  void onSwipeLeft() {
+    widget.pageController.nextPage(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void onSwipeRight() {
+    widget.pageController.previousPage(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   void initState() {
@@ -66,125 +84,162 @@ class _CalendarState extends State<Calendar> {
         .toList();
   }
 
+  DateTime _getSafeDisplayDate(DateTime date) {
+    final now = DateTime.now();
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final targetTime = now.subtract(const Duration(hours: 1, minutes: 30));
+    
+    // If subtracting 1h30m would go to previous day, use start of day instead
+    if (targetTime.isBefore(startOfDay)) {
+      return startOfDay;
+    }
+    return targetTime;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                  right: 16.0,
-                  top: 0.0,
-                  bottom: 0.0,
-                ),
-                child: Column(
-                  spacing: 8.0,
-                  children: [
-                    // Month View (50% of screen)
-                    Expanded(
-                      child: SfCalendar(
-                        controller: _monthController,
-                        view: CalendarView.month,
-                        initialDisplayDate: _selectedDate,
-                        initialSelectedDate: _selectedDate,
-                        showNavigationArrow: true,
-                        showDatePickerButton: true,
-                        firstDayOfWeek: 1,
-                        viewNavigationMode: ViewNavigationMode.snap,
-                        selectionDecoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16.0),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                        ),
-                        onTap: (CalendarTapDetails details) {
-                          if (details.targetElement == CalendarElement.calendarCell) {
-                            setState(() {
-                              _selectedDate = details.date!;
-                              _dayController.displayDate = _selectedDate;
-                              _dayController.selectedDate = _selectedDate;
-                            });
-                          }
-                        },
-                        headerStyle: CalendarHeaderStyle(
-                          textAlign: TextAlign.center,
-                          backgroundColor: Theme.of(context).colorScheme.surface,
-                        ),
-                        cellBorderColor: Colors.transparent,
-                        dataSource: EventsDataSource(_getEventsForDay(_selectedDate)),
-                      ),
+      body: SafeArea(
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      top: 0.0,
+                      bottom: 0.0,
                     ),
-                    // Day View (50% of screen)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin),
-                        child: SfCalendar(
-                          controller: _dayController,
-                          view: CalendarView.day,
-                          initialDisplayDate: _selectedDate,
-                          initialSelectedDate: _selectedDate,
-                          showCurrentTimeIndicator: true,
-                          headerHeight: 0.0,
-                          todayHighlightColor: Theme.of(context).colorScheme.primary,
-                          todayTextStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            fontWeight: FontWeights.medium,
-                          ),
-                          selectionDecoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.secondary,
+                    child: Column(
+                      spacing: 8.0,
+                      children: [
+                        // Month View (50% of screen)
+                        Expanded(
+                          child: SfCalendar(
+                            controller: _monthController,
+                            view: CalendarView.month,
+                            allowViewNavigation: false,
+                            viewNavigationMode: ViewNavigationMode.none,
+                            initialDisplayDate: _selectedDate,
+                            initialSelectedDate: _selectedDate,
+                            showNavigationArrow: true,
+                            showDatePickerButton: true,
+                            firstDayOfWeek: 1,
+                            selectionDecoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
                             ),
+                            onTap: (CalendarTapDetails details) {
+                              if (details.targetElement == CalendarElement.calendarCell) {
+                                setState(() {
+                                  _selectedDate = details.date!;
+                                  _dayController.displayDate = _selectedDate;
+                                  _dayController.selectedDate = _selectedDate;
+                                });
+                              }
+                            },
+                            headerStyle: CalendarHeaderStyle(
+                              textAlign: TextAlign.center,
+                              backgroundColor: Theme.of(context).colorScheme.surface,
+                            ),
+                            cellBorderColor: Colors.transparent,
+                            dataSource: _isLoading ? null : EventsDataSource(_getEventsForDay(_selectedDate)),
                           ),
-                          appointmentBuilder: (context, details) {
-                            final event = details.appointments.first as Event;
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: event.background.withValues(alpha: 0.2),
+                        ),
+                        // Day View (50% of screen)
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin),
+                            child: SfCalendar(
+                              controller: _dayController,
+                              view: CalendarView.day,
+                              allowViewNavigation: false,
+                              viewNavigationMode: ViewNavigationMode.none,
+                              initialDisplayDate: _getSafeDisplayDate(_selectedDate),
+                              initialSelectedDate: _selectedDate,
+                              showCurrentTimeIndicator: true,
+                              headerHeight: 0.0,
+                              todayHighlightColor: Theme.of(context).colorScheme.primary,
+                              todayTextStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontWeight: FontWeights.medium,
+                              ),
+                              timeSlotViewSettings: TimeSlotViewSettings(
+                                timeIntervalHeight: 60,
+                              ),
+                              selectionDecoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
-                                  color: event.background.withValues(alpha: 0.1),
-                                  width: 1.5,
+                                  color: Colors.transparent
                                 ),
                               ),
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    event.eventName,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface,
-                                      fontWeight: FontWeights.medium,
-                                      fontSize: 12,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${_formatTime(event.from)} - ${_formatTime(event.to)}',
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.7),
-                                      fontSize: 10,
+                              appointmentBuilder: (context, details) {
+                                final event = details.appointments.first as Event;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: event.background,
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    border: Border.all(
+                                      color: event.background.withValues(alpha: 0.1),
+                                      width: 1.5,
                                     ),
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                          dataSource: EventsDataSource(_getEventsForDay(_selectedDate)),
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        event.eventName,
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.surface,
+                                          fontWeight: FontWeights.medium,
+                                          fontSize: 12,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${_formatTime(event.from)} - ${_formatTime(event.to)}',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface
+                                              .withValues(alpha: 0.7),
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              dataSource: _isLoading ? null : EventsDataSource(_getEventsForDay(_selectedDate)),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onHorizontalDragStart: (details) {
+                      _dragStartX = details.globalPosition.dx;
+                    },
+                    onHorizontalDragUpdate: (details) {
+                      final dragDistance = details.globalPosition.dx - _dragStartX;
+                      if (dragDistance.abs() > _minSwipeDistance) {
+                        if (dragDistance > 0) {
+                          onSwipeRight();
+                        } else {
+                          onSwipeLeft();
+                        }
+                        _dragStartX = details.globalPosition.dx;
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
     );
