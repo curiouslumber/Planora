@@ -3,13 +3,15 @@ import 'package:planora/bloc/auth_bloc/auth_bloc.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/pages/calendar.dart';
+import 'package:planora/views/pages/create/create_event.dart';
+import 'package:planora/views/pages/create/create_task.dart';
 import 'package:planora/views/pages/guest.dart';
 import 'package:planora/views/pages/home.dart';
 import 'package:planora/views/pages/profile.dart';
 import 'package:planora/views/pages/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:planora/views/pages/tools/events/add_event.dart';
+import 'package:planora/widgets/custom_fab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.user});
@@ -115,27 +117,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            shape: const CircleBorder(),
-            onPressed: () {
+          floatingActionButton: CustomFab(
+            onCreateEvent: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddEvent(user: widget.user),
+                  builder: (context) => CreateEvent(),
                 ),
               );
             },
-            child: Icon(
-              Ionicons.add,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
+            onCreateTask: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CreateTask(),
+                ),
+              );
+            },
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: BottomAppBar(
             height: kBottomNavigationBarHeight + 16,
-            shape: CircularNotchedRectangle(),
             color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

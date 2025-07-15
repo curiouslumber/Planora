@@ -42,6 +42,7 @@ class _AddEventState extends State<AddEvent> {
   Future<void> addEvent(EventModel event) async {
     await FirebaseFirestoreService().createEventDocument(event: event);
     await HiveEvents.addEventToHive(event);
+    EventTaskImageService.handleImageTileForEvent(event);
   }
 
   Future<void> addTask(TaskModel task) async {
@@ -584,11 +585,7 @@ class _AddEventState extends State<AddEvent> {
               updatedAt: DateTime.now(),
             );
 
-            // Add event to Hive
-            await addEvent(event);
-
-            // Asynchronously function to generate event image tile
-            EventTaskImageService.handleImageTileForEvent(event);
+            addEvent(event);
           } else {
             TaskModel task = TaskModel(
               id: Uuid().v4(),
@@ -599,11 +596,9 @@ class _AddEventState extends State<AddEvent> {
               taskStatus: Constants.taskStatus[0],
             );
 
-            // Add task to Hive
-            await addTask(task);
+            addTask(task);
           }
 
-          // ignore: use_build_context_synchronously
           Navigator.pop(context);
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
