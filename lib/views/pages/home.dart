@@ -364,6 +364,7 @@ class _HomeState extends State<Home> {
                       ),
                       suffixIconColor: Theme.of(context).colorScheme.primary,
                       hintText: 'Search your tasks, events, notes...',
+                      enabled: false,
                       hintStyle: TextStyle(
                         color: Theme.of(
                           context,

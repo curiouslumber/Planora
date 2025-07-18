@@ -149,74 +149,74 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   children: [
-                    IconButton(
-                      icon: Icon(
+                    GestureDetector(
+                      onTap: () => _onBottomNavTap(0),
+                      child: Icon(
                         size: 24,
                         _currentIndex == 0
-                            ? Ionicons.home
-                            : Ionicons.home_outline,
+                              ? Ionicons.home
+                              : Ionicons.home_outline,
+                        color:
+                            _currentIndex == 0
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.8)
+                                : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
-                      color:
-                          _currentIndex == 0
-                              ? Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.8)
-                              : Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.8),
-                      onPressed: () => _onBottomNavTap(0),
                     ),
-                    IconButton(
-                      icon: Icon(
+                    GestureDetector(
+                      onTap: () => _onBottomNavTap(1),
+                      child: Icon(
                         size: 24,
                         _currentIndex == 1
                             ? Ionicons.today
                             : Ionicons.today_outline,
-                      ),
-                      color:
-                          _currentIndex == 1
-                              ? Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                        color:
+                            _currentIndex == 1
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.8)
                               : Theme.of(
                                 context,
-                              ).colorScheme.primary.withValues(alpha: 0.8),
-                      onPressed: () => _onBottomNavTap(1),
+                              ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
                     ),
                     SizedBox(width: 24),
-                    IconButton(
-                      icon: Icon(
+                    GestureDetector(
+                      onTap: () => _onBottomNavTap(2),
+                      child: Icon(
                         size: 24,
                         _currentIndex == 2
                             ? Ionicons.grid
                             : Ionicons.grid_outline,
-                      ),
-                      color:
-                          _currentIndex == 2
-                              ? Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                        color:
+                            _currentIndex == 2
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.8)
                               : Theme.of(
                                 context,
-                              ).colorScheme.primary.withValues(alpha: 0.8),
-                      onPressed: () => _onBottomNavTap(2),
+                              ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
                     ),
-                    IconButton(
-                      icon: Icon(
+                    GestureDetector(
+                      onTap: () => _onBottomNavTap(3),
+                      child: Icon(
                         size: 24,
                         _currentIndex == 3
                             ? Ionicons.person
                             : Ionicons.person_outline,
-                  ),
-                      color:
-                          _currentIndex == 3
-                              ? Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.8)
+                        color:
+                            _currentIndex == 3
+                                ? Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.8)
                               : Theme.of(
                                 context,
-                              ).colorScheme.primary.withValues(alpha: 0.8),
-                      onPressed: () => _onBottomNavTap(3),
+                              ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
                     ),
                   ],
                 ),

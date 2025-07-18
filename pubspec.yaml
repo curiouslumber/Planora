@@ -31,6 +31,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   flutter_speed_dial: ^7.0.0
   flutter_staggered_grid_view: ^0.7.0
+  flutter_native_splash: ^2.4.6
   flutter_svg: ^2.0.17
   google_sign_in: ^6.3.0
   hive: ^2.2.3
@@ -109,3 +110,16 @@ flutter:
         - asset: assets/fonts/Poppins/Poppins-BlackItalic.ttf
           weight: 900
           style: italic
+
+flutter_native_splash:
+  color: "#3b4c42"
+  image: assets/images/planora.png
+  color_dark: "#3b4c42"
+  image_dark: assets/images/planora.png
+  android: true
+  ios: true
+  web: true
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+  

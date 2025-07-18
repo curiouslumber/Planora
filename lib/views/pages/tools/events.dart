@@ -8,7 +8,7 @@ import 'package:planora/models/user_model.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/dialogs.dart';
 import 'package:planora/utils/font_weights.dart';
-import 'package:planora/views/pages/tools/events/add_event.dart';
+import 'package:planora/views/pages/create/create_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 
 enum EventMode { none, selecting }
@@ -317,7 +317,7 @@ class _EventsState extends State<Events> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddEvent(user: widget.user),
+              builder: (context) => CreateEvent(user: widget.user),
             ),
           );
         },

@@ -5,17 +5,14 @@ class CustomFab extends StatefulWidget {
   final VoidCallback? onCreateEvent;
   final VoidCallback? onCreateTask;
 
-  const CustomFab({
-    super.key,
-    this.onCreateEvent,
-    this.onCreateTask,
-  });
+  const CustomFab({super.key, this.onCreateEvent, this.onCreateTask});
 
   @override
   State<CustomFab> createState() => _CustomFabState();
 }
 
-class _CustomFabState extends State<CustomFab> with SingleTickerProviderStateMixin {
+class _CustomFabState extends State<CustomFab>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isOpen = false;
@@ -27,9 +24,10 @@ class _CustomFabState extends State<CustomFab> with SingleTickerProviderStateMix
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _animation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.linear),
-    );
+    _animation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
   }
 
   @override
@@ -54,63 +52,63 @@ class _CustomFabState extends State<CustomFab> with SingleTickerProviderStateMix
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        // Event button
         Positioned(
           bottom: kBottomNavigationBarHeight + 56,
-          left: MediaQuery.of(context).size.width * 0.09,
-          child: ScaleTransition(
-            scale: _animation,
-            child: FloatingActionButton.extended(
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              heroTag: 'event',
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              label: Text(
-                'Create Event',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 16,
+            children: [
+              // Event button
+              ScaleTransition(
+                scale: _animation,
+                child: FloatingActionButton.extended(
+                  heroTag: 'event',
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  extendedPadding: EdgeInsets.symmetric(horizontal: 16),
+                  label: Text(
+                    'Event',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                  icon: Icon(
+                    Icons.event,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  onPressed: () {
+                    if (widget.onCreateEvent != null) {
+                      widget.onCreateEvent!();
+                    }
+                    _toggle();
+                  },
                 ),
               ),
-              icon: Icon(
-                Icons.event,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-              onPressed: () {
-                if (widget.onCreateEvent != null) {
-                  widget.onCreateEvent!();
-                }
-                _toggle();
-              },
-            ),
-          ),
-        ),
 
-        // Task button
-        Positioned(
-          bottom: kBottomNavigationBarHeight + 56,
-          right: MediaQuery.of(context).size.width * 0.09,
-          child: ScaleTransition(
-            scale: _animation,
-            child: FloatingActionButton.extended(
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              heroTag: 'task',
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              onPressed: () {
-                if (widget.onCreateTask != null) {
-                  widget.onCreateTask!();
-                }
-                _toggle();
-              },
-              label: Text(
-                'Create Task',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
+              // Task button
+              ScaleTransition(
+                scale: _animation,
+                child: FloatingActionButton.extended(
+                  heroTag: 'task',
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  onPressed: () {
+                    if (widget.onCreateTask != null) {
+                      widget.onCreateTask!();
+                    }
+                    _toggle();
+                  },
+                  label: Text(
+                    'Task',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                  icon: Icon(
+                    Icons.check_box_outlined,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
               ),
-              icon: Icon(
-                Icons.check_box_outlined,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
+            ],
           ),
         ),
 
