@@ -51,6 +51,15 @@ class FirebaseFirestoreService {
     return null;
   }
 
+  // Get user document from Firestore by email
+  Future<UserModel?> getUserDocumentByEmail(String email) async {
+    final doc = await _usersCollection.where('email', isEqualTo: email).get();
+    if (doc.docs.isNotEmpty) {
+      return UserModel.fromFirestore(doc.docs.first);
+    }
+    return null;
+  }
+
   // Create a new event document in Firestore
   Future<void> createEventDocument({required EventModel event}) async {
     await _eventsCollection.doc(event.id).set(event.toFirestore());

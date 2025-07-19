@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -54,12 +55,27 @@ class EventTaskImageService {
       );
       await HiveEvents.updateEventInHive(processingEvent);
 
-      String? semanticSearchResponse = await _trySemanticSearch(
+      Map<String, Object>? semanticSearchResponse = await _trySemanticSearch(
         event.name + event.description,
       );
 
       if (semanticSearchResponse != null) {
-        await _updateEventWithImage(processingEvent, semanticSearchResponse);
+        final rawAttribution = semanticSearchResponse["attribution"];
+        Map<String, Object> attributionMap;
+
+        if (rawAttribution is String) {
+          attributionMap = Map<String, Object>.from(json.decode(rawAttribution));
+        } else if (rawAttribution is Map) {
+          attributionMap = Map<String, Object>.from(rawAttribution);
+        } else {
+          attributionMap = {};
+        }
+
+        await _updateEventWithImage(
+          processingEvent,
+          semanticSearchResponse["image_url"]! as String,
+          attributionMap,
+        );
       } else {
         await _generateAndUploadImageForEvent(processingEvent);
       }
@@ -71,13 +87,14 @@ class EventTaskImageService {
   }
 
   // Private helper methods
-  static Future<String?> _trySemanticSearch(String query) async {
+  static Future<Map<String, Object>?> _trySemanticSearch(String query) async {
     return await PineconeVectorService.semanticSearch(query);
   }
 
   static Future<void> _updateEventWithImage(
     EventModel event,
     String fileUrl,
+    Map<String, Object>? attribution,
   ) async {
     try {
 
@@ -94,7 +111,7 @@ class EventTaskImageService {
       // Create updated event with local cache path
       final updatedEvent = event.copyWith(
         userId: event.userId,
-        attribution: event.attribution,
+        attribution: Map<String, String>.from(attribution as Map<String, dynamic>),
         eventTileImage: fileUrl,
         eventStatus: event.eventStatus,
         eventTileImageLocalUrl: cachedImage.path,
@@ -155,7 +172,7 @@ class EventTaskImageService {
     if (fileUrl == null) return;
     fileUrl =
         "${dotenv.env['SUPABASE_BASE_URL']!}/storage/v1/object/public/$fileUrl";
-    await _updateEventWithImage(updatedEvent, fileUrl);
+    await _updateEventWithImage(updatedEvent, fileUrl, updatedEvent.attribution);
     await PineconeVectorService.upsertNewIndex(
       updatedEvent.name + updatedEvent.description,
       fileUrl,

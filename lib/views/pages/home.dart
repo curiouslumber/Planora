@@ -84,8 +84,8 @@ class _HomeState extends State<Home> {
 
     _events = _events
         .where((e) =>
-            DateTime.parse(e.startDate).isAfter(todayStart) &&
-            DateTime.parse(e.startDate).isBefore(todayEnd))
+            DateTime.parse(e.startDate).add(const Duration(milliseconds: 1)).isAfter(todayStart) &&
+            DateTime.parse(e.startDate).add(const Duration(milliseconds: 1)).isBefore(todayEnd))
         .toList();
     
     _events.sort((a, b) {
@@ -280,8 +280,9 @@ class _HomeState extends State<Home> {
                         },
                         child: CircleAvatar(
                           radius: 24,
+                          backgroundImage: widget.user?.profilePicUrl != null ? NetworkImage(widget.user!.profilePicUrl!) : null,
                           backgroundColor: Theme.of(context).colorScheme.primary,
-                          child: Icon(
+                          child: widget.user?.profilePicUrl != null ? null : Icon(
                             Ionicons.person,
                             size: 16,
                             color: Theme.of(context).colorScheme.onPrimary,

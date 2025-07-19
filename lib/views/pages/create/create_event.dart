@@ -10,6 +10,7 @@ import 'package:planora/services/common/event_task_image_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
+import 'package:planora/widgets/common_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateEvent extends StatefulWidget {
@@ -41,20 +42,79 @@ class _CreateEventState extends State<CreateEvent> {
     await FirebaseFirestoreService().createEventDocument(event: event);
     await HiveEvents.addEventToHive(event);
     EventTaskImageService.handleImageTileForEvent(event);
+    if (!mounted) return;
+    CommonSnackbar.showSnackbar(context, 'Event added successfully');
   }
 
   Future<void> addTask(TaskModel task) async {
     await FirebaseFirestoreService().createTaskDocument(task: task);
     await HiveEvents.addTaskToHive(task);
+    if (!mounted) return;
+    CommonSnackbar.showSnackbar(context, 'Task added successfully');
+  }
+
+  void _clearAllFields() {
+    setState(() {
+      _nameController.clear();
+      _descriptionController.clear();
+      startDate = null;
+      endDate = null;
+      startTime = null;
+      endTime = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Event')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+      appBar: AppBar(
+        title: const Text('Create Event'),
+        centerTitle: true,
+        actionsPadding: const EdgeInsets.only(right: 8.0),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            tooltip: 'Clear all fields',
+            onPressed: () {
+              if (_nameController.text.isNotEmpty ||
+                  _descriptionController.text.isNotEmpty ||
+                  startDate != null ||
+                  endDate != null ||
+                  startTime != null ||
+                  endTime != null) {
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: Text('Clear all fields?'),
+                        content: Text('This will remove all entered data.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              _clearAllFields();
+                              CommonSnackbar.showSnackbar(context, 'All fields cleared');
+                              Navigator.pop(context);
+                            },
+                            child: Text('Clear', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          ),
+                        ],
+                      ),
+                );
+              } else {
+                _clearAllFields();
+                CommonSnackbar.showSnackbar(context, 'All fields cleared');
+              }
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -230,6 +290,8 @@ class _CreateEventState extends State<CreateEvent> {
                             children: [
                               Text(
                                 'End Date (Optional)',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeights.regular,
@@ -305,7 +367,7 @@ class _CreateEventState extends State<CreateEvent> {
                                   });
                                 },
                                 mode: DateTimeFieldPickerMode.time,
-                                initialPickerDateTime: DateTime.now(),
+                                initialPickerDateTime: getNextHalfHour(),
                                 style: TextStyle(
                                   fontSize: 14.0,
                                   fontWeight: FontWeights.regular,
@@ -354,6 +416,12 @@ class _CreateEventState extends State<CreateEvent> {
                               ),
                               DateTimeField(
                                 value: endTime,
+                                initialPickerDateTime: getDefaultEndTime(
+                                  startTime,
+                                ),
+                                firstDate: (startTime ?? getNextHalfHour()).add(
+                                  const Duration(minutes: 5),
+                                ),
                                 onChanged: (value) {
                                   setState(() {
                                     endTime = value;
@@ -406,7 +474,7 @@ class _CreateEventState extends State<CreateEvent> {
           borderRadius: BorderRadius.circular(32.0),
         ),
         onPressed: () async {
-          if (_nameController.text.isEmpty) {
+          if (_nameController.text.isEmpty || widget.user == null || widget.user!.uid.isEmpty || startDate == null || startTime == null) {
             return;
           }
 
@@ -444,5 +512,26 @@ class _CreateEventState extends State<CreateEvent> {
         ),
       ),
     );
+  }
+
+  DateTime getNextHalfHour() {
+    final now = DateTime.now();
+    int minute = now.minute;
+    int addMinutes;
+    if (minute == 0) {
+      addMinutes = 30;
+    } else if (minute <= 30) {
+      addMinutes = 30 - minute;
+    } else {
+      addMinutes = 60 - minute;
+    }
+    DateTime next = now.add(Duration(minutes: addMinutes));
+    // Remove seconds and microseconds for cleanliness
+    return DateTime(next.year, next.month, next.day, next.hour, next.minute);
+  }
+
+  DateTime getDefaultEndTime(DateTime? start) {
+    final base = start ?? getNextHalfHour();
+    return base.add(const Duration(hours: 1));
   }
 }

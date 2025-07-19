@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PineconeVectorService {
 
-  static Future<String?> semanticSearch(String imagePrompt) async {
+  static Future<Map<String, Object>?> semanticSearch(String imagePrompt) async {
     final url =
         '${dotenv.env['SUPABASE_BASE_URL']!}/functions/v1/semanticSearch';
     try {
@@ -26,7 +26,10 @@ class PineconeVectorService {
           print(data);
         }
         if (data["results"] != null && data["results"].isNotEmpty) {
-          return data["results"][0]["image_url"];
+          return {
+            "image_url": data["results"][0]["image_url"],
+            "attribution": json.decode(data["results"][0]["attribution"]),
+          };
         }
       }
     } catch (e) {

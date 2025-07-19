@@ -20,12 +20,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<EmailSignUpRequested>(_onEmailSignUpRequested);
     on<EmailSignOutRequested>(_onEmailSignOutRequested);
 
+    on<GoogleSignInRequested>(_onGoogleSignInRequested);
     on<GoogleSignOutRequested>(_onGoogleSignOutRequested);
 
     // Initial Check
     add(CheckSignInRequested());
   }
 
+  Future<bool> checkUserExists(String email) async {
+    final userDoc = await _authRepository.getUserDocumentByEmail(email);
+    if (userDoc == null) {
+      return false;
+    }
+
+    return true;
+  }
 
   // Event handlers
   Future<void> _checkSignInRequested(
@@ -47,6 +56,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
+      // Check if user exists
+      final userExists = await checkUserExists(event.email);
+      if (userExists) {
+        emit(AuthError('User already exists'));
+        return;
+      }
+
       // Firebase Auth
       final user = await _authRepository
           .createFirebaseAuthUserWithEmailAndPassword(
@@ -95,22 +111,51 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   // Update this later to have business logic
-  // // Event handlers
-  // Future<void> _onGoogleSignInRequested(
-  //   GoogleSignInRequested event,
-  //   Emitter<AuthState> emit,
-  // ) async {
-  //   try {
-  //     final user = await _authRepository.signInWithGoogle();
-  //     if (user != null) {
-  //       emit(Authenticated(user));
-  //     } else {
-  //       emit(Unauthenticated());
-  //     }
-  //   } catch (e) {
-  //     emit(AuthError(e.toString()));
-  //   }
-  // }
+  // Event handlers
+  Future<void> _onGoogleSignInRequested(
+    GoogleSignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final user = await _authRepository.signInWithGoogle();
+      if (user is! User) {
+        emit(AuthError(user.toString()));
+        return;
+      }
+      // Check if user exists
+      final userExists = await checkUserExists(user.email!);
+      if (userExists) {
+        final userDoc = await _authRepository.getUserDocument(user.uid);
+        if (userDoc == null) {
+          emit(AuthError('User not found'));
+          return;
+        }
+        emit(Authenticated(userDoc));
+        return;
+      }
+
+      // Firebase Firestore
+      await _authRepository.createFirebaseFirestoreUserWithEmailAndPassword(
+        user.uid,
+        user.email!,
+        user.displayName!,
+        user.photoURL,
+        user.phoneNumber,
+        'GOOGLE',
+      );
+
+      final userDoc = await _authRepository.getUserDocument(user.uid);
+      if (userDoc == null) {
+        emit(AuthError('User not found'));
+        return;
+      }
+
+      emit(Authenticated(userDoc));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
 
   // Event handlers
   Future<void> _onGoogleSignOutRequested(

@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/people_model.dart';
 import 'package:planora/models/task_model.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateTask extends StatefulWidget {
-  const CreateTask({super.key});
+  const CreateTask({super.key, this.user});
+
+  final UserModel? user;
 
   @override
   State<CreateTask> createState() => _CreateTaskState();
@@ -166,6 +169,7 @@ class _CreateTaskState extends State<CreateTask> {
 
           TaskModel task = TaskModel(
             id: Uuid().v4(),
+            userId: widget.user!.uid,
             name: _nameController.text,
             notes: _descriptionController.text,
             createdAt: DateTime.now(),

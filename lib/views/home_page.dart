@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CreateEvent(),
+                  builder: (context) => CreateEvent(user: widget.user),
                 ),
               );
             },
@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CreateTask(),
+                  builder: (context) => CreateTask(user: widget.user),
                 ),
               );
             },

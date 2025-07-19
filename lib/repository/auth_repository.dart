@@ -25,6 +25,10 @@ class AuthRepository {
     return _firebaseFirestoreService.getUserDocument(uuid);
   }
 
+  Future<UserModel?> getUserDocumentByEmail(String email) async {
+    return _firebaseFirestoreService.getUserDocumentByEmail(email);
+  }
+
   Future<Object?> createFirebaseAuthUserWithEmailAndPassword(
     String email,
     String password,
@@ -58,8 +62,6 @@ class AuthRepository {
     return await _firebaseAuthService.signInWithGoogle();
   }
 
-  // Update this later to have the repository format i.e only the service functions, move business logic to bloc
- 
   Future<void> signOut() {
     return _firebaseAuthService.signOut();
   }
