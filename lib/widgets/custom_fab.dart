@@ -11,39 +11,12 @@ class CustomFab extends StatefulWidget {
   State<CustomFab> createState() => _CustomFabState();
 }
 
-class _CustomFabState extends State<CustomFab>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+class _CustomFabState extends State<CustomFab> {
   bool _isOpen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _animation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   void _toggle() {
     setState(() {
       _isOpen = !_isOpen;
-      if (_isOpen) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
     });
   }
 
@@ -52,16 +25,15 @@ class _CustomFabState extends State<CustomFab>
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        Positioned(
-          bottom: kBottomNavigationBarHeight + 56,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 16,
-            children: [
-              // Event button
-              ScaleTransition(
-                scale: _animation,
-                child: FloatingActionButton.extended(
+        if (_isOpen)
+          Positioned(
+            bottom: kBottomNavigationBarHeight + 56,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 16,
+              children: [
+                // Event button
+                FloatingActionButton.extended(
                   heroTag: 'event',
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   extendedPadding: EdgeInsets.symmetric(horizontal: 16),
@@ -82,12 +54,9 @@ class _CustomFabState extends State<CustomFab>
                     _toggle();
                   },
                 ),
-              ),
 
-              // Task button
-              ScaleTransition(
-                scale: _animation,
-                child: FloatingActionButton.extended(
+                // Task button
+                FloatingActionButton.extended(
                   heroTag: 'task',
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   onPressed: () {
@@ -107,10 +76,9 @@ class _CustomFabState extends State<CustomFab>
                     color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
         // Main FAB
         Positioned(

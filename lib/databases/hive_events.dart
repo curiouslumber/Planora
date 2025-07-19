@@ -32,9 +32,9 @@ class HiveEvents {
     await box.putAt(index, event);
   }
 
-  static Future<void> deleteEventFromHive(int index) async {
+  static Future<void> deleteEventFromHive(EventModel event) async {
     var box = await Hive.openBox<EventModel>(eventsBox);
-    await box.deleteAt(index);
+    await box.delete(event.id);
   }
 
   static Future<void> deleteEventsFromHive(
@@ -154,9 +154,9 @@ class HiveEvents {
     await box.putAt(index, task);
   }
 
-  static Future<void> deleteTaskFromHive(int index) async {
+  static Future<void> deleteTaskFromHive(TaskModel task) async {
     var box = await Hive.openBox<TaskModel>(tasksBox);
-    await box.deleteAt(index);
+    await box.delete(task.id);
   }
 
   static Future<void> deleteTasksFromHive(Set<int> selectedTaskIndices) async {

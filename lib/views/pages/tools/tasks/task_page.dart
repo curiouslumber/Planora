@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planora/bloc/task_bloc/task_bloc.dart';
+import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/task_model.dart';
 import 'package:intl/intl.dart';
+import 'package:planora/widgets/common_snackbar.dart';
 
 class TaskPage extends StatefulWidget {
   final TaskModel task;
@@ -30,6 +32,13 @@ class _TaskPageState extends State<TaskPage> {
     _nameController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  void deleteTask() {
+    HiveEvents.deleteTaskFromHive(widget.task);
+    Navigator.pop(context);
+    setState(() {});
+    CommonSnackbar.showSnackbar(context, 'Task deleted successfully');
   }
 
   @override
@@ -65,7 +74,53 @@ class _TaskPageState extends State<TaskPage> {
                 title: Text("Task"),
                 actionsPadding: const EdgeInsets.only(right: 8.0),
                 actions: [
-                  IconButton(icon: const Icon(Icons.copy), onPressed: () => {}),
+                  IconButton(
+                    icon: Icon(Icons.copy, size: 20),
+                    onPressed: () => {},
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed:
+                        () => {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Delete Task'),
+                                content: const Text(
+                                  'Are you sure you want to delete this task?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      deleteTask();
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        },
+                  ),
                 ],
               ),
               body: SafeArea(
@@ -99,7 +154,8 @@ class _TaskPageState extends State<TaskPage> {
                                     .textTheme
                                     .headlineMedium
                                     ?.copyWith(fontWeight: FontWeight.bold),
-                                cursorColor: Theme.of(context).colorScheme.onSurface,
+                                cursorColor:
+                                    Theme.of(context).colorScheme.onSurface,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.zero,
@@ -121,7 +177,8 @@ class _TaskPageState extends State<TaskPage> {
                                       ),
                                     ),
                                 style: Theme.of(context).textTheme.bodyMedium,
-                                cursorColor: Theme.of(context).colorScheme.onSurface,
+                                cursorColor:
+                                    Theme.of(context).colorScheme.onSurface,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Add details...',
@@ -150,7 +207,7 @@ class _TaskPageState extends State<TaskPage> {
                   ),
                 ),
               ),
-              floatingActionButton:  null,
+              floatingActionButton: null,
               // SpeedDial(
               //   icon: Icons.add,
               //   activeIcon: Icons.close,

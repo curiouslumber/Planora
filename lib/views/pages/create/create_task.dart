@@ -167,6 +167,8 @@ class _CreateTaskState extends State<CreateTask> {
             return;
           }
 
+          FocusScope.of(context).unfocus();
+
           TaskModel task = TaskModel(
             id: Uuid().v4(),
             userId: widget.user!.uid,

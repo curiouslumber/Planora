@@ -31,7 +31,7 @@ class _TasksState extends State<Tasks> {
   }
 
   void deleteTask(int index) async {
-    await HiveEvents.deleteTaskFromHive(index);
+    await HiveEvents.deleteTaskFromHive(tasks[index]);
     setState(() {
       tasks.removeAt(index);
     });
