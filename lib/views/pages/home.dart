@@ -402,6 +402,7 @@ class _HomeState extends State<Home> {
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        spacing: 8.0,
                         children: [
                           Row(
                             children: [
