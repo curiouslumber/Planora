@@ -7,6 +7,10 @@ class EventsDataSource extends CalendarDataSource {
     appointments = source;
   }
 
+  String getEventId(int index) {
+    return appointments![index].id;
+  }
+
   @override
   DateTime getStartTime(int index) {
     return appointments![index].from;
@@ -34,9 +38,10 @@ class EventsDataSource extends CalendarDataSource {
 }
 
 class Event {
-  Event(this.eventName, this.from, this.to, this.background, this.isAllDay);
+  Event(this.eventName, this.id, this.from, this.to, this.background, this.isAllDay);
 
   String eventName;
+  String id;
   DateTime from;
   DateTime to;
   Color background;

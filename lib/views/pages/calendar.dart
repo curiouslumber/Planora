@@ -3,6 +3,7 @@ import 'package:planora/data/events_data_source.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/utils/font_weights.dart';
+import 'package:planora/views/pages/tools/events/event_page.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Calendar extends StatefulWidget {
@@ -67,17 +68,18 @@ class _CalendarState extends State<Calendar> {
   List<Event> _getEventsForDay(DateTime day) {
     return _events
         .where((event) {
-          final eventDate = DateTime.parse(event.startDate);
+          final eventDate = DateTime.parse(event.startTime);
           return eventDate.year == day.year &&
               eventDate.month == day.month &&
               eventDate.day == day.day;
         })
         .map((event) => Event(
               event.name,
-              DateTime.parse(event.startDate),
+              event.id,
+              DateTime.parse(event.startTime),
               event.endDate != null
                   ? DateTime.parse(event.endDate!)
-                  : DateTime.parse(event.startDate).add(const Duration(hours: 1)),
+                  : DateTime.parse(event.startTime).add(const Duration(hours: 1)),
               Theme.of(context).colorScheme.secondary,
               false,
             ))
@@ -152,6 +154,17 @@ class _CalendarState extends State<Calendar> {
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin),
                             child: SfCalendar(
+                              onTap: (calendarTapDetails) {
+                                if (calendarTapDetails.targetElement == CalendarElement.appointment) {
+                                  final eventId = calendarTapDetails.appointments?.first as Event;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EventPage(event: _events.firstWhere((event) => event.id == eventId.id)),
+                                    ),
+                                  );
+                                }
+                              },
                               controller: _dayController,
                               view: CalendarView.day,
                               allowViewNavigation: false,

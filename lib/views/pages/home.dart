@@ -82,12 +82,19 @@ class _HomeState extends State<Home> {
     final todayStart = DateTime(today.year, today.month, today.day);
     final todayEnd = DateTime(today.year, today.month, today.day + 1);
 
-    _events = _events
-        .where((e) =>
-            DateTime.parse(e.startDate).add(const Duration(milliseconds: 1)).isAfter(todayStart) &&
-            DateTime.parse(e.startDate).add(const Duration(milliseconds: 1)).isBefore(todayEnd))
-        .toList();
-    
+    _events =
+        _events
+            .where(
+              (e) =>
+                  DateTime.parse(
+                    e.startDate,
+                  ).add(const Duration(milliseconds: 1)).isAfter(todayStart) &&
+                  DateTime.parse(
+                    e.startDate,
+                  ).add(const Duration(milliseconds: 1)).isBefore(todayEnd),
+            )
+            .toList();
+
     _events.sort((a, b) {
       final aIsOngoing = a.eventStatus != Constants.eventStatus[2];
       final bIsOngoing = b.eventStatus != Constants.eventStatus[2];
@@ -276,17 +283,27 @@ class _HomeState extends State<Home> {
                       SizedBox(width: 16),
                       GestureDetector(
                         onTap: () {
-                         widget.pageController?.jumpToPage(3); 
+                          widget.pageController?.jumpToPage(3);
                         },
                         child: CircleAvatar(
                           radius: 24,
-                          backgroundImage: widget.user?.profilePicUrl != null ? NetworkImage(widget.user!.profilePicUrl!) : null,
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          child: widget.user?.profilePicUrl != null ? null : Icon(
-                            Ionicons.person,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+                          backgroundImage:
+                              (widget.user?.profilePicUrl != null &&
+                                      widget.user!.profilePicUrl!.isNotEmpty)
+                                  ? NetworkImage(widget.user!.profilePicUrl!)
+                                  : null,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          child:
+                              (widget.user?.profilePicUrl == null ||
+                                      widget.user!.profilePicUrl!.isEmpty)
+                                  ? Icon(
+                                    Ionicons.person,
+                                    size: 16,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  )
+                                  : null,
                         ),
                       ),
                     ],
@@ -608,10 +625,10 @@ class _HomeState extends State<Home> {
                                 Colors.transparent,
                               ),
                               onChanged: (value) {
-                                if(event.eventStatus == "completed") {
+                                if (event.eventStatus == "completed") {
                                   return;
                                 }
-                                
+
                                 if (value != null) {
                                   EventModel updatedEvent = event.copyWith(
                                     userId: event.userId,
@@ -773,7 +790,9 @@ class _HomeState extends State<Home> {
                       child: Text(
                         'Made with ❤️\nby Noel Pinto',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ),

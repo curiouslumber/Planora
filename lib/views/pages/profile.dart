@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:planora/bloc/auth_bloc/auth_bloc.dart';
 import 'package:planora/cubit/theme_cubit.dart';
 import 'package:planora/models/user_model.dart';
@@ -120,18 +121,25 @@ class Profile extends StatelessWidget {
                             ],
                           ),
                           child: CircleAvatar(
-                            radius: 40,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.surfaceContainer,
-                            backgroundImage: user.profilePicUrl != null ? NetworkImage(user.profilePicUrl!) : null,
-                            child: user.profilePicUrl != null ? null : Icon(
-                              Icons.person,
-                              color:
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                            ),
-                          ),
+                          radius: 40,
+                          backgroundImage:
+                              (user.profilePicUrl != null &&
+                                      user.profilePicUrl!.isNotEmpty)
+                                  ? NetworkImage(user.profilePicUrl!)
+                                  : null,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          child:
+                              (user.profilePicUrl == null ||
+                                      user.profilePicUrl!.isEmpty)
+                                  ? Icon(
+                                    Ionicons.person,
+                                    size: 16,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  )
+                                  : null,
+                        ),
                         ),
                       ),
                       Positioned(
