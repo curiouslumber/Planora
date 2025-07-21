@@ -27,6 +27,8 @@ class _CreateTaskState extends State<CreateTask> {
   DateTime? endTime;
   Set<PeopleModel> addedPeople = {};
   String taskOrEvent = "task";
+  List<String> recurringEventDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+  bool isRecurring = false;
 
   void addPeople(PeopleModel people) {
     setState(() {
@@ -56,6 +58,8 @@ class _CreateTaskState extends State<CreateTask> {
           vertical: 8.0,
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 16.0,
           children: [
             Column(
@@ -154,6 +158,50 @@ class _CreateTaskState extends State<CreateTask> {
                 ),
               ],
             ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8.0,
+              children:  [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                     "Repeat",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeights.regular,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    Switch(value: isRecurring, onChanged: (value) {
+                      setState(() {
+                        isRecurring = value;
+                      });
+                    })
+                ],
+              ),
+               LayoutBuilder(
+                 builder: (context, constraints) {
+                   final chipWidth = (constraints.maxWidth / recurringEventDays.length) - 4;
+                   return Wrap(
+                     spacing: 4.0,
+                     runSpacing: 4.0,
+                     children: List.generate(
+                       recurringEventDays.length,
+                       (index) => SizedBox(
+                         width: chipWidth,
+                         child: Chip(
+                          padding: EdgeInsets.all(6.0),
+                           label: FittedBox(child: Text(recurringEventDays[index])),
+                           shape: CircleBorder(),
+                         ),
+                       ),
+                     ),
+                   );
+                 },
+               )
+            ],)
           ],
         ),
       ),
