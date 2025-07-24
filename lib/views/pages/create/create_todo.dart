@@ -289,7 +289,7 @@ class _CreateTodoState extends State<CreateTodo> {
 
           TaskModel task = TaskModel(
             id: Uuid().v4(),
-            userId: widget.user!.uid,
+            userId: widget.user?.uid ?? '',
             name: _nameController.text,
             notes: _descriptionController.text,
             createdAt: DateTime.now(),

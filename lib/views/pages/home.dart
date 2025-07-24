@@ -729,8 +729,6 @@ class _HomeState extends State<Home> {
                             contentPadding: EdgeInsets.only(
                               left: 16.0,
                               right: 16.0,
-                              top: 2.0,
-                              bottom: 2.0,
                             ),
                             title: Text(
                               _todos[index].name,
@@ -745,44 +743,59 @@ class _HomeState extends State<Home> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 1.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Chip(
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    label: Text(
-                                      _todos[index].priority,
-                                      style: TextStyle(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onPrimary,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        _todos[index].priority == 'High'
-                                            ? Colors.redAccent
-                                            : _todos[index].priority == 'Medium'
-                                            ? Colors.orangeAccent
-                                            : _todos[index].priority == 'Low'
-                                            ? Colors.green
-                                            : Colors.grey,
-                                    labelStyle: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
-                                      fontSize: 12,
-                                      fontWeight: FontWeights.medium,
-                                    ),
-                                    visualDensity: VisualDensity.compact,
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                ],
-                              ),
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child:
+                                  _todos[index].priority.isNotEmpty
+                                      ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  _todos[index].priority == 'High'
+                                                      ? Colors.redAccent
+                                                          .withValues(alpha: 0.2)
+                                                      : _todos[index].priority ==
+                                                          'Medium'
+                                                      ? Colors.orangeAccent
+                                                          .withValues(alpha: 0.2)
+                                                      : _todos[index].priority ==
+                                                          'Low'
+                                                      ? Colors.green.withValues(
+                                                          alpha: 0.2,
+                                                        )
+                                                      : Colors.grey.withValues(
+                                                          alpha: 0.2,
+                                                        ),
+                                              borderRadius: BorderRadius.circular(
+                                                12,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              _todos[index].priority,
+                                              style: TextStyle(
+                                                color:
+                                                    _todos[index].priority == 'High'
+                                                        ? Colors.redAccent
+                                                        : _todos[index].priority ==
+                                                            'Medium'
+                                                        ? Colors.orangeAccent
+                                                        : _todos[index].priority ==
+                                                            'Low'
+                                                        ? Colors.green
+                                                        : Colors.grey,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                      : null,
                             ),
                             trailing: Checkbox(
                               value:

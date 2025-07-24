@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/views/pages/tools/events.dart';
-import 'package:planora/views/pages/tools/tasks/tasks.dart';
+// import 'package:planora/views/pages/tools/tasks/tasks.dart';
+import 'package:planora/views/pages/tools/todos/todos.dart';
 // import 'package:planora/widgets/common_snackbar.dart';
 
 class ToolItem {
@@ -32,7 +33,7 @@ class Tools extends StatelessWidget {
         ToolItem(
           title: 'Todos',
           icon: Icons.task_alt,
-          page: const Tasks(),
+          page: const Todos(),
         ),
         const ToolItem(
           title: 'Add',

@@ -62,11 +62,8 @@ class _TodoPageState extends State<TodoPage> {
             FirebaseFirestoreService().updateTaskDocument(_todo.id, _todo);
           });
         },
-        icon: Icon(isDone ? Icons.undo : Icons.check, color: Theme.of(context).colorScheme.onPrimary),
         label: Text(isDone ? 'Mark as Undone' : 'Mark as Done', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-        backgroundColor: isDone
-            ? Theme.of(context).colorScheme.secondary
-            : Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
