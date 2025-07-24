@@ -9,13 +9,13 @@ import 'package:planora/views/pages/tools/todos/todos.dart';
 
 class ToolItem {
   final String title;
-  final IconData icon;
+  final IconData? icon;
   final Widget? page;
   final bool isComingSoon;
 
   const ToolItem({
     required this.title,
-    required this.icon,
+    this.icon,
     this.page,
     this.isComingSoon = false,
   });
@@ -39,12 +39,11 @@ class Tools extends StatelessWidget {
         ),
         ToolItem(
           title: 'Notes',
-          icon: Ionicons.book_outline,
+          icon: Ionicons.book,
           page: const Notes(),
         ),
         const ToolItem(
-          title: 'Add',
-          icon: Icons.add,
+          title: 'Coming\nSoon!',
           isComingSoon: true,
         ),
       ];
@@ -125,24 +124,14 @@ class Tools extends StatelessWidget {
   }
 
   Widget _buildComingSoonContent(ThemeData theme, ToolItem tool) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
+    return Text(
           tool.title,
+          textAlign: TextAlign.center,
           style: theme.textTheme.titleMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        const SizedBox(width: 4),
-        Icon(
-          tool.icon,
-          color: theme.colorScheme.onSurfaceVariant,
-          size: 20.0,
-        ),
-      ],
-    );
+        );
   }
 
   void _handleToolTap(BuildContext context, ToolItem tool) {

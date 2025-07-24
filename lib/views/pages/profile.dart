@@ -87,7 +87,7 @@ class Profile extends StatelessWidget {
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Theme.of(context).colorScheme.onSurface
+                              color: Theme.of(context).colorScheme.surface
                               // ignore: deprecated_member_use
                               .withOpacity(0.05),
                               blurRadius: 20,
@@ -111,9 +111,8 @@ class Profile extends StatelessWidget {
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Theme.of(context).colorScheme.onSurface
-                                // ignore: deprecated_member_use
-                                .withOpacity(0.025),
+                                color: Theme.of(context).colorScheme.surface
+                                .withAlpha(5),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                                 offset: Offset(0, 5),
