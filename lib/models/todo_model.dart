@@ -1,19 +1,15 @@
-import 'dart:io';
-
 import 'package:hive/hive.dart';
 
-part 'task_model.g.dart';
+part 'todo_model.g.dart';
 
-@HiveType(typeId: 4)
-class TaskModel {
+@HiveType(typeId: 5)
+class TodoModel {
   @HiveField(0)
   final String id;
   @HiveField(1)
   final String userId;
   @HiveField(2)
-  final String name;
-  @HiveField(3)
-  final String notes;
+  final String todo;
   @HiveField(4)
   final bool doesRepeat;
   @HiveField(5)
@@ -21,26 +17,22 @@ class TaskModel {
   @HiveField(6)
   final List<String> selectedDays;
   @HiveField(7)
-  final String taskStatus;
+  final String todoStatus;
   @HiveField(8)
-  final List<File> attachments;
-  @HiveField(9)
   final DateTime createdAt;
-  @HiveField(10)
+  @HiveField(9)
   final DateTime updatedAt;
   @HiveField(11)
   final String priority;
 
-  TaskModel({
+  TodoModel({
     required this.id,
     required this.userId,
-    required this.name,
-    required this.notes,
+    required this.todo,
     this.doesRepeat = false,
     this.repeatOption = "never",
     this.selectedDays = const [],
-    this.taskStatus = "ongoing",
-    this.attachments = const [],
+    this.todoStatus = "ongoing",
     required this.createdAt,
     required this.updatedAt,
     this.priority = "None",
@@ -50,58 +42,50 @@ class TaskModel {
     return {
       'id': id,
       'userId': userId,
-      'name': name,
-      'notes': notes,
+      'todo': todo,
       'doesRepeat': doesRepeat,
       'repeatOption': repeatOption,
       'selectedDays': selectedDays,
-      'taskStatus': taskStatus,
-      'attachments': attachments,
+      'todoStatus': todoStatus,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'priority': priority,
     };
   }
 
-  TaskModel copyWith({
-    required String name,
-    required String notes,
+  TodoModel copyWith({
+    required String todo,
     required bool doesRepeat,
     required String repeatOption,
     required List<String> selectedDays,
-    required String taskStatus,
-    required List<File> attachments,
+    required String todoStatus,
     required DateTime createdAt,
     required DateTime updatedAt,
     required String priority,
   }) {
-    return TaskModel(
+    return TodoModel(
       id: id,
       userId: userId,
-      name: name,
-      notes: notes,
+      todo: todo,
       doesRepeat: doesRepeat,
       repeatOption: repeatOption,
       selectedDays: selectedDays,
-      taskStatus: taskStatus,
-      attachments: attachments,
+      todoStatus: todoStatus,
       createdAt: createdAt,
       updatedAt: updatedAt,
       priority: priority,
     );
   }
 
-  static TaskModel? fromMap(Map<String, dynamic> map) {
-    return TaskModel(
+  static TodoModel? fromMap(Map<String, dynamic> map) {
+    return TodoModel(
       id: map['id'],
       userId: map['userId'],
-      name: map['name'],
-      notes: map['notes'],
+      todo: map['todo'],
       doesRepeat: map['doesRepeat'],
       repeatOption: map['repeatOption'],
       selectedDays: map['selectedDays'] as List<String>,
-      taskStatus: map['taskStatus'],
-      attachments: map['attachments'] as List<File>,
+      todoStatus: map['todoStatus'],
       createdAt: map['createdAt'],
       updatedAt: map['updatedAt'],
       priority: map['priority'] ?? 'None',

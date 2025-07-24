@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
-import 'package:planora/models/people_model.dart';
-import 'package:planora/models/task_model.dart';
+import 'package:planora/models/todo_model.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/constants.dart';
@@ -21,29 +20,16 @@ class CreateTodo extends StatefulWidget {
 class _CreateTodoState extends State<CreateTodo> {
   String _priority = 'Low';
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  DateTime? startDate;
-  DateTime? endDate;
-  DateTime? startTime;
-  DateTime? endTime;
-  Set<PeopleModel> addedPeople = {};
-  String taskOrEvent = "task";
   List<String> recurringEventDays = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
   bool isRecurring = false;
   String repeatOption = "never";
   List<String> selectedDays = [];
 
-  void addPeople(PeopleModel people) {
-    setState(() {
-      addedPeople.add(people);
-    });
-  }
-
-  Future<void> addTask(TaskModel task) async {
-    await HiveEvents.addTaskToHive(task);
+  Future<void> addTodo(TodoModel todo) async {
+    await HiveEvents.addTodoToHive(todo);
     // If internet is available, add to firestore
     try {
-      await FirebaseFirestoreService().createTaskDocument(task: task);
+      await FirebaseFirestoreService().createTodoDocument(todo: todo);
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -109,52 +95,31 @@ class _CreateTodoState extends State<CreateTodo> {
                 ),
               ],
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 8.0,
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  taskOrEvent == "event" ? 'Description' : 'Notes',
+                  'Priority',
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeights.regular,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                TextField(
-                  controller: _descriptionController,
-                  textInputAction: TextInputAction.next,
-                  textCapitalization: TextCapitalization.none,
-                  autocorrect: true,
-                  maxLines: null,
-                  minLines: 3,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeights.regular,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    hintText: '',
-                    hintStyle: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeights.regular,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withAlpha(100),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 24.0,
-                      horizontal: 16.0,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
+                DropdownButton<String>(
+                  value: _priority,
+                  items:
+                      ['Low', 'Medium', 'High']
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _priority = value!;
+                    });
+                  },
                 ),
               ],
             ),
@@ -195,6 +160,7 @@ class _CreateTodoState extends State<CreateTodo> {
                     ),
                   ],
                 ),
+
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final chipWidth =
@@ -244,34 +210,6 @@ class _CreateTodoState extends State<CreateTodo> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Priority',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeights.regular,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                DropdownButton<String>(
-                  value: _priority,
-                  items:
-                      ['Low', 'Medium', 'High']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _priority = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -287,18 +225,17 @@ class _CreateTodoState extends State<CreateTodo> {
 
           FocusScope.of(context).unfocus();
 
-          TaskModel task = TaskModel(
+          TodoModel todo = TodoModel(
             id: Uuid().v4(),
             userId: widget.user?.uid ?? '',
-            name: _nameController.text,
-            notes: _descriptionController.text,
+            todo: _nameController.text,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
-            taskStatus: Constants.todoStatus[0],
+            todoStatus: Constants.todoStatus[0],
             priority: _priority,
           );
 
-          addTask(task);
+          addTodo(todo);
 
           Navigator.pop(context);
         },

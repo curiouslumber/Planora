@@ -23,4 +23,6 @@ class Constants {
   };
 
   static const List<String> repeatOptions = ["never", "daily", "weekly", "monthly", "yearly"];
+
+  static const List<String> priority = ["Low", "Medium", "High"];
 }

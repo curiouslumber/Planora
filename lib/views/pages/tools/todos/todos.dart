@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
-import 'package:planora/models/task_model.dart';
+import 'package:planora/models/todo_model.dart';
 import 'package:planora/views/pages/create/create_todo.dart';
 import 'package:intl/intl.dart';
+import 'package:planora/views/pages/tools/todos/todo_page.dart';
 
 class Todos extends StatefulWidget {
   const Todos({super.key});
@@ -12,7 +13,7 @@ class Todos extends StatefulWidget {
 }
 
 class _TodosState extends State<Todos> {
-  List<TaskModel> _todos = [];
+  List<TodoModel> _todos = [];
   bool _isLoading = true;
 
   @override
@@ -23,7 +24,7 @@ class _TodosState extends State<Todos> {
 
   Future<void> _fetchTodos() async {
     setState(() => _isLoading = true);
-    final todos = await HiveEvents.getTasksFromHive();
+    final todos = await HiveEvents.getTodosFromHive();
     setState(() {
       _todos = todos;
       _isLoading = false;
@@ -32,8 +33,8 @@ class _TodosState extends State<Todos> {
 
   @override
   Widget build(BuildContext context) {
-    final ongoing = _todos.where((t) => t.taskStatus != 'completed').toList();
-    final completed = _todos.where((t) => t.taskStatus == 'completed').toList();
+    final ongoing = _todos.where((t) => t.todoStatus != 'completed').toList();
+    final completed = _todos.where((t) => t.todoStatus == 'completed').toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -47,6 +48,9 @@ class _TodosState extends State<Todos> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         onPressed: () async {
           await Navigator.push(
             context,
@@ -91,8 +95,8 @@ class _TodosState extends State<Todos> {
     );
   }
 
-  Widget _buildTodoTile(TaskModel todo) {
-    final isDone = todo.taskStatus == 'completed';
+  Widget _buildTodoTile(TodoModel todo) {
+    final isDone = todo.todoStatus == 'completed';
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: ListTile(
@@ -103,23 +107,21 @@ class _TodosState extends State<Todos> {
           onChanged: (val) async {
             if (isDone) return;
             final updated = todo.copyWith(
-              taskStatus: 'completed',
+              todoStatus: 'completed',
               updatedAt: DateTime.now(),
-              name: todo.name,
-              notes: todo.notes,
+              todo: todo.todo,
               doesRepeat: todo.doesRepeat,
               repeatOption: todo.repeatOption,
               selectedDays: todo.selectedDays,
-              attachments: todo.attachments,
               createdAt: todo.createdAt,
               priority: todo.priority,
             );
-            await HiveEvents.updateTaskInHive(updated);
+            await HiveEvents.updateTodoInHive(updated);
             _fetchTodos();
           },
         ),
         title: Text(
-          todo.name,
+          todo.todo,
           style: TextStyle(
             decoration: isDone ? TextDecoration.lineThrough : null,
             color: isDone ? Colors.grey : Theme.of(context).colorScheme.onSurface,
@@ -150,7 +152,10 @@ class _TodosState extends State<Todos> {
             ? Icon(Icons.check_circle, color: Colors.green)
             : null,
         onTap: () {
-          // Optionally: navigate to details page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TodoPage(todo: todo)),
+          );
         },
       ),
     );

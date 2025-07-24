@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
-import 'package:planora/models/task_model.dart';
 import 'package:intl/intl.dart';
+import 'package:planora/models/todo_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
+import 'package:planora/utils/constants.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key, required this.todo});
 
-  final TaskModel todo;
+  final TodoModel todo;
 
   @override
   State<TodoPage> createState() => _TodoPageState();
 }
 
 class _TodoPageState extends State<TodoPage> {
-  late TaskModel _todo;
+  late TodoModel _todo;
 
   @override
   void initState() {
@@ -24,10 +25,10 @@ class _TodoPageState extends State<TodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDone = _todo.taskStatus == 'completed';
+    final isDone = _todo.todoStatus == Constants.todoStatus[1];
     return Scaffold(
       appBar: AppBar(
-        title: Text(_todo.name),
+        title: Text(_todo.todo),
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
@@ -47,19 +48,17 @@ class _TodoPageState extends State<TodoPage> {
         onPressed: () {
           setState(() {
             _todo = _todo.copyWith(
-              name: _todo.name,
-              notes: _todo.notes,
+              todo: _todo.todo,
+              todoStatus: _todo.todoStatus == Constants.todoStatus[1] ? Constants.todoStatus[0] : Constants.todoStatus[1],
+              updatedAt: DateTime.now(),
+              createdAt: _todo.createdAt,
+              priority: _todo.priority,
               doesRepeat: _todo.doesRepeat,
               repeatOption: _todo.repeatOption,
               selectedDays: _todo.selectedDays,
-              taskStatus: isDone ? 'ongoing' : 'completed',
-              attachments: _todo.attachments,
-              createdAt: _todo.createdAt,
-              updatedAt: DateTime.now(),
-              priority: _todo.priority,
             );
-            HiveEvents.updateTaskInHive(_todo);
-            FirebaseFirestoreService().updateTaskDocument(_todo.id, _todo);
+            HiveEvents.updateTodoInHive(_todo);
+            FirebaseFirestoreService().updateTodoDocument(_todo.id, _todo);
           });
         },
         label: Text(isDone ? 'Mark as Undone' : 'Mark as Done', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
@@ -68,22 +67,16 @@ class _TodoPageState extends State<TodoPage> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          if (_todo.notes.isNotEmpty)
-            ListTile(
-              leading: Icon(Icons.notes),
-              title: Text('Notes', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-              subtitle: Text(_todo.notes),
-            ),
           ListTile(
             leading: Icon(Icons.flag),
             title: Text('Priority', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
             trailing: Chip(
               label: Text(_todo.priority),
-              backgroundColor: _todo.priority == 'High'
+              backgroundColor: _todo.priority == Constants.priority[2]
                   ? Colors.redAccent
-                  : _todo.priority == 'Medium'
+                  : _todo.priority == Constants.priority[1]
                       ? Colors.orangeAccent
-                      : _todo.priority == 'Low'
+                      : _todo.priority == Constants.priority[0]
                           ? Colors.green
                           : Colors.grey,
               labelStyle: TextStyle(color: Colors.white),
@@ -92,7 +85,7 @@ class _TodoPageState extends State<TodoPage> {
           ListTile(
             leading: Icon(Icons.repeat),
             title: Text('Repeat', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(_todo.repeatOption == 'never'
+            subtitle: Text(_todo.repeatOption == Constants.repeatOptions[0]
                 ? 'Does not repeat'
                 : '${_todo.repeatOption} (${_todo.selectedDays.join(", ")})'),
           ),
@@ -109,19 +102,8 @@ class _TodoPageState extends State<TodoPage> {
           ListTile(
             leading: Icon(isDone ? Icons.check_circle : Icons.radio_button_unchecked),
             title: Text('Status', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-            subtitle: Text(isDone ? 'Completed' : 'Ongoing'),
+            subtitle: Text(_todo.todoStatus == Constants.todoStatus[1] ? Constants.todoStatus[1] : Constants.todoStatus[0]),
           ),
-          if (_todo.attachments.isNotEmpty)
-            ListTile(
-              leading: Icon(Icons.attach_file),
-              title: Text('Attachments', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-              subtitle: Wrap(
-                spacing: 8,
-                children: _todo.attachments
-                    .map((file) => Chip(label: Text(file.path.split('/').last)))
-                    .toList(),
-              ),
-            ),
         ],
       ),
     );

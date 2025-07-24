@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/image_model.dart';
 import 'package:planora/models/task_model.dart';
+import 'package:planora/models/todo_model.dart';
 import 'package:planora/models/user_model.dart';
 
 class FirebaseFirestoreService {
@@ -21,6 +22,9 @@ class FirebaseFirestoreService {
 
   // Reference to the 'images' collection
   CollectionReference get _imagesCollection => _firestore.collection('images');
+
+  // Reference to the 'todos' collection
+  CollectionReference get _todosCollection => _firestore.collection('todos');
 
   // Create a new user document in Firestore
   Future<void> createUserDocument({
@@ -92,5 +96,15 @@ class FirebaseFirestoreService {
   // Update task document in Firestore
   Future<void> updateTaskDocument(String id, TaskModel updatedTask) async {
     await _tasksCollection.doc(id).update(updatedTask.toFirestore());
+  }
+
+  // Create a new todo document in Firestore
+  Future<void> createTodoDocument({required TodoModel todo}) async {
+    await _todosCollection.doc(todo.id).set(todo.toFirestore());
+  }
+
+  // Update todo document in Firestore
+  Future<void> updateTodoDocument(String id, TodoModel updatedTodo) async {
+    await _todosCollection.doc(id).update(updatedTodo.toFirestore());
   }
 }

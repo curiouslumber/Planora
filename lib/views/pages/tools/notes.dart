@@ -160,6 +160,19 @@ class _NotesState extends State<Notes> {
       appBar: AppBar(
         title: Text("Notes"),
         actionsPadding: EdgeInsets.only(right: 24.0),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new),
+          onPressed: () => {
+            if (mode == NoteMode.none) {
+              Navigator.pop(context),
+            } else {
+              setState(() {
+                mode = NoteMode.none;
+                selectedIndex = null;
+              }),
+            },
+          },
+        ),
         actions: [
           if (selectedNoteIndices.isNotEmpty) ...[
             IconButton(
@@ -230,7 +243,7 @@ class _NotesState extends State<Notes> {
                                           color:
                                               Theme.of(
                                                 context,
-                                              ).colorScheme.tertiary,
+                                              ).colorScheme.primary,
                                           borderRadius: BorderRadius.circular(
                                             16,
                                           ),
@@ -258,8 +271,14 @@ class _NotesState extends State<Notes> {
                                                     color:
                                                         Theme.of(
                                                           context,
-                                                        ).colorScheme.primary,
+                                                        ).colorScheme.onPrimary,
                                                   ),
+                                            ),
+                                            Divider(
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary,
                                             ),
                                             Text(
                                               notes[index].text,
@@ -271,7 +290,7 @@ class _NotesState extends State<Notes> {
                                                 color:
                                                     Theme.of(
                                                       context,
-                                                    ).colorScheme.primary,
+                                                    ).colorScheme.onPrimary,
                                               ),
                                             ),
                                           ],
@@ -339,11 +358,7 @@ class _NotesState extends State<Notes> {
       floatingActionButton:
           mode == NoteMode.none
               ? FloatingActionButton(
-                shape: CircleBorder(
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                ),
+                shape: CircleBorder(),
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 child: const Icon(Icons.add),

@@ -13,6 +13,7 @@ import 'package:planora/models/meetings_model.dart';
 import 'package:planora/models/notes_model.dart';
 import 'package:planora/models/people_model.dart';
 import 'package:planora/models/task_model.dart';
+import 'package:planora/models/todo_model.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/home_page.dart';
 
@@ -31,6 +32,7 @@ void main() async {
   Hive.registerAdapter(MeetingsModelAdapter());
   Hive.registerAdapter(PeopleModelAdapter());
   Hive.registerAdapter(TaskModelAdapter());
+  Hive.registerAdapter(TodoModelAdapter());
   runApp(PlanoraApp(initialTheme: initialTheme));
 }
 

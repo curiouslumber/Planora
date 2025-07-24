@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/views/pages/tools/events.dart';
+import 'package:planora/views/pages/tools/notes.dart';
 // import 'package:planora/views/pages/tools/tasks/tasks.dart';
 import 'package:planora/views/pages/tools/todos/todos.dart';
 // import 'package:planora/widgets/common_snackbar.dart';
@@ -34,6 +36,11 @@ class Tools extends StatelessWidget {
           title: 'Todos',
           icon: Icons.task_alt,
           page: const Todos(),
+        ),
+        ToolItem(
+          title: 'Notes',
+          icon: Ionicons.book_outline,
+          page: const Notes(),
         ),
         const ToolItem(
           title: 'Add',

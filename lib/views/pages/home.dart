@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
-import 'package:planora/models/task_model.dart';
+import 'package:planora/models/todo_model.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/cache_manager.dart';
@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
 
   // Event lists
   List<EventModel> _events = [];
-  List<TaskModel> _todos = [];
+  List<TodoModel> _todos = [];
 
   // LIFECYCLE METHODS
   @override
@@ -59,15 +59,15 @@ class _HomeState extends State<Home> {
 
   Future<void> _fetchEventsAndTasks() async {
     _events = await HiveEvents.getEventsFromHive();
-    _todos = await HiveEvents.getTasksFromHive();
+    _todos = await HiveEvents.getTodosFromHive();
     _processTasks();
     _processEvents();
   }
 
   void _processTasks() {
     _todos.sort((a, b) {
-      final aIsOngoing = a.taskStatus != Constants.todoStatus[1];
-      final bIsOngoing = b.taskStatus != Constants.todoStatus[1];
+      final aIsOngoing = a.todoStatus != Constants.todoStatus[1];
+      final bIsOngoing = b.todoStatus != Constants.todoStatus[1];
       if (aIsOngoing != bIsOngoing) {
         return aIsOngoing ? -1 : 1;
       }
@@ -127,21 +127,19 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void markTaskComplete(TaskModel task, int index) {
-    TaskModel updatedTask = task.copyWith(
-      name: task.name,
-      notes: task.notes,
-      doesRepeat: task.doesRepeat,
-      repeatOption: task.repeatOption,
-      selectedDays: task.selectedDays,
-      taskStatus: Constants.todoStatus[1],
-      attachments: task.attachments,
-      createdAt: task.createdAt,
+  void markTodoComplete(TodoModel todo, int selectedIndex) {
+    TodoModel updatedTodo = todo.copyWith(
+      todo: todo.todo,
+      doesRepeat: todo.doesRepeat,
+      repeatOption: todo.repeatOption,
+      selectedDays: todo.selectedDays,
+      todoStatus: Constants.todoStatus[1],
+      createdAt: todo.createdAt,
       updatedAt: DateTime.now(),
-      priority: task.priority,
+      priority: todo.priority,
     );
-    HiveEvents.updateTaskInHive(updatedTask);
-    FirebaseFirestoreService().updateTaskDocument(task.id, updatedTask);
+    HiveEvents.updateTodoInHive(updatedTodo);
+    FirebaseFirestoreService().updateTodoDocument(todo.id, updatedTodo);
     _loadData();
     if (mounted) {
       setState(() {});
@@ -679,7 +677,7 @@ class _HomeState extends State<Home> {
                         Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Text(
-                            '${_todos.where((t) => t.taskStatus == Constants.todoStatus[1]).length} of ${_todos.length} ${_todos.length == 1 ? "task" : "tasks"} completed',
+                            '${_todos.where((t) => t.todoStatus == Constants.todoStatus[1]).length} of ${_todos.length} ${_todos.length == 1 ? "task" : "tasks"} completed',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14,
@@ -731,7 +729,7 @@ class _HomeState extends State<Home> {
                               right: 16.0,
                             ),
                             title: Text(
-                              _todos[index].name,
+                              _todos[index].todo,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 14,
@@ -799,15 +797,15 @@ class _HomeState extends State<Home> {
                             ),
                             trailing: Checkbox(
                               value:
-                                  _todos[index].taskStatus ==
+                                  _todos[index].todoStatus ==
                                   Constants.todoStatus[1],
                               onChanged: (value) {
-                                if (_todos[index].taskStatus ==
+                                if (_todos[index].todoStatus ==
                                     Constants.todoStatus[1]) {
                                   return;
                                 }
                                 if (value != null) {
-                                  markTaskComplete(_todos[index], index);
+                                  markTodoComplete(_todos[index], index);
                                 }
                               },
                               checkColor:
