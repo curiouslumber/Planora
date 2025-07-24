@@ -21,17 +21,21 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
       userId: fields[1] as String,
       name: fields[2] as String,
       notes: fields[3] as String,
-      taskStatus: fields[4] as String,
-      attachments: (fields[5] as List).cast<File>(),
-      createdAt: fields[6] as DateTime,
-      updatedAt: fields[7] as DateTime,
+      doesRepeat: fields[4] as bool,
+      repeatOption: fields[5] as String,
+      selectedDays: (fields[6] as List).cast<String>(),
+      taskStatus: fields[7] as String,
+      attachments: (fields[8] as List).cast<File>(),
+      createdAt: fields[9] as DateTime,
+      updatedAt: fields[10] as DateTime,
+      priority: fields[11] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, TaskModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,13 +45,21 @@ class TaskModelAdapter extends TypeAdapter<TaskModel> {
       ..writeByte(3)
       ..write(obj.notes)
       ..writeByte(4)
-      ..write(obj.taskStatus)
+      ..write(obj.doesRepeat)
       ..writeByte(5)
-      ..write(obj.attachments)
+      ..write(obj.repeatOption)
       ..writeByte(6)
-      ..write(obj.createdAt)
+      ..write(obj.selectedDays)
       ..writeByte(7)
-      ..write(obj.updatedAt);
+      ..write(obj.taskStatus)
+      ..writeByte(8)
+      ..write(obj.attachments)
+      ..writeByte(9)
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.updatedAt)
+      ..writeByte(11)
+      ..write(obj.priority);
   }
 
   @override

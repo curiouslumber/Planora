@@ -30,7 +30,7 @@ class Tools extends StatelessWidget {
           page: Events(user: user),
         ),
         ToolItem(
-          title: 'Tasks',
+          title: 'Todos',
           icon: Icons.task_alt,
           page: const Tasks(),
         ),

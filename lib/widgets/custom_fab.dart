@@ -3,9 +3,9 @@ import 'package:ionicons/ionicons.dart';
 
 class CustomFab extends StatefulWidget {
   final VoidCallback? onCreateEvent;
-  final VoidCallback? onCreateTask;
+  final VoidCallback? onCreateTodo;
 
-  const CustomFab({super.key, this.onCreateEvent, this.onCreateTask});
+  const CustomFab({super.key, this.onCreateEvent, this.onCreateTodo});
 
   @override
   State<CustomFab> createState() => _CustomFabState();
@@ -55,18 +55,18 @@ class _CustomFabState extends State<CustomFab> {
                   },
                 ),
 
-                // Task button
+                // Todo button
                 FloatingActionButton.extended(
-                  heroTag: 'task',
+                  heroTag: 'todo',
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   onPressed: () {
-                    if (widget.onCreateTask != null) {
-                      widget.onCreateTask!();
+                    if (widget.onCreateTodo != null) {
+                      widget.onCreateTodo!();
                     }
                     _toggle();
                   },
                   label: Text(
-                    'Task',
+                    'Todo',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),

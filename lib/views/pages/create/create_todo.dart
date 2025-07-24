@@ -9,16 +9,17 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:uuid/uuid.dart';
 
-class CreateTask extends StatefulWidget {
-  const CreateTask({super.key, this.user});
+class CreateTodo extends StatefulWidget {
+  const CreateTodo({super.key, this.user});
 
   final UserModel? user;
 
   @override
-  State<CreateTask> createState() => _CreateTaskState();
+  State<CreateTodo> createState() => _CreateTodoState();
 }
 
-class _CreateTaskState extends State<CreateTask> {
+class _CreateTodoState extends State<CreateTodo> {
+  String _priority = 'Low';
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   DateTime? startDate;
@@ -53,7 +54,7 @@ class _CreateTaskState extends State<CreateTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Task')),
+      appBar: AppBar(title: const Text('Create Todo')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
         child: Column(
@@ -67,7 +68,7 @@ class _CreateTaskState extends State<CreateTask> {
               spacing: 8.0,
               children: [
                 Text(
-                  'Task',
+                  'Todo',
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeights.regular,
@@ -127,7 +128,7 @@ class _CreateTaskState extends State<CreateTask> {
                   textCapitalization: TextCapitalization.none,
                   autocorrect: true,
                   maxLines: null,
-                  minLines: 8,
+                  minLines: 3,
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeights.regular,
@@ -173,19 +174,25 @@ class _CreateTaskState extends State<CreateTask> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                DropdownButton<String>(
-                  value: repeatOption,
-                  items: Constants.repeatOptions.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (value) {
-                    if (value == "never" || value == "daily") {
-                      selectedDays = [];
-                    }
-                    setState(() {
-                      repeatOption = value!;
-                      selectedDays = [];
-                    });
-                  },
-                ),
+                    DropdownButton<String>(
+                      value: repeatOption,
+                      items:
+                          Constants.repeatOptions
+                              .map(
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
+                              )
+                              .toList(),
+                      onChanged: (value) {
+                        if (value == "never" || value == "daily") {
+                          selectedDays = [];
+                        }
+                        setState(() {
+                          repeatOption = value!;
+                          selectedDays = [];
+                        });
+                      },
+                    ),
                   ],
                 ),
                 LayoutBuilder(
@@ -203,10 +210,14 @@ class _CreateTaskState extends State<CreateTask> {
                             labelStyle: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                            selectedColor: Theme.of(context).colorScheme.primary,
-                            selected: selectedDays.contains(recurringEventDays[index]),
+                            selectedColor:
+                                Theme.of(context).colorScheme.primary,
+                            selected: selectedDays.contains(
+                              recurringEventDays[index],
+                            ),
                             onSelected: (value) {
-                              if (repeatOption == "never" || repeatOption == "daily") {
+                              if (repeatOption == "never" ||
+                                  repeatOption == "daily") {
                                 selectedDays = [];
                                 return;
                               }
@@ -214,21 +225,49 @@ class _CreateTaskState extends State<CreateTask> {
                                 if (value) {
                                   selectedDays.add(recurringEventDays[index]);
                                 } else {
-                                  selectedDays.remove(recurringEventDays[index]);
+                                  selectedDays.remove(
+                                    recurringEventDays[index],
+                                  );
                                 }
                               });
                             },
                             label: FittedBox(
                               fit: BoxFit.fitHeight,
-                              child: Text(
-                                recurringEventDays[index],
-                              ),
+                              child: Text(recurringEventDays[index]),
                             ),
                             shape: CircleBorder(),
                           ),
                         ),
                       ),
                     );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Priority',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeights.regular,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                DropdownButton<String>(
+                  value: _priority,
+                  items:
+                      ['Low', 'Medium', 'High']
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _priority = value!;
+                    });
                   },
                 ),
               ],
@@ -256,6 +295,7 @@ class _CreateTaskState extends State<CreateTask> {
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
             taskStatus: Constants.taskStatus[0],
+            priority: _priority,
           );
 
           addTask(task);

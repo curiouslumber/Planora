@@ -4,7 +4,7 @@ import 'package:planora/models/user_model.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/pages/calendar.dart';
 import 'package:planora/views/pages/create/create_event.dart';
-import 'package:planora/views/pages/create/create_task.dart';
+import 'package:planora/views/pages/create/create_todo.dart';
 import 'package:planora/views/pages/guest.dart';
 import 'package:planora/views/pages/home.dart';
 import 'package:planora/views/pages/profile.dart';
@@ -126,11 +126,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-            onCreateTask: () {
+            onCreateTodo: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CreateTask(user: widget.user),
+                  builder: (context) => CreateTodo(user: widget.user),
                 ),
               );
             },

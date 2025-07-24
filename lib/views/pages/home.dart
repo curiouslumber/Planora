@@ -131,10 +131,14 @@ class _HomeState extends State<Home> {
     TaskModel updatedTask = task.copyWith(
       name: task.name,
       notes: task.notes,
+      doesRepeat: task.doesRepeat,
+      repeatOption: task.repeatOption,
+      selectedDays: task.selectedDays,
       taskStatus: Constants.taskStatus[1],
       attachments: task.attachments,
       createdAt: task.createdAt,
       updatedAt: DateTime.now(),
+      priority: task.priority,
     );
     HiveEvents.updateTaskInHive(updatedTask);
     FirebaseFirestoreService().updateTaskDocument(task.id, updatedTask);
@@ -665,7 +669,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Tasks',
+                          'Todos',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
@@ -691,7 +695,7 @@ class _HomeState extends State<Home> {
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.06,
                         child: Text(
-                          "No tasks.",
+                          "No todos.",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,

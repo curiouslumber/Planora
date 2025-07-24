@@ -293,7 +293,7 @@ class _EventPageState extends State<EventPage> {
                 spacing: 16.0,
                 children: [
                   Text(
-                    "Meeting with Hansel",
+                    widget.event.name,
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeights.bold,
                     ),

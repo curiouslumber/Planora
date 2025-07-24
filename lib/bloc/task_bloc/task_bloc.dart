@@ -38,10 +38,14 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     _currentTask = _currentTask!.copyWith(
       name: event.name ?? _currentTask!.name,
       notes: event.notes ?? _currentTask!.notes,
+      doesRepeat: _currentTask!.doesRepeat,
+      repeatOption: _currentTask!.repeatOption,
+      selectedDays: _currentTask!.selectedDays,
       taskStatus: event.taskStatus ?? _currentTask!.taskStatus,
       attachments: _currentTask!.attachments,
       createdAt: _currentTask!.createdAt,
       updatedAt: DateTime.now(),
+      priority: _currentTask!.priority,
     );
     emit(TaskLoaded(_currentTask!));
 

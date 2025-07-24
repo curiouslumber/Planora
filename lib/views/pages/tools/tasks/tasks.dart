@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/task_model.dart';
-import 'package:planora/views/pages/create/create_task.dart';
+import 'package:planora/views/pages/create/create_todo.dart';
 import 'package:planora/views/pages/tools/tasks/task_page.dart';
 
 class Tasks extends StatefulWidget {
@@ -135,7 +135,7 @@ class _TasksState extends State<Tasks> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CreateTask()),
+            MaterialPageRoute(builder: (context) => const CreateTodo()),
           );
         },
         child: const Icon(Icons.add),
