@@ -12,7 +12,7 @@ import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
-import 'package:planora/views/pages/tools/tasks/task_page.dart';
+import 'package:planora/views/pages/tools/todos/todo_page.dart';
 import 'package:planora/widgets/search_bar_delegate.dart';
 import 'package:planora/widgets/step_progress_indicator.dart';
 
@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
 
   // Event lists
   List<EventModel> _events = [];
-  List<TaskModel> _tasks = [];
+  List<TaskModel> _todos = [];
 
   // LIFECYCLE METHODS
   @override
@@ -59,15 +59,15 @@ class _HomeState extends State<Home> {
 
   Future<void> _fetchEventsAndTasks() async {
     _events = await HiveEvents.getEventsFromHive();
-    _tasks = await HiveEvents.getTasksFromHive();
+    _todos = await HiveEvents.getTasksFromHive();
     _processTasks();
     _processEvents();
   }
 
   void _processTasks() {
-    _tasks.sort((a, b) {
-      final aIsOngoing = a.taskStatus != Constants.taskStatus[1];
-      final bIsOngoing = b.taskStatus != Constants.taskStatus[1];
+    _todos.sort((a, b) {
+      final aIsOngoing = a.taskStatus != Constants.todoStatus[1];
+      final bIsOngoing = b.taskStatus != Constants.todoStatus[1];
       if (aIsOngoing != bIsOngoing) {
         return aIsOngoing ? -1 : 1;
       }
@@ -134,7 +134,7 @@ class _HomeState extends State<Home> {
       doesRepeat: task.doesRepeat,
       repeatOption: task.repeatOption,
       selectedDays: task.selectedDays,
-      taskStatus: Constants.taskStatus[1],
+      taskStatus: Constants.todoStatus[1],
       attachments: task.attachments,
       createdAt: task.createdAt,
       updatedAt: DateTime.now(),
@@ -679,7 +679,7 @@ class _HomeState extends State<Home> {
                         Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Text(
-                            '${_tasks.where((t) => t.taskStatus == Constants.taskStatus[1]).length} of ${_tasks.length} ${_tasks.length == 1 ? "task" : "tasks"} completed',
+                            '${_todos.where((t) => t.taskStatus == Constants.todoStatus[1]).length} of ${_todos.length} ${_todos.length == 1 ? "task" : "tasks"} completed',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14,
@@ -690,7 +690,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    if (_tasks.isEmpty)
+                    if (_todos.isEmpty)
                       Container(
                         alignment: Alignment.center,
                         height: MediaQuery.of(context).size.height * 0.06,
@@ -710,7 +710,7 @@ class _HomeState extends State<Home> {
                         separatorBuilder: (context, index) {
                           return SizedBox(height: 16);
                         },
-                        itemCount: _tasks.length,
+                        itemCount: _todos.length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             onTap: () {
@@ -719,7 +719,7 @@ class _HomeState extends State<Home> {
                                 MaterialPageRoute(
                                   builder:
                                       (context) =>
-                                          TaskPage(task: _tasks[index]),
+                                          TodoPage(todo: _todos[index]),
                                 ),
                               );
                             },
@@ -729,10 +729,11 @@ class _HomeState extends State<Home> {
                             contentPadding: EdgeInsets.only(
                               left: 16.0,
                               right: 16.0,
+                              top: 2.0,
+                              bottom: 2.0,
                             ),
-                            minVerticalPadding: 0.0,
                             title: Text(
-                              _tasks[index].name,
+                              _todos[index].name,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 14,
@@ -743,33 +744,57 @@ class _HomeState extends State<Home> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            subtitle:
-                                _tasks[index].notes.isNotEmpty
-                                    ? Text(
-                                      _tasks[index].notes,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 1.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Chip(
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    label: Text(
+                                      _todos[index].priority,
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
-                                            .withValues(alpha: 0.7),
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
                                         fontSize: 12,
-                                        fontWeight: FontWeights.regular,
                                       ),
-                                    )
-                                    : null,
+                                    ),
+                                    backgroundColor:
+                                        _todos[index].priority == 'High'
+                                            ? Colors.redAccent
+                                            : _todos[index].priority == 'Medium'
+                                            ? Colors.orangeAccent
+                                            : _todos[index].priority == 'Low'
+                                            ? Colors.green
+                                            : Colors.grey,
+                                    labelStyle: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeights.medium,
+                                    ),
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ],
+                              ),
+                            ),
                             trailing: Checkbox(
                               value:
-                                  _tasks[index].taskStatus ==
-                                  Constants.taskStatus[1],
+                                  _todos[index].taskStatus ==
+                                  Constants.todoStatus[1],
                               onChanged: (value) {
-                                if (_tasks[index].taskStatus ==
-                                    Constants.taskStatus[1]) {
+                                if (_todos[index].taskStatus ==
+                                    Constants.todoStatus[1]) {
                                   return;
                                 }
                                 if (value != null) {
-                                  markTaskComplete(_tasks[index], index);
+                                  markTaskComplete(_todos[index], index);
                                 }
                               },
                               checkColor:

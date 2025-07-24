@@ -57,7 +57,7 @@ class _EventPageState extends State<EventPage> {
     HiveEvents.deleteEventFromHive(widget.event);
     Navigator.pop(context);
     setState(() {});
-    CommonSnackbar.showSnackbar(context, 'Event deleted successfully');
+    CommonSnackbar.showSnackbar(context, 'Event deleted successfully', Theme.of(context).colorScheme.primary);
   }
 
   @override

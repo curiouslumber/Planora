@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/views/pages/tools/events.dart';
-import 'package:planora/views/pages/tools/people.dart';
 import 'package:planora/views/pages/tools/tasks/tasks.dart';
+// import 'package:planora/widgets/common_snackbar.dart';
 
 class ToolItem {
   final String title;
@@ -33,11 +33,6 @@ class Tools extends StatelessWidget {
           title: 'Todos',
           icon: Icons.task_alt,
           page: const Tasks(),
-        ),
-        ToolItem(
-          title: 'People',
-          icon: Icons.people,
-          page: const People(),
         ),
         const ToolItem(
           title: 'Add',
@@ -144,19 +139,7 @@ class Tools extends StatelessWidget {
 
   void _handleToolTap(BuildContext context, ToolItem tool) {
     if (tool.isComingSoon) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          content: Text(
-            'Coming soon!',
-            style: TextStyle(
-              fontSize: 18.0,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-          ),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      // CommonSnackbar.showSnackbar(context, 'Coming soon!', Theme.of(context).colorScheme.primary);
     } else if (tool.page != null) {
       Navigator.push(
         context,

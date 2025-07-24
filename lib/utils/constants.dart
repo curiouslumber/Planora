@@ -7,7 +7,7 @@ class Constants {
     "cancelled",
   ];
 
-  static const List<String> taskStatus = ["ongoing", "completed"];
+  static const List<String> todoStatus = ["pending", "completed"];
 
   static const String greetingMorning = "Good Morning";
   static const String greetingAfternoon = "Good Afternoon";

@@ -294,7 +294,7 @@ class _CreateTodoState extends State<CreateTodo> {
             notes: _descriptionController.text,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
-            taskStatus: Constants.taskStatus[0],
+            taskStatus: Constants.todoStatus[0],
             priority: _priority,
           );
 

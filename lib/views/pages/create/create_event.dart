@@ -46,14 +46,14 @@ class _CreateEventState extends State<CreateEvent> {
     await HiveEvents.addEventToHive(event);
     EventTaskImageService.handleImageTileForEvent(event);
     if (!mounted) return;
-    CommonSnackbar.showSnackbar(context, 'Event added successfully');
+    CommonSnackbar.showSnackbar(context, 'Event added successfully', Theme.of(context).colorScheme.primary);
   }
 
   Future<void> addTask(TaskModel task) async {
     await FirebaseFirestoreService().createTaskDocument(task: task);
     await HiveEvents.addTaskToHive(task);
     if (!mounted) return;
-    CommonSnackbar.showSnackbar(context, 'Task added successfully');
+    CommonSnackbar.showSnackbar(context, 'Task added successfully', Theme.of(context).colorScheme.primary);
   }
 
   void _clearAllFields() {
@@ -99,7 +99,7 @@ class _CreateEventState extends State<CreateEvent> {
                           TextButton(
                             onPressed: () {
                               _clearAllFields();
-                              CommonSnackbar.showSnackbar(context, 'All fields cleared');
+                              CommonSnackbar.showSnackbar(context, 'All fields cleared', Theme.of(context).colorScheme.primary);
                               Navigator.pop(context);
                             },
                             child: Text('Clear', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
@@ -109,7 +109,7 @@ class _CreateEventState extends State<CreateEvent> {
                 );
               } else {
                 _clearAllFields();
-                CommonSnackbar.showSnackbar(context, 'All fields cleared');
+                CommonSnackbar.showSnackbar(context, 'All fields cleared', Theme.of(context).colorScheme.primary);
               }
             },
           ),

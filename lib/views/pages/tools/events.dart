@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
 import 'package:planora/models/user_model.dart';
@@ -107,10 +108,7 @@ class _EventsState extends State<Events> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => EventPage(
-                            event: event,
-                          ),
+                      builder: (context) => EventPage(event: event),
                     ),
                   );
                 }
@@ -126,7 +124,7 @@ class _EventsState extends State<Events> {
                     Expanded(
                       flex: 2,
                       child: Stack(
-                      children: [
+                        children: [
                           FutureBuilder<File?>(
                             future: CustomImageCacheManager()
                                 .getCachedImageByEventId(event.id),
@@ -172,24 +170,24 @@ class _EventsState extends State<Events> {
                               }
                             },
                           ),
-                        Positioned(
-                          top: 8.0,
-                          right: 8.0,
-                          child: Container(
+                          Positioned(
+                            top: 8.0,
+                            right: 8.0,
+                            child: Container(
                               padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onPrimary.withAlpha(200),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withAlpha(200),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.edit,
+                                color: Theme.of(context).colorScheme.primary,
                                 size: 16.0,
+                              ),
                             ),
                           ),
-                        ),
                           if (checkedEvents.contains(index) ||
                               mode == EventMode.selecting)
                             Positioned(
@@ -211,99 +209,101 @@ class _EventsState extends State<Events> {
                                 ),
                               ),
                             ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        spacing: 8.0,
-                        children: [
-                          Flexible(
-                            flex: 5,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    event.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium!.copyWith(
-                                    fontWeight: FontWeights.medium,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                ),
-                                Text(
-                                    event.description,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodySmall!.copyWith(
-                                    fontWeight: FontWeights.light,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          VerticalDivider(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            indent: 16.0,
-                            endIndent: 16.0,
-                          ),
-                          Flexible(
-                            flex: 3,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                FittedBox(
-                                  child: Text(
-                                      DateTime.parse(
-                                        event.startDate,
-                                      ).toString(),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium!.copyWith(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
-                                    ),
-                                  ),
-                                ),
-                                FittedBox(
-                                  child: Text(
-                                      "${DateTime.parse(event.startTime).hour}:${DateTime.parse(event.startTime).minute} - ${DateTime.parse(event.endTime).hour}:${DateTime.parse(event.endTime).minute}",
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium!.copyWith(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          spacing: 8.0,
+                          children: [
+                            Flexible(
+                              flex: 5,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    event.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium!.copyWith(
+                                      fontWeight: FontWeights.medium,
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                  Text(
+                                    event.eventStatus,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium!.copyWith(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            VerticalDivider(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              indent: 16.0,
+                              endIndent: 16.0,
+                            ),
+                            Flexible(
+                              flex: 3,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                spacing: 4.0,
+                                children: [
+                                  FittedBox(
+                                    child: Text(
+                                      DateFormat(
+                                        'EEE, MMM d',
+                                      ).format(DateTime.parse(event.startDate)),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  FittedBox(
+                                    child: Text(
+                                      '${DateFormat("jm").format(DateTime.parse(event.startTime))} ${event.endTime != event.startTime ? '- ${DateFormat("jm").format(DateTime.parse(event.endTime))}' : ''}',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -326,4 +326,3 @@ class _EventsState extends State<Events> {
     );
   }
 }
-  

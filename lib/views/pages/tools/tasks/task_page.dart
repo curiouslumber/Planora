@@ -38,7 +38,7 @@ class _TaskPageState extends State<TaskPage> {
     HiveEvents.deleteTaskFromHive(widget.task);
     Navigator.pop(context);
     setState(() {});
-    CommonSnackbar.showSnackbar(context, 'Task deleted successfully');
+    CommonSnackbar.showSnackbar(context, 'Task deleted successfully', Theme.of(context).colorScheme.primary);
   }
 
   @override
