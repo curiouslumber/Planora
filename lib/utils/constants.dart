@@ -21,4 +21,6 @@ class Constants {
     75: "Almost there, just a little more!",
     100: "You’ve completed everything for today!",
   };
+
+  static const List<String> repeatOptions = ["never", "daily", "weekly", "monthly", "yearly"];
 }

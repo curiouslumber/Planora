@@ -27,8 +27,10 @@ class _CreateTaskState extends State<CreateTask> {
   DateTime? endTime;
   Set<PeopleModel> addedPeople = {};
   String taskOrEvent = "task";
-  List<String> recurringEventDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+  List<String> recurringEventDays = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
   bool isRecurring = false;
+  String repeatOption = "never";
+  List<String> selectedDays = [];
 
   void addPeople(PeopleModel people) {
     setState(() {
@@ -53,10 +55,7 @@ class _CreateTaskState extends State<CreateTask> {
     return Scaffold(
       appBar: AppBar(title: const Text('Create Task')),
       body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24.0,
-          vertical: 8.0,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,46 +161,78 @@ class _CreateTaskState extends State<CreateTask> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 8.0,
-              children:  [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                     "Repeat",
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Repeat",
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeights.regular,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                    Switch(value: isRecurring, onChanged: (value) {
-                      setState(() {
-                        isRecurring = value;
-                      });
-                    })
-                ],
-              ),
-               LayoutBuilder(
-                 builder: (context, constraints) {
-                   final chipWidth = (constraints.maxWidth / recurringEventDays.length) - 4;
-                   return Wrap(
-                     spacing: 4.0,
-                     runSpacing: 4.0,
-                     children: List.generate(
-                       recurringEventDays.length,
-                       (index) => SizedBox(
-                         width: chipWidth,
-                         child: Chip(
-                          padding: EdgeInsets.all(6.0),
-                           label: FittedBox(child: Text(recurringEventDays[index])),
-                           shape: CircleBorder(),
-                         ),
-                       ),
-                     ),
-                   );
-                 },
-               )
-            ],)
+                DropdownButton<String>(
+                  value: repeatOption,
+                  items: Constants.repeatOptions.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                  onChanged: (value) {
+                    if (value == "never" || value == "daily") {
+                      selectedDays = [];
+                    }
+                    setState(() {
+                      repeatOption = value!;
+                      selectedDays = [];
+                    });
+                  },
+                ),
+                  ],
+                ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final chipWidth =
+                        (constraints.maxWidth / recurringEventDays.length) - 4;
+                    return Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
+                      children: List.generate(
+                        recurringEventDays.length,
+                        (index) => SizedBox(
+                          width: chipWidth,
+                          child: FilterChip(
+                            labelStyle: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            selectedColor: Theme.of(context).colorScheme.primary,
+                            selected: selectedDays.contains(recurringEventDays[index]),
+                            onSelected: (value) {
+                              if (repeatOption == "never" || repeatOption == "daily") {
+                                selectedDays = [];
+                                return;
+                              }
+                              setState(() {
+                                if (value) {
+                                  selectedDays.add(recurringEventDays[index]);
+                                } else {
+                                  selectedDays.remove(recurringEventDays[index]);
+                                }
+                              });
+                            },
+                            label: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Text(
+                                recurringEventDays[index],
+                              ),
+                            ),
+                            shape: CircleBorder(),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
