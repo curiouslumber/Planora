@@ -426,12 +426,12 @@ class _EventPageState extends State<EventPage> {
                   onPressed: null, // disabled
                   icon: Icon(
                     Icons.check,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   label: Text(
                     'Event Completed',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
