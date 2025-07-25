@@ -1,10 +1,9 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
-import 'package:planora/models/people_model.dart';
-import 'package:planora/models/task_model.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/services/common/event_task_image_service.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
@@ -12,7 +11,6 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/widgets/common_snackbar.dart';
 import 'package:uuid/uuid.dart';
-
 class CreateEvent extends StatefulWidget {
   const CreateEvent({super.key, this.user});
 
@@ -29,31 +27,82 @@ class _CreateEventState extends State<CreateEvent> {
   DateTime? endDate;
   DateTime? startTime;
   DateTime? endTime;
-  Set<PeopleModel> addedPeople = {};
   String taskOrEvent = "event";
   String repeatOption = "never";
   List<String> selectedDays = [];
   List<String> recurringEventDays = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
 
-  void addPeople(PeopleModel people) {
-    setState(() {
-      addedPeople.add(people);
-    });
-  }
-
   Future<void> addEvent(EventModel event) async {
-    await FirebaseFirestoreService().createEventDocument(event: event);
-    await HiveEvents.addEventToHive(event);
-    EventTaskImageService.handleImageTileForEvent(event);
-    if (!mounted) return;
-    CommonSnackbar.showSnackbar(context, 'Event added successfully', Theme.of(context).colorScheme.primary);
+    try {
+      // First try to save to Firestore if online
+      bool isOnline = await _checkInternetConnection();
+      
+      if (isOnline) {
+        await FirebaseFirestoreService().createEventDocument(event: event);
+      } else {
+        // If offline, just save to local storage
+        event = event.copyWith(isSynced: false);
+      }
+      
+      // Always save to local Hive storage
+      await HiveEvents.addEventToHive(event);
+      
+      // Handle image processing if needed
+      if (event.eventTileImage.isNotEmpty) {
+        EventTaskImageService.handleImageTileForEvent(event);
+      }
+      
+      if (!mounted) return;
+      
+      // Show success message based on connectivity
+      if (isOnline) {
+        CommonSnackbar.showSnackbar(
+          context, 
+          'Event created successfully!', 
+          Theme.of(context).colorScheme.primary
+        );
+      } else {
+        CommonSnackbar.showSnackbar(
+          context, 
+          'Event saved offline and will sync when online', 
+          Colors.orange
+        );
+      }
+      
+    } catch (e) {
+      // If there's an error with Firestore, save to local storage
+      if (e.toString().contains('Exception') && !e.toString().contains('permission')) {
+        await HiveEvents.addEventToHive(event.copyWith(isSynced: false));
+        
+        if (mounted) {
+          CommonSnackbar.showSnackbar(
+            context, 
+            'Event saved offline due to network issues', 
+            Colors.orange
+          );
+        }
+      } else {
+        // Re-throw if it's a permission error or other critical error
+        if (mounted) {
+          CommonSnackbar.showSnackbar(
+            context, 
+            'Error: ${e.toString()}', 
+            Theme.of(context).colorScheme.error
+          );
+        }
+        rethrow;
+      }
+    }
   }
-
-  Future<void> addTask(TaskModel task) async {
-    await FirebaseFirestoreService().createTaskDocument(task: task);
-    await HiveEvents.addTaskToHive(task);
-    if (!mounted) return;
-    CommonSnackbar.showSnackbar(context, 'Task added successfully', Theme.of(context).colorScheme.primary);
+  
+  Future<bool> _checkInternetConnection() async {
+    try {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+      return connectivityResult != ConnectivityResult.none;
+    } catch (e) {
+      debugPrint('Error checking connectivity: $e');
+      return false; // Assume offline if there's an error
+    }
   }
 
   void _clearAllFields() {
@@ -576,14 +625,15 @@ class _CreateEventState extends State<CreateEvent> {
             endTime:
                 endTime != null ? endTime!.toString() : startTime!.toString(),
             eventStatus: Constants.eventStatus[0],
-            people: addedPeople.map((e) => e.id).toList(),
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
 
-          addEvent(event);
-
-          Navigator.pop(context);
+          await addEvent(event);
+          
+          if (mounted) {
+            Navigator.of(context).pop(event);
+          }
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
         label: Text(

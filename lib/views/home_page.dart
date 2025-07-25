@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planora/bloc/auth_bloc/auth_bloc.dart';
+import 'package:planora/models/event_model.dart';
 import 'package:planora/models/user_model.dart';
 import 'package:planora/repository/auth_repository.dart';
 import 'package:planora/views/pages/calendar.dart';
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Flag to control whether the custom (direct) animation overlay is active.
   bool _isCustomTransitionActive = false;
 
+  final _homeKey = GlobalKey<HomeState>();
 
   // Called when a bottom nav item is tapped.
   void _onBottomNavTap(int index) {
@@ -73,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
-      Home(user: widget.user, pageController: _pageController),
+      Home(key: _homeKey, user: widget.user, pageController: _pageController),
       Calendar(pageController: _pageController),
       Tools(user: widget.user),
       widget.user != null ? Profile(user: widget.user!) : Guest(),
@@ -118,13 +120,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           floatingActionButton: CustomFab(
-            onCreateEvent: () {
-              Navigator.push(
-                context,
+            onCreateEvent: () async {
+              final result = await Navigator.of(context).push<EventModel>(
                 MaterialPageRoute(
                   builder: (context) => CreateEvent(user: widget.user),
                 ),
               );
+              
+              if (result != null && mounted) {
+                // Refresh the events list
+                if (_homeKey.currentState != null) {
+                  _homeKey.currentState!.loadData();
+                }
+              }
             },
             onCreateTodo: () {
               Navigator.push(

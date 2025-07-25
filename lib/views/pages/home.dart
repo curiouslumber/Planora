@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
@@ -10,6 +12,7 @@ import 'package:planora/models/user_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/cache_manager.dart';
 import 'package:planora/utils/constants.dart';
+import 'package:planora/utils/event_bus.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 import 'package:planora/views/pages/tools/todos/todo_page.dart';
@@ -23,12 +26,13 @@ class Home extends StatefulWidget {
   final PageController? pageController;
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Home> createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
+class HomeState extends State<Home> {
   // STATE VARIABLES
   final TextEditingController _searchController = TextEditingController();
+  late StreamSubscription<ImageUpdateEvent> _imageUpdateSubscription;
 
   // Event lists
   List<EventModel> _events = [];
@@ -38,7 +42,43 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    loadData();
+    _setupImageUpdateListener();
+  }
+
+  @override
+  void dispose() {
+    _imageUpdateSubscription.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _setupImageUpdateListener() {
+    _imageUpdateSubscription = EventBus().onImageUpdated.listen((event) {
+      if (mounted) {
+        _refreshEvent(event.eventId);
+      }
+    });
+  }
+
+  Future<void> _refreshEvent(String eventId) async {
+    try {
+      // Get the latest event from Hive
+      final events = await HiveEvents.getEventsFromHive();
+      final updatedEvent = events.firstWhere((e) => e.id == eventId);
+
+      // Update the events list
+      setState(() {
+        final index = _events.indexWhere((e) => e.id == eventId);
+        if (index != -1) {
+          _events[index] = updatedEvent;
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing event: $e');
+      }
+    }
   }
 
   @override
@@ -46,13 +86,13 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (ModalRoute.of(context)?.isCurrent ?? false) {
-        _loadData();
+        loadData();
       }
     });
   }
 
   // DATA LOADING
-  Future<void> _loadData() async {
+  Future<void> loadData() async {
     await _fetchEventsAndTasks();
     if (mounted) setState(() {});
   }
@@ -121,7 +161,7 @@ class _HomeState extends State<Home> {
     );
     HiveEvents.updateEventInHive(updatedEvent);
     FirebaseFirestoreService().updateEventDocument(event.id, updatedEvent);
-    _loadData();
+    loadData();
     if (mounted) {
       setState(() {});
     }
@@ -140,7 +180,7 @@ class _HomeState extends State<Home> {
     );
     HiveEvents.updateTodoInHive(updatedTodo);
     FirebaseFirestoreService().updateTodoDocument(todo.id, updatedTodo);
-    _loadData();
+    loadData();
     if (mounted) {
       setState(() {});
     }
@@ -644,7 +684,7 @@ class _HomeState extends State<Home> {
                                     updatedAt: DateTime.now(),
                                   );
                                   HiveEvents.updateEventInHive(updatedEvent);
-                                  _loadData();
+                                  loadData();
                                   if (mounted) {
                                     setState(() {});
                                   }

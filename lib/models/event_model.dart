@@ -27,17 +27,17 @@ class EventModel {
   @HiveField(10)
   final String endTime;
   @HiveField(11)
-  final List<String>? people;
-  @HiveField(12)
   final String? meeting;
-  @HiveField(13)
+  @HiveField(12)
   final String eventStatus;
-  @HiveField(14)
+  @HiveField(13)
   final DateTime createdAt;
-  @HiveField(15)
+  @HiveField(14)
   final DateTime updatedAt;
-  @HiveField(16)
+  @HiveField(15)
   final Map<String, String>? attribution;
+  @HiveField(16, defaultValue: true)
+  final bool isSynced;
 
   EventModel({
     required this.id,
@@ -51,12 +51,12 @@ class EventModel {
     this.endDate,
     required this.startTime,
     required this.endTime,
-    this.people = const [],
     this.meeting,
     this.eventStatus = "upcoming",
     required this.createdAt,
     required this.updatedAt,
     this.attribution,
+    this.isSynced = true,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -71,43 +71,96 @@ class EventModel {
       'endDate': endDate,
       'startTime': startTime,
       'endTime': endTime,
-      'people': people,
       'meeting': meeting,
       'eventStatus': eventStatus,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'attribution': attribution,
+      'isSynced': isSynced,
     };
   }
 
   EventModel copyWith({
-    required String userId,
-    required String eventTileImage,
-    required String eventStatus,
-    required String eventTileImageLocalUrl,
-    required bool isImageProcessing,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    required Map<String, String>? attribution
+    String? id,
+    String? userId,
+    String? eventTileImage,
+    String? eventTileImageLocalUrl,
+    bool? isImageProcessing,
+    String? name,
+    String? description,
+    String? startDate,
+    String? endDate,
+    String? startTime,
+    String? endTime,
+    String? meeting,
+    String? eventStatus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Map<String, String>? attribution,
+    bool? isSynced,
   }) {
     return EventModel(
-      id: id,
-      userId: userId,
-      eventTileImage: eventTileImage,
-      eventTileImageLocalUrl: eventTileImageLocalUrl,
-      isImageProcessing: isImageProcessing,
-      name: name,
-      description: description,
-      startDate: startDate,
-      endDate: endDate,
-      startTime: startTime,
-      endTime: endTime,
-      people: people,
-      meeting: meeting,
-      eventStatus: eventStatus,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      attribution: attribution,
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      eventTileImage: eventTileImage ?? this.eventTileImage,
+      eventTileImageLocalUrl: eventTileImageLocalUrl ?? this.eventTileImageLocalUrl,
+      isImageProcessing: isImageProcessing ?? this.isImageProcessing,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      meeting: meeting ?? this.meeting,
+      eventStatus: eventStatus ?? this.eventStatus,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      attribution: attribution ?? this.attribution,
+      isSynced: isSynced ?? this.isSynced,
     );
+  }
+
+  static fromJson(Map<String, dynamic> map) {
+    return EventModel(
+      id: map['id'],
+      userId: map['userId'],
+      eventTileImage: map['eventTileImage'],
+      eventTileImageLocalUrl: map['eventTileImageLocalUrl'],
+      isImageProcessing: map['isImageProcessing'],
+      name: map['name'],
+      description: map['description'],
+      startDate: map['startDate'],
+      endDate: map['endDate'],
+      startTime: map['startTime'],
+      endTime: map['endTime'],
+      meeting: map['meeting'],
+      eventStatus: map['eventStatus'],
+      createdAt: map['createdAt'],
+      updatedAt: map['updatedAt'],
+      attribution: map['attribution'],
+      isSynced: map['isSynced'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'eventTileImage': eventTileImage,
+      'eventTileImageLocalUrl': eventTileImageLocalUrl,
+      'isImageProcessing': isImageProcessing,
+      'name': name,
+      'description': description,
+      'startDate': startDate,
+      'endDate': endDate,
+      'startTime': startTime,
+      'endTime': endTime,
+      'meeting': meeting,
+      'eventStatus': eventStatus,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'attribution': attribution,
+      'isSynced': isSynced,
+    };
   }
 }

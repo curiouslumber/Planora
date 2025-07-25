@@ -28,12 +28,12 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       endDate: fields[8] as String?,
       startTime: fields[9] as String,
       endTime: fields[10] as String,
-      people: (fields[11] as List?)?.cast<String>(),
-      meeting: fields[12] as String?,
-      eventStatus: fields[13] as String,
-      createdAt: fields[14] as DateTime,
-      updatedAt: fields[15] as DateTime,
-      attribution: (fields[16] as Map?)?.cast<String, String>(),
+      meeting: fields[11] as String?,
+      eventStatus: fields[12] as String,
+      createdAt: fields[13] as DateTime,
+      updatedAt: fields[14] as DateTime,
+      attribution: (fields[15] as Map?)?.cast<String, String>(),
+      isSynced: fields[16] == null ? true : fields[16] as bool,
     );
   }
 
@@ -64,17 +64,17 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
       ..writeByte(10)
       ..write(obj.endTime)
       ..writeByte(11)
-      ..write(obj.people)
-      ..writeByte(12)
       ..write(obj.meeting)
-      ..writeByte(13)
+      ..writeByte(12)
       ..write(obj.eventStatus)
-      ..writeByte(14)
+      ..writeByte(13)
       ..write(obj.createdAt)
-      ..writeByte(15)
+      ..writeByte(14)
       ..write(obj.updatedAt)
+      ..writeByte(15)
+      ..write(obj.attribution)
       ..writeByte(16)
-      ..write(obj.attribution);
+      ..write(obj.isSynced);
   }
 
   @override
