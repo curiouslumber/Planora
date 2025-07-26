@@ -112,7 +112,18 @@ flutter:
         - asset: assets/fonts/Poppins/Poppins-BlackItalic.ttf
           weight: 900
           style: italic
-
+    
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka/Fredoka-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Fredoka/Fredoka-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Fredoka/Fredoka-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Fredoka/Fredoka-Light.ttf
+          
+        
 flutter_native_splash:
   color: "#3b4c42"
   image: assets/images/planora.png

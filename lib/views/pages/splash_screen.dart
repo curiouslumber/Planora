@@ -1,203 +1,110 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final Widget child;
+  final Duration duration;
+  
+  const SplashScreen({
+    super.key,
+    required this.child,
+    this.duration = const Duration(seconds: 3),
+  });
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _scaleController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+class _SplashScreenState extends State<SplashScreen> {
+  String _displayText = '';
+  final String _fullText = 'Planora';
+  int _charIndex = 0;
+  Timer? _typingTimer;
+  bool _showCursor = true;
+  bool _isInitialized = false;
+  bool _isTypingComplete = false;
 
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
-    _navigateToNextScreen();
+    _startTypingAnimation();
+    
+    // Blinking cursor effect
+    Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (mounted) {
+        setState(() => _showCursor = !_showCursor);
+      }
+    });
   }
 
-  void _setupAnimations() {
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-    
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
-
-    _fadeController.forward();
-    _scaleController.forward();
+  void _startTypingAnimation() {
+    // Start typing animation
+    _typingTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+      if (_charIndex < _fullText.length) {
+        setState(() {
+          _displayText = _fullText.substring(0, _charIndex + 1);
+          _charIndex++;
+        });
+      } else {
+        _typingTimer?.cancel();
+        _isTypingComplete = true;
+        _checkAndNavigate();
+      }
+    });
   }
 
-  Future<void> _navigateToNextScreen() async {
-    await Future.delayed(const Duration(milliseconds: 3000));
+  void _checkAndNavigate() async {
+    if (!_isTypingComplete) return;
     
+    await Future.delayed(Duration(milliseconds: 500));
+  
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, _) => Container(),  
-          // pageBuilder: (context, animation, _) => isOnboardingCompleted 
-          //     ? null 
-          //     : null,
-          transitionsBuilder: (context, animation, _, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 800),
-        ),
-      );
+      setState(() => _isInitialized = true);
     }
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _scaleController.dispose();
+    _typingTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    
-    return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.white,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    Colors.black,
-                    const Color(0xFF1A1A1A),
-                    const Color(0xFF2A2A2A),
-                  ]
-                : [
-                    Colors.white,
-                    const Color(0xFFF5F5F5),
-                    const Color(0xFFE8E8E8),
-                  ],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedBuilder(
-                animation: Listenable.merge([_fadeAnimation, _scaleAnimation]),
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Opacity(
-                      opacity: _fadeAnimation.value,
-                      child: Column(
-                        children: [
-                          // Logo Container
-                          Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: isDark ? Colors.white : Colors.black,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: (isDark ? Colors.white : Colors.black)
-                                      .withValues(alpha: 0.1),
-                                  blurRadius: 20,
-                                  spreadRadius: 5,
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Text(
-                                'VS',
-                                style: theme.textTheme.headlineLarge?.copyWith(
-                                  color: isDark ? Colors.black : Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 32),
-                          
-                          // Brand Name
-                          Text(
-                            'VogueStride',
-                            style: theme.textTheme.displaySmall?.copyWith(
-                              color: isDark ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 8),
-                          
-                          // Tagline
-                          Text(
-                            'LUXURY × ATHLETIC',
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              color: theme.colorScheme.secondary,
-                              letterSpacing: 3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 80),
-              
-              // Loading indicator
-              AnimatedBuilder(
-                animation: _fadeAnimation,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _fadeAnimation.value * 0.7,
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          theme.colorScheme.secondary,
+    return Stack(
+      children: [
+        widget.child,
+        
+        if (!_isInitialized)
+          Material(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _displayText,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Fredoka',
+                          letterSpacing: 1.2,
                         ),
-                      ),
+                  ),
+                  if (_showCursor)
+                    Container(
+                      width: 2,
+                      height: 40,
+                      margin: const EdgeInsets.only(left: 2),
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
-                  );
-                },
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+      ],
     );
   }
 }
