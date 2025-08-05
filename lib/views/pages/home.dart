@@ -16,14 +16,17 @@ import 'package:planora/utils/event_bus.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 import 'package:planora/views/pages/tools/todos/todo_page.dart';
-import 'package:planora/widgets/search_bar_delegate.dart';
 import 'package:planora/widgets/step_progress_indicator.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key, this.user, this.pageController});
+  const Home({
+    super.key,
+    required this.user,
+    required this.pageController,
+  });
 
   final UserModel? user;
-  final PageController? pageController;
+  final PageController pageController;
 
   @override
   State<Home> createState() => HomeState();
@@ -240,312 +243,245 @@ class HomeState extends State<Home> {
 
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // SliverAppBar for greeting/profile/notification
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              floating: true,
-              snap: true,
-              pinned: false,
-              elevation: 0.0,
-              toolbarHeight: kToolbarHeight + 8,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              surfaceTintColor: Theme.of(context).colorScheme.surface,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 24,
-                    top: 8,
-                    right: 24,
-                    bottom: 0,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${DateTime.now().hour < 12
-                                  ? Constants.greetingMorning
-                                  : DateTime.now().hour < 18
-                                  ? Constants.greetingAfternoon
-                                  : Constants.greetingEvening},',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 14,
-                                fontWeight: FontWeights.regular,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              widget.user?.displayName ?? 'Guest',
-                              style: TextStyle(
-                                fontFamily:
-                                    Theme.of(
-                                      context,
-                                    ).textTheme.headlineLarge!.fontFamily,
-                                fontWeight: FontWeights.semiBold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
+        child: Column(
+          children: [
+            // App Bar
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${DateTime.now().hour < 12
+                              ? Constants.greetingMorning
+                              : DateTime.now().hour < 18
+                              ? Constants.greetingAfternoon
+                              : Constants.greetingEvening},',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 14,
+                            fontWeight: FontWeights.regular,
+                          ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  style: BorderStyle.solid,
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.8),
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              Ionicons.notifications_outline,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.8),
-                            ),
-                          ],
+                        SizedBox(height: 2),
+                        Text(
+                          widget.user?.displayName ?? 'Guest',
+                          style: TextStyle(
+                            fontFamily:
+                                Theme.of(
+                                  context,
+                                ).textTheme.headlineLarge!.fontFamily,
+                            fontWeight: FontWeights.semiBold,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 18,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 16),
-                      GestureDetector(
-                        onTap: () {
-                          widget.pageController?.jumpToPage(3);
-                        },
-                        child: CircleAvatar(
-                          radius: 24,
-                          backgroundImage:
-                              (widget.user?.profilePicUrl != null &&
-                                      widget.user!.profilePicUrl!.isNotEmpty)
-                                  ? NetworkImage(widget.user!.profilePicUrl!)
-                                  : null,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          child:
-                              (widget.user?.profilePicUrl == null ||
-                                      widget.user!.profilePicUrl!.isEmpty)
-                                  ? Icon(
-                                    Ionicons.person,
-                                    size: 16,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  )
-                                  : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // SliverPersistentHeader for sticky search bar
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: SearchBarDelegate(
-                minExtent: 80,
-                maxExtent: 80,
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 0.0,
-                  ),
-                  alignment: Alignment.center,
-                  child: TextField(
-                    controller: _searchController,
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
-                    maxLines: 1,
-                    minLines: 1,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeights.regular,
+                      ],
                     ),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide(
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              color: Theme.of(context).colorScheme.onSurface
+                                  .withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Ionicons.notifications_outline,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.5),
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
-                      ),
-                      prefixIcon: Container(
-                        margin: EdgeInsets.only(left: 16.0, right: 8.0),
-                        child: Icon(
-                          Ionicons.search_outline,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      prefixIconColor: Theme.of(context).colorScheme.primary,
-                      suffixIcon: Container(
-                        margin: EdgeInsets.only(right: 4.0),
-                        width: MediaQuery.of(context).size.width * 0.15,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              height: 24,
-                              width: 1,
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Ionicons.mic_outline,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                      ),
-                      suffixIconColor: Theme.of(context).colorScheme.primary,
-                      hintText: 'Search your tasks, events, notes...',
-                      enabled: false,
-                      hintStyle: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.5),
-                        fontSize: 14,
-                        fontWeight: FontWeights.regular,
-                      ),
+                      ],
                     ),
+                  ),
+                  SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: () {
+                      widget.pageController.jumpToPage(3);
+                    },
+                    child: CircleAvatar(
+                      radius: 24,
+                      backgroundImage:
+                          (widget.user?.profilePicUrl != null &&
+                                  widget.user!.profilePicUrl!.isNotEmpty)
+                              ? NetworkImage(widget.user!.profilePicUrl!)
+                              : null,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primary,
+                      child:
+                          (widget.user?.profilePicUrl == null ||
+                                  widget.user!.profilePicUrl!.isEmpty)
+                              ? Icon(
+                                  Ionicons.person,
+                                  size: 16,
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                )
+                              : null,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: _searchController,
+                cursorColor: Theme.of(context).colorScheme.onSurface,
+                maxLines: 1,
+                minLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeights.regular,
+                ),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  prefixIcon: Container(
+                    margin: EdgeInsets.only(left: 16.0, right: 8.0),
+                    child: Icon(
+                      Ionicons.search_outline,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  prefixIconColor: Theme.of(context).colorScheme.primary,
+                  suffixIcon: Container(
+                    margin: EdgeInsets.only(right: 4.0),
+                    width: MediaQuery.of(context).size.width * 0.15,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          height: 24,
+                          width: 1,
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Ionicons.mic_outline,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  suffixIconColor: Theme.of(context).colorScheme.primary,
+                  hintText: 'Search your tasks, events, notes...',
+                  enabled: false,
+                  hintStyle: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                    fontSize: 14,
+                    fontWeight: FontWeights.regular,
                   ),
                 ),
               ),
             ),
-
-            // Main content as a sliver
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 16.0,
-                        horizontal: 16.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        spacing: 8.0,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                "Event Progress",
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeights.semiBold,
-                                ),
+            
+            // Main Content
+            Expanded(
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 16.0,
+                      horizontal: 16.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 8.0,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "Event Progress",
+                              style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeights.semiBold,
                               ),
-                              Spacer(),
-                              Icon(
-                                Ionicons.chevron_forward,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 8.0,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    spacing: 16.0,
-                                    children: [
-                                      Text(
-                                        getCompletedEventsPercentage(),
-                                        style: TextStyle(
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onPrimary,
-                                          fontSize: 32,
-                                          fontWeight: FontWeights.semiBold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 4.0),
-                                    child: Text(
-                                      "${_events.where((e) => e.eventStatus == Constants.eventStatus[2]).length} of ${_events.length} completed",
+                            ),
+                            Spacer(),
+                            Icon(
+                              Ionicons.chevron_forward,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 8.0,
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.center,
+                                  spacing: 16.0,
+                                  children: [
+                                    Text(
+                                      getCompletedEventsPercentage(),
                                       style: TextStyle(
                                         color:
                                             Theme.of(
                                               context,
                                             ).colorScheme.onPrimary,
-                                        fontSize: 16,
+                                        fontSize: 32,
                                         fontWeight: FontWeights.semiBold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              StepProgressIndicator(
-                                height: 8.0,
-                                currentMinute: currentMinute,
-                                snappedProgress: getSnappedDayProgress(_events),
-                                progressColor:
-                                    Theme.of(context).colorScheme.tertiary,
-                                trackColor:
-                                    Theme.of(context).colorScheme.onPrimary,
-                                checkpointColor:
-                                    Theme.of(context).colorScheme.primary,
-                                checkpointDiameter: 6.0,
-                                checkpointTimes: checkpointTimes,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2.0),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
                                   child: Text(
-                                    getMilestoneMessage(
-                                      getCompletedEventsPercentage(),
-                                    ),
-                                    maxLines: 1,
+                                    "${_events.where((e) => e.eventStatus == Constants.eventStatus[2]).length} of ${_events.length} completed",
                                     style: TextStyle(
                                       color:
                                           Theme.of(
@@ -556,235 +492,269 @@ class HomeState extends State<Home> {
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Today\'s Schedule',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18,
-                            fontWeight: FontWeights.semiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    if (_events.isEmpty)
-                      Container(
-                        alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                        child: Text(
-                          "No events scheduled for today.",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 16,
-                            fontWeight: FontWeights.regular,
-                          ),
-                        ),
-                      )
-                    else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) {
-                          return SizedBox(height: 16);
-                        },
-                        itemCount: _events.length,
-                        itemBuilder: (context, index) {
-                          final event = _events[index];
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EventPage(event: event),
-                                ),
-                              );
-                            },
-                            tileColor: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.9),
-                            contentPadding: EdgeInsets.only(
-                              left: 8.0,
-                              right: 16.0,
+                              ],
                             ),
-                            minVerticalPadding: 0.0,
-                            title: Text(
-                              event.name,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeights.semiBold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${DateFormat("jm").format(DateTime.parse(event.startTime))} ${event.endTime != event.startTime ? '- ${DateFormat("jm").format(DateTime.parse(event.endTime))}' : ''}',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 14,
-                                fontWeight: FontWeights.semiBold,
-                              ),
-                            ),
-                            minTileHeight: 72,
-                            leading: AspectRatio(
-                              aspectRatio: 1,
-                              child: FutureBuilder<File?>(
-                                future: CustomImageCacheManager()
-                                    .getCachedImageByEventId(event.id),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                          ConnectionState.done &&
-                                      snapshot.hasData) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.file(
-                                        snapshot.data!,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    );
-                                  } else {
-                                    return Container(color: Colors.transparent);
-                                  }
-                                },
-                              ),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            trailing: Checkbox(
-                              value: event.eventStatus == "completed",
-                              checkColor:
+                            StepProgressIndicator(
+                              height: 8.0,
+                              currentMinute: currentMinute,
+                              snappedProgress: getSnappedDayProgress(_events),
+                              progressColor:
+                                  Theme.of(context).colorScheme.tertiary,
+                              trackColor:
                                   Theme.of(context).colorScheme.onPrimary,
-                              fillColor: WidgetStateProperty.all(
-                                Colors.transparent,
-                              ),
-                              onChanged: (value) {
-                                if (event.eventStatus == "completed") {
-                                  return;
-                                }
-
-                                if (value != null) {
-                                  EventModel updatedEvent = event.copyWith(
-                                    userId: event.userId,
-                                    attribution: event.attribution,
-                                    eventStatus: Constants.eventStatus[2],
-                                    eventTileImage: event.eventTileImage,
-                                    eventTileImageLocalUrl:
-                                        event.eventTileImageLocalUrl,
-                                    isImageProcessing: false,
-                                    createdAt: event.createdAt,
-                                    updatedAt: DateTime.now(),
-                                  );
-                                  HiveEvents.updateEventInHive(updatedEvent);
-                                  loadData();
-                                  if (mounted) {
-                                    setState(() {});
-                                  }
-                                }
-                              },
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              side: BorderSide(
-                                width: 1.5,
-                                color: Theme.of(context).colorScheme.onPrimary,
+                              checkpointColor:
+                                  Theme.of(context).colorScheme.primary,
+                              checkpointDiameter: 6.0,
+                              checkpointTimes: checkpointTimes,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  getMilestoneMessage(
+                                    getCompletedEventsPercentage(),
+                                  ),
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeights.semiBold,
+                                  ),
+                                ),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Todos',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18,
-                            fontWeight: FontWeights.semiBold,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(
-                            '${_todos.where((t) => t.todoStatus == Constants.todoStatus[1]).length} of ${_todos.length} ${_todos.length == 1 ? "task" : "tasks"} completed',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 14,
-                              fontWeight: FontWeights.regular,
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    if (_todos.isEmpty)
-                      Container(
-                        alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.06,
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Today\'s Schedule',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeights.semiBold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  if (_events.isEmpty)
+                    Container(
+                      alignment: Alignment.center,
+                      height: MediaQuery.of(context).size.height * 0.1,
+                      child: Text(
+                        "No events scheduled for today.",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 16,
+                          fontWeight: FontWeights.regular,
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 16);
+                      },
+                      itemCount: _events.length,
+                      itemBuilder: (context, index) {
+                        final event = _events[index];
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EventPage(event: event),
+                              ),
+                            );
+                          },
+                          tileColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.9),
+                          contentPadding: EdgeInsets.only(
+                            // left: 8.0,
+                            right: 16.0,
+                          ),
+                          minVerticalPadding: 0.0,
+                          title: Text(
+                            event.name,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeights.semiBold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${DateFormat("jm").format(DateTime.parse(event.startTime))} ${event.endTime != event.startTime ? '- ${DateFormat("jm").format(DateTime.parse(event.endTime))}' : ''}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeights.semiBold,
+                            ),
+                          ),
+                          minTileHeight: 72,
+                          leading: FutureBuilder<File?>(
+                            future: CustomImageCacheManager()
+                                .getCachedImageByEventId(event.id),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData &&
+                                  snapshot.data != null) {
+                                return AspectRatio(
+                                  aspectRatio: 1,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.file(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          trailing: Checkbox(
+                            value: event.eventStatus == "completed",
+                            checkColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            fillColor: WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
+                            onChanged: (value) {
+                              if (event.eventStatus == "completed") {
+                                return;
+                              }
+
+                              if (value != null) {
+                                EventModel updatedEvent = event.copyWith(
+                                  userId: event.userId,
+                                  attribution: event.attribution,
+                                  eventStatus: Constants.eventStatus[2],
+                                  eventTileImage: event.eventTileImage,
+                                  eventTileImageLocalUrl:
+                                      event.eventTileImageLocalUrl,
+                                  isImageProcessing: false,
+                                  createdAt: event.createdAt,
+                                  updatedAt: DateTime.now(),
+                                );
+                                HiveEvents.updateEventInHive(updatedEvent);
+                                loadData();
+                                if (mounted) {
+                                  setState(() {});
+                                }
+                              }
+                            },
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            side: BorderSide(
+                              width: 1.5,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Todos',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeights.semiBold,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
                         child: Text(
-                          "No todos.",
+                          '${_todos.where((t) => t.todoStatus == Constants.todoStatus[1]).length} of ${_todos.length} ${_todos.length == 1 ? "task" : "tasks"} completed',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeights.regular,
                           ),
                         ),
-                      )
-                    else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) {
-                          return SizedBox(height: 16);
-                        },
-                        itemCount: _todos.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          TodoPage(todo: _todos[index]),
-                                ),
-                              );
-                            },
-                            tileColor: Theme.of(
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  if (_todos.isEmpty)
+                    Container(
+                      alignment: Alignment.center,
+                      height: MediaQuery.of(context).size.height * 0.06,
+                      child: Text(
+                        "No todos.",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 16,
+                          fontWeight: FontWeights.regular,
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 16);
+                      },
+                      itemCount: _todos.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
                               context,
-                            ).colorScheme.primary.withValues(alpha: 0.9),
-                            contentPadding: EdgeInsets.only(
-                              left: 16.0,
-                              right: 16.0,
-                            ),
-                            title: Text(
-                              _todos[index].todo,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 14,
-                                fontWeight: FontWeights.semiBold,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        TodoPage(todo: _todos[index]),
                               ),
+                            );
+                          },
+                          tileColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.9),
+                          contentPadding: EdgeInsets.only(
+                            left: 16.0,
+                            right: 16.0,
+                          ),
+                          title: Text(
+                            _todos[index].todo,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeights.semiBold,
                             ),
-                            minTileHeight: 72,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child:
-                                  _todos[index].priority.isNotEmpty
-                                      ? Row(
+                          ),
+                          minTileHeight: 72,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child:
+                                _todos[index].priority.isNotEmpty
+                                    ? Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
@@ -833,51 +803,50 @@ class HomeState extends State<Home> {
                                           ),
                                         ],
                                       )
-                                      : null,
+                                    : null,
+                          ),
+                          trailing: Checkbox(
+                            value:
+                                _todos[index].todoStatus ==
+                                Constants.todoStatus[1],
+                            onChanged: (value) {
+                              if (_todos[index].todoStatus ==
+                                  Constants.todoStatus[1]) {
+                                return;
+                              }
+                              if (value != null) {
+                                markTodoComplete(_todos[index], index);
+                              }
+                            },
+                            checkColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            fillColor: WidgetStateProperty.all(
+                              Colors.transparent,
                             ),
-                            trailing: Checkbox(
-                              value:
-                                  _todos[index].todoStatus ==
-                                  Constants.todoStatus[1],
-                              onChanged: (value) {
-                                if (_todos[index].todoStatus ==
-                                    Constants.todoStatus[1]) {
-                                  return;
-                                }
-                                if (value != null) {
-                                  markTodoComplete(_todos[index], index);
-                                }
-                              },
-                              checkColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                              fillColor: WidgetStateProperty.all(
-                                Colors.transparent,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              side: BorderSide(
-                                width: 1.5,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
                             ),
-                          );
-                        },
-                      ),
-                    const SizedBox(height: 24.0),
-                    Container(
-                      margin: EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Made with ❤️\nby Noel Pinto',
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
+                            side: BorderSide(
+                              width: 1.5,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  const SizedBox(height: 24.0),
+                  Container(
+                    margin: EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      'Made with ❤️\nby Noel Pinto',
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],

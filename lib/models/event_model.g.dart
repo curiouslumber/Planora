@@ -18,7 +18,7 @@ class EventModelAdapter extends TypeAdapter<EventModel> {
     };
     return EventModel(
       id: fields[0] as String,
-      userId: fields[1] as String,
+      userId: fields[1] as String?,
       eventTileImage: fields[2] as String,
       eventTileImageLocalUrl: fields[3] as String,
       isImageProcessing: fields[4] as bool,

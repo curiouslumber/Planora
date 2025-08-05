@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:planora/data/events_data_source.dart';
 import 'package:planora/databases/hive_events.dart';
 import 'package:planora/models/event_model.dart';
+import 'package:planora/models/user_model.dart';
 import 'package:planora/utils/font_weights.dart';
+import 'package:planora/views/pages/create/create_event.dart';
 import 'package:planora/views/pages/tools/events/event_page.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Calendar extends StatefulWidget {
-  const Calendar({super.key, required this.pageController});
+  const Calendar({super.key, required this.pageController, this.user});
 
   final PageController pageController;
+  final UserModel? user;
 
   @override
   State<Calendar> createState() => _CalendarState();
@@ -155,6 +158,25 @@ class _CalendarState extends State<Calendar> {
                             padding: const EdgeInsets.only(bottom: kFloatingActionButtonMargin),
                             child: SfCalendar(
                               onTap: (calendarTapDetails) {
+                                if(calendarTapDetails.targetElement == CalendarElement.calendarCell) {
+                                final now = DateTime.now();
+                                final selectedTime = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, now.hour, 0);
+                                final startTime = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, selectedTime.hour, 0);
+                                final endTime = startTime.add(const Duration(hours: 1));
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CreateEvent(
+                                      user: widget.user,
+                                      startDate: _selectedDate,
+                                      startTime: startTime,
+                                      endTime: endTime,
+                                      endDate: _selectedDate,
+                                    ),
+                                  ),
+                                );
+                                }
                                 if (calendarTapDetails.targetElement == CalendarElement.appointment) {
                                   final eventId = calendarTapDetails.appointments?.first as Event;
                                   Navigator.push(

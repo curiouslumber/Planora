@@ -7,7 +7,7 @@ class EventModel {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String userId;
+  final String? userId;
   @HiveField(2)
   final String eventTileImage;
   @HiveField(3)

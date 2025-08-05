@@ -23,47 +23,23 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   int _previousIndex = 0;
-  final PageController _pageController = PageController();
-
-  // Flag to control whether the custom (direct) animation overlay is active.
-  bool _isCustomTransitionActive = false;
-
+  late final PageController _pageController;
+  late final List<Widget> _pages;
   final _homeKey = GlobalKey<HomeState>();
 
-  // Called when a bottom nav item is tapped.
-  void _onBottomNavTap(int index) {
-    // If the difference is greater than 1, use a direct custom transition.
-    if ((index - _currentIndex).abs() > 1) {
-      setState(() {
-        _previousIndex = _currentIndex;
-        _currentIndex = index;
-        _isCustomTransitionActive = true;
-      });
-      // Jump immediately without animating through intermediate pages.
-      _pageController.jumpToPage(index);
-      // Disable the custom overlay after the transition duration.
-      Future.delayed(Duration(milliseconds: 300), () {
-        if (mounted) {
-          setState(() {
-            _isCustomTransitionActive = false;
-          });
-        }
-      });
-    } else {
-      // For adjacent pages, animate normally.
-      setState(() {
-        _previousIndex = _currentIndex;
-        _currentIndex = index;
-      });
-      _pageController.animateToPage(
-        index,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _pages = [
+      Home(key: _homeKey, user: widget.user, pageController: _pageController),
+      Calendar(user: widget.user, pageController: _pageController),
+      Tools(user: widget.user),
+      widget.user != null ? Profile(user: widget.user!) : Guest(),
+    ];
   }
 
   @override
@@ -72,52 +48,48 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  void _onBottomNavTap(int index) {
+  if (index == _currentIndex) return;
+  
+  _previousIndex = _currentIndex;
+  
+  setState(() {
+    _currentIndex = index;
+  });
+
+  if ((index - _previousIndex).abs() > 1) {
+    // Jump immediately if more than 1 page away
+    _pageController.jumpToPage(index);
+  } else {
+    // Smooth animation for adjacent pages
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+}
+
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      Home(key: _homeKey, user: widget.user, pageController: _pageController),
-      Calendar(pageController: _pageController),
-      Tools(user: widget.user),
-      widget.user != null ? Profile(user: widget.user!) : Guest(),
-    ];
-
     return RepositoryProvider(
       create: (context) => AuthRepository(),
       child: BlocProvider(
         create: (context) => AuthBloc(context.read<AuthRepository>()),
         child: Scaffold(
-          body: Stack(
-            children: [
-              PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                children: pages,
-              ),
-              if (_isCustomTransitionActive)
-                AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    // Determine slide direction based on page order.
-                    final isForward = _currentIndex > _previousIndex;
-                    final offsetTween = Tween<Offset>(
-                      begin: Offset(isForward ? 1.0 : -1.0, 0.0),
-                      end: Offset(0.0, 0.0),
-                    );
-                    return SlideTransition(
-                      position: offsetTween.animate(animation),
-                      child: child,
-                    );
-                  },
-                  child: Container(
-                    key: ValueKey<int>(_currentIndex),
-                    child: pages[_currentIndex],
-                  ),
-                ),
-            ],
+          body: PageView.builder(
+            controller: _pageController,
+            physics: const ClampingScrollPhysics(),
+            itemCount: _pages.length,
+            onPageChanged: (index) {
+              setState(() {
+                _previousIndex = _currentIndex;
+                _currentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return _pages[index];
+            },
           ),
           floatingActionButton: CustomFab(
             onCreateEvent: () async {

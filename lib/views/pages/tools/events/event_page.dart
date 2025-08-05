@@ -269,6 +269,7 @@ class _EventPageState extends State<EventPage> {
               } else {
                 return Container(
                   width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.2,
                   color: Colors.transparent,
                 );
               }

@@ -12,9 +12,13 @@ import 'package:planora/utils/font_weights.dart';
 import 'package:planora/widgets/common_snackbar.dart';
 import 'package:uuid/uuid.dart';
 class CreateEvent extends StatefulWidget {
-  const CreateEvent({super.key, this.user});
+  const CreateEvent({super.key, this.user,  this.startDate,  this.startTime,  this.endTime,  this.endDate});
 
   final UserModel? user;
+  final DateTime? startDate;
+  final DateTime? startTime;
+  final DateTime? endTime;
+  final DateTime? endDate;
 
   @override
   State<CreateEvent> createState() => _CreateEventState();
@@ -31,6 +35,15 @@ class _CreateEventState extends State<CreateEvent> {
   String repeatOption = "never";
   List<String> selectedDays = [];
   List<String> recurringEventDays = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
+
+  @override
+  void initState() {
+    super.initState();
+    startDate = widget.startDate;
+    endDate = widget.endDate;
+    startTime = widget.startTime;
+    endTime = widget.endTime;
+  }
 
   Future<void> addEvent(EventModel event) async {
     try {
@@ -548,6 +561,7 @@ class _CreateEventState extends State<CreateEvent> {
                     ),
                   ],
                 ),
+                if (repeatOption != "never" && repeatOption != "daily")
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final chipWidth =
@@ -607,13 +621,13 @@ class _CreateEventState extends State<CreateEvent> {
           borderRadius: BorderRadius.circular(32.0),
         ),
         onPressed: () async {
-          if (_nameController.text.isEmpty || widget.user == null || widget.user!.uid.isEmpty || startDate == null || startTime == null) {
+          if (_nameController.text.isEmpty || startDate == null || startTime == null) {
             return;
           }
 
           EventModel event = EventModel(
             id: Uuid().v4(),
-            userId: widget.user!.uid,
+            userId: widget.user?.uid,
             name: _nameController.text,
             description: _descriptionController.text,
             eventTileImage: '',

@@ -131,43 +131,17 @@ class _EventsState extends State<Events> {
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                       ConnectionState.done &&
-                                  snapshot.hasData) {
+                                  snapshot.hasData &&
+                                  snapshot.data != null) {
                                 return ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Image.file(
                                     snapshot.data!,
                                     fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
                                   ),
                                 );
-                              } else {
-                                final imagePathOrUrl = imageIdToUrl[event.id];
-                                if (imagePathOrUrl != null &&
-                                    File(imagePathOrUrl).existsSync()) {
-                                  // It's a file path
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.file(
-                                      File(imagePathOrUrl),
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  );
-                                } else {
-                                  // It's a network URL or null
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      imagePathOrUrl ?? '',
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  );
-                                }
                               }
+                              return const SizedBox.shrink();
                             },
                           ),
                           Positioned(
