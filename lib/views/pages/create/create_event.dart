@@ -61,9 +61,9 @@ class _CreateEventState extends State<CreateEvent> {
       await HiveEvents.addEventToHive(event);
       
       // Handle image processing if needed
-      if (event.eventTileImage.isNotEmpty) {
+      // if (event.eventTileImage.isNotEmpty) {
         EventTaskImageService.handleImageTileForEvent(event);
-      }
+      // }
       
       if (!mounted) return;
       
