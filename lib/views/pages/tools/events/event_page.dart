@@ -309,7 +309,7 @@ class _EventPageState extends State<EventPage> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       Text(
-                        "${DateFormat('MMMM dd').format(DateTime.parse(widget.event.startDate))} - ${DateFormat.jm().format(DateTime.parse(widget.event.startTime))}",
+                        "${DateFormat('MMMM dd').format(DateTime.parse(widget.event.startDate))} : ${DateFormat.jm().format(DateTime.parse(widget.event.startTime))} ${widget.event.endTime.isNotEmpty ? "- ${DateFormat.jm().format(DateTime.parse(widget.event.endTime))}" : ""}",
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           fontWeight: FontWeights.regular,
                         ),

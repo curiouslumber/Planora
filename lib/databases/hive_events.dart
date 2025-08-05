@@ -144,6 +144,11 @@ class HiveEvents {
     return box.values.toList();
   }
 
+  static Future<TodoModel?> getTodoById(String id) async {
+    var box = await Hive.openBox<TodoModel>(todosBox);
+    return box.values.toList().firstWhere((e) => e.id == id);
+  }
+
   static Future<void> updateTodoInHive(TodoModel todo) async {
     var box = await Hive.openBox<TodoModel>(todosBox);
     int index = box.values.toList().indexWhere((e) => e.id == todo.id);
@@ -152,7 +157,7 @@ class HiveEvents {
 
   static Future<void> deleteTodoFromHive(TodoModel todo) async {
     var box = await Hive.openBox<TodoModel>(todosBox);
-    await box.delete(todo.id);
+    await box.deleteAt(box.values.toList().indexWhere((e) => e.id == todo.id));
   }
 
   static Future<void> deleteTodosFromHive(Set<int> selectedTodoIndices) async {

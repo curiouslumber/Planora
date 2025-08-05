@@ -80,9 +80,7 @@ class _CalendarState extends State<Calendar> {
               event.name,
               event.id,
               DateTime.parse(event.startTime),
-              event.endDate != null
-                  ? DateTime.parse(event.endDate!)
-                  : DateTime.parse(event.startTime).add(const Duration(hours: 1)),
+              DateTime.parse(event.endTime),
               Theme.of(context).colorScheme.secondary,
               false,
             ))

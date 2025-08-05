@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:planora/models/todo_model.dart';
 import 'package:planora/services/firebase/firebase_firestore_service.dart';
 import 'package:planora/utils/constants.dart';
+import 'package:planora/views/pages/tools/todos/edit_todo.dart';
+import 'package:planora/widgets/common_snackbar.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key, required this.todo});
@@ -23,6 +25,15 @@ class _TodoPageState extends State<TodoPage> {
     _todo = widget.todo;
   }
 
+  Future<bool> deleteTodo() async {
+    await HiveEvents.deleteTodoFromHive(widget.todo);
+    setState(() {});
+    if (mounted) {
+      CommonSnackbar.showSnackbar(context, 'Todo deleted successfully', Theme.of(context).colorScheme.primary);
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDone = _todo.todoStatus == Constants.todoStatus[1];
@@ -32,14 +43,32 @@ class _TodoPageState extends State<TodoPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () {
-              // TODO: Navigate to edit page
+            onPressed: () async {
+              final result = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditTodo(todo: _todo),
+                ),
+              );
+              
+              if (result == true && mounted) {
+                // Refresh the todo data after editing
+                final updatedTodo = await HiveEvents.getTodoById(_todo.id);
+                if (updatedTodo != null) {
+                  setState(() {
+                    _todo = updatedTodo;
+                  });
+                }
+              }
             },
           ),
           IconButton(
             icon: Icon(Icons.delete),
-            onPressed: () {
-              // TODO: Confirm and delete task
+            onPressed: () async {
+              final result = await deleteTodo();
+              if (result && mounted) {
+                Navigator.pop(context);
+              }
             },
           ),
         ],
