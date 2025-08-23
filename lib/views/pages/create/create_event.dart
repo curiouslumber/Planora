@@ -11,8 +11,16 @@ import 'package:planora/utils/constants.dart';
 import 'package:planora/utils/font_weights.dart';
 import 'package:planora/widgets/common_snackbar.dart';
 import 'package:uuid/uuid.dart';
+
 class CreateEvent extends StatefulWidget {
-  const CreateEvent({super.key, this.user,  this.startDate,  this.startTime,  this.endTime,  this.endDate});
+  const CreateEvent({
+    super.key,
+    this.user,
+    this.startDate,
+    this.startTime,
+    this.endTime,
+    this.endDate,
+  });
 
   final UserModel? user;
   final DateTime? startDate;
@@ -35,6 +43,7 @@ class _CreateEventState extends State<CreateEvent> {
   String repeatOption = "never";
   List<String> selectedDays = [];
   List<String> recurringEventDays = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
+  late bool allDayPanel;
 
   @override
   void initState() {
@@ -43,71 +52,79 @@ class _CreateEventState extends State<CreateEvent> {
     endDate = widget.endDate;
     startTime = widget.startTime;
     endTime = widget.endTime;
+
+    allDayPanel = (startTime == null && endTime == null) ||
+                      (startTime != null &&
+                          startTime?.hour == 0 &&
+                          startTime?.minute == 0 &&
+                          endTime != null &&
+                          endTime?.hour == 23 &&
+                          endTime?.minute == 59);
   }
 
   Future<void> addEvent(EventModel event) async {
     try {
       // First try to save to Firestore if online
       bool isOnline = await _checkInternetConnection();
-      
+
       if (isOnline) {
         await FirebaseFirestoreService().createEventDocument(event: event);
       } else {
         // If offline, just save to local storage
         event = event.copyWith(isSynced: false);
       }
-      
+
       // Always save to local Hive storage
       await HiveEvents.addEventToHive(event);
-      
+
       // Handle image processing if needed
       // if (event.eventTileImage.isNotEmpty) {
-        EventTaskImageService.handleImageTileForEvent(event);
+      EventTaskImageService.handleImageTileForEvent(event);
       // }
-      
+
       if (!mounted) return;
-      
+
       // Show success message based on connectivity
       if (isOnline) {
         CommonSnackbar.showSnackbar(
-          context, 
-          'Event created successfully!', 
-          Theme.of(context).colorScheme.primary
+          context,
+          'Event created successfully!',
+          Theme.of(context).colorScheme.primary,
         );
       } else {
         CommonSnackbar.showSnackbar(
-          context, 
-          'Event saved offline and will sync when online', 
-          Colors.orange
+          context,
+          'Event saved offline and will sync when online',
+          Colors.orange,
         );
       }
-      
     } catch (e) {
       // If there's an error with Firestore, save to local storage
-      if (e.toString().contains('Exception') && !e.toString().contains('permission')) {
+      if (e.toString().contains('Exception') &&
+          !e.toString().contains('permission')) {
         await HiveEvents.addEventToHive(event.copyWith(isSynced: false));
-        
+
         if (mounted) {
           CommonSnackbar.showSnackbar(
-            context, 
-            'Event saved offline due to network issues', 
-            Colors.orange
+            context,
+            'Event saved offline due to network issues',
+            Colors.orange,
           );
         }
       } else {
         // Re-throw if it's a permission error or other critical error
         if (mounted) {
           CommonSnackbar.showSnackbar(
-            context, 
-            'Error: ${e.toString()}', 
-            Theme.of(context).colorScheme.error
+            context,
+            'Error: ${e.toString()}',
+            Theme.of(context).colorScheme.error,
           );
         }
         rethrow;
       }
     }
   }
-  
+
   Future<bool> _checkInternetConnection() async {
     try {
       final connectivityResult = await (Connectivity().checkConnectivity());
@@ -156,22 +173,40 @@ class _CreateEventState extends State<CreateEvent> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
                           ),
                           TextButton(
                             onPressed: () {
                               _clearAllFields();
-                              CommonSnackbar.showSnackbar(context, 'All fields cleared', Theme.of(context).colorScheme.primary);
+                              CommonSnackbar.showSnackbar(
+                                context,
+                                'All fields cleared',
+                                Theme.of(context).colorScheme.primary,
+                              );
                               Navigator.pop(context);
                             },
-                            child: Text('Clear', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                            child: Text(
+                              'Clear',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                 );
               } else {
                 _clearAllFields();
-                CommonSnackbar.showSnackbar(context, 'All fields cleared', Theme.of(context).colorScheme.primary);
+                CommonSnackbar.showSnackbar(
+                  context,
+                  'All fields cleared',
+                  Theme.of(context).colorScheme.primary,
+                );
               }
             },
           ),
@@ -298,8 +333,7 @@ class _CreateEventState extends State<CreateEvent> {
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             DateTimeField(
@@ -315,8 +349,7 @@ class _CreateEventState extends State<CreateEvent> {
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: '',
@@ -356,11 +389,11 @@ class _CreateEventState extends State<CreateEvent> {
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             DateTimeField(
+                              enabled: false,
                               value: endDate,
                               onChanged: (value) {
                                 setState(() {
@@ -372,8 +405,7 @@ class _CreateEventState extends State<CreateEvent> {
                               style: TextStyle(
                                 fontSize: 14.0,
                                 fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: '',
@@ -402,215 +434,160 @@ class _CreateEventState extends State<CreateEvent> {
                       ),
                     ],
                   ),
-                  Row(
-                    spacing: 16.0,
+                  Column(
+                    spacing: 4.0,
                     children: [
-                      Flexible(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 8.0,
-                          children: [
-                            Text(
-                              'Start Time',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
-                              ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "All Day Event",
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeights.regular,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
-                            DateTimeField(
-                              value: startTime,
-                              onChanged: (value) {
-                                setState(() {
-                                  startTime = value;
-                                });
-                              },
-                              mode: DateTimeFieldPickerMode.time,
-                              initialPickerDateTime: getNextHalfHour(),
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: '',
-                                hintStyle: TextStyle(
+                          ),
+                          Switch(
+                            value: allDayPanel,
+                            onChanged: (value) {
+                              if (value) {
+                                startTime = null;
+                                endTime = null;
+                              }
+                              setState(() {
+                                allDayPanel = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      
+                  if (!allDayPanel)
+                    Row(
+                      spacing: 16.0,
+                      children: [
+                        Flexible(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 8.0,
+                            children: [
+                              Text(
+                                'Start Time',
+                                style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeights.regular,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface.withAlpha(100),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 24.0,
+                              ),
+                              DateTimeField(
+                                value: startTime,
+                                onChanged: (value) {
+                                  setState(() {
+                                    startTime = value;
+                                  });
+                                },
+                                mode: DateTimeFieldPickerMode.time,
+                                initialPickerDateTime: getNextHalfHour(),
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeights.regular,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(32.0),
-                                  borderSide: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                decoration: InputDecoration(
+                                  hintText: '',
+                                  hintStyle: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeights.regular,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withAlpha(100),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16.0,
+                                    horizontal: 24.0,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(32.0),
+                                    borderSide: BorderSide(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Flexible(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 8.0,
-                          children: [
-                            Text(
-                              'End Time',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            DateTimeField(
-                              value: endTime,
-                              initialPickerDateTime: getDefaultEndTime(
-                                startTime,
-                              ),
-                              firstDate: (startTime ?? getNextHalfHour()).add(
-                                const Duration(minutes: 5),
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  endTime = value;
-                                });
-                              },
-                              mode: DateTimeFieldPickerMode.time,
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeights.regular,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: '',
-                                hintStyle: TextStyle(
+                        Flexible(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 8.0,
+                            children: [
+                              Text(
+                                'End Time',
+                                style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeights.regular,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface.withAlpha(100),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 24.0,
+                              ),
+                              DateTimeField(
+                                value: endTime,
+                                initialPickerDateTime: getDefaultEndTime(
+                                  startTime,
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(32.0),
-                                  borderSide: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                firstDate: (startTime ?? getNextHalfHour()).add(
+                                  const Duration(minutes: 5),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    endTime = value;
+                                  });
+                                },
+                                mode: DateTimeFieldPickerMode.time,
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeights.regular,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: '',
+                                  hintStyle: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeights.regular,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withAlpha(100),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16.0,
+                                    horizontal: 24.0,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(32.0),
+                                    borderSide: BorderSide(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
+                    ),
                     ],
                   ),
                 ],
               ),
-              Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 8.0,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Repeat",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeights.regular,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    DropdownButton<String>(
-                      value: repeatOption,
-                      items:
-                          Constants.repeatOptions
-                              .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
-                              )
-                              .toList(),
-                      onChanged: (value) {
-                        if (value == "never" || value == "daily") {
-                          selectedDays = [];
-                        }
-                        setState(() {
-                          repeatOption = value!;
-                          selectedDays = [];
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                if (repeatOption != "never" && repeatOption != "daily")
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final chipWidth =
-                        (constraints.maxWidth / recurringEventDays.length) - 4;
-                    return Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: List.generate(
-                        recurringEventDays.length,
-                        (index) => SizedBox(
-                          width: chipWidth,
-                          child: FilterChip(
-                            labelStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            selectedColor:
-                                Theme.of(context).colorScheme.primary,
-                            selected: selectedDays.contains(
-                              recurringEventDays[index],
-                            ),
-                            onSelected: (value) {
-                              if (repeatOption == "never" ||
-                                  repeatOption == "daily") {
-                                selectedDays = [];
-                                return;
-                              }
-                              setState(() {
-                                if (value) {
-                                  selectedDays.add(recurringEventDays[index]);
-                                } else {
-                                  selectedDays.remove(
-                                    recurringEventDays[index],
-                                  );
-                                }
-                              });
-                            },
-                            label: FittedBox(
-                              fit: BoxFit.fitHeight,
-                              child: Text(recurringEventDays[index]),
-                            ),
-                            shape: CircleBorder(),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
             ],
           ),
         ),
@@ -620,9 +597,15 @@ class _CreateEventState extends State<CreateEvent> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),
-        onPressed: () async {
-          if (_nameController.text.isEmpty || startDate == null || startTime == null) {
+        onPressed: () {
+          if (_nameController.text.isEmpty ||
+              startDate == null) {
             return;
+          }
+
+          if (allDayPanel) {
+            startTime = DateTime(startDate!.year, startDate!.month, startDate!.day, 0, 0);
+            endTime = DateTime(startDate!.year, startDate!.month, startDate!.day, 23, 59);
           }
 
           EventModel event = EventModel(
@@ -643,8 +626,8 @@ class _CreateEventState extends State<CreateEvent> {
             updatedAt: DateTime.now(),
           );
 
-          await addEvent(event);
-          
+          addEvent(event);
+
           if (mounted) {
             Navigator.of(context).pop(event);
           }

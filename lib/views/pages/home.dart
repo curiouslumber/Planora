@@ -247,7 +247,7 @@ class HomeState extends State<Home> {
           children: [
             // App Bar
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -342,7 +342,7 @@ class HomeState extends State<Home> {
             
             // Search Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: TextField(
                 controller: _searchController,
                 cursorColor: Theme.of(context).colorScheme.onSurface,
@@ -416,7 +416,7 @@ class HomeState extends State<Home> {
             Expanded(
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 children: [
                   Container(
                     padding: EdgeInsets.symmetric(
@@ -583,7 +583,6 @@ class HomeState extends State<Home> {
                             context,
                           ).colorScheme.primary.withValues(alpha: 0.9),
                           contentPadding: EdgeInsets.only(
-                            // left: 8.0,
                             right: 16.0,
                           ),
                           minVerticalPadding: 0.0,
@@ -612,13 +611,16 @@ class HomeState extends State<Home> {
                                       ConnectionState.done &&
                                   snapshot.hasData &&
                                   snapshot.data != null) {
-                                return AspectRatio(
-                                  aspectRatio: 1,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.file(
-                                      snapshot.data!,
-                                      fit: BoxFit.cover,
+                                return Container(
+                                  margin: EdgeInsets.only(left: 8.0),
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.file(
+                                        snapshot.data!,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
                                 );

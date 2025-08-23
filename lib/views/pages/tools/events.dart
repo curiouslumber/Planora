@@ -138,6 +138,7 @@ class _EventsState extends State<Events> {
                                   child: Image.file(
                                     snapshot.data!,
                                     fit: BoxFit.cover,
+                                    width: double.infinity,
                                   ),
                                 );
                               }

@@ -152,6 +152,7 @@ class _EventPageState extends State<EventPage> {
                       Image.file(
                         snapshot.data!,
                         fit: BoxFit.cover,
+                        width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.38,
                       ),
                       if (widget.event.attribution != null)
