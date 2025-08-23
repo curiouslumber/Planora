@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -39,9 +38,6 @@ void main() async {
   
   // Get initial theme
   final initialTheme = await SharedPreferencesHelper.getTheme();
-  
-  // Set system UI mode
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   runApp(PlanoraApp(initialTheme: initialTheme));
 }
