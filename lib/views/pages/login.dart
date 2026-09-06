@@ -307,7 +307,7 @@ class _LoginState extends State<Login> {
                             onPressed: () {
                               // Apple login logic
                             },
-                            icon: Icon(Ionicons.logo_apple),
+                            icon: Icon(Ionicons.logoApple),
                             style: IconButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,
@@ -322,7 +322,7 @@ class _LoginState extends State<Login> {
                                 () => context.read<AuthBloc>().add(
                                   GoogleSignInRequested(),
                                 ),
-                            icon: Icon(Ionicons.logo_google),
+                            icon: Icon(Ionicons.logoGoogle),
                             style: IconButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,
@@ -336,7 +336,7 @@ class _LoginState extends State<Login> {
                             onPressed: () {
                               // Facebook login logic
                             },
-                            icon: Icon(Ionicons.logo_facebook),
+                            icon: Icon(Ionicons.logoFacebook),
                             style: IconButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,

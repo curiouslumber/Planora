@@ -6,7 +6,7 @@ import 'package:planora/services/common/event_task_image_service.dart';
 
 class ConnectivityService {
   final Connectivity _connectivity = Connectivity();
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   bool _isProcessing = false;
 
   // Singleton pattern
@@ -36,8 +36,8 @@ class ConnectivityService {
   }
 
   // Handle connectivity changes
-  Future<void> _handleConnectivityChange(ConnectivityResult result) async {
-    if (result != ConnectivityResult.none) {
+  Future<void> _handleConnectivityChange(List<ConnectivityResult> result) async {
+    if (result.any((r) => r != ConnectivityResult.none)) {
       if (kDebugMode) {
         print('Network connection restored, checking for events needing images...');
       }

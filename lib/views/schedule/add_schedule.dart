@@ -175,7 +175,7 @@ class AddSchedule extends StatelessWidget {
                               top: 8.0,
                               bottom: 8.0,
                             ),
-                            child: Icon(Ionicons.calendar_outline),
+                            child: Icon(Ionicons.calendarOutline),
                           ),
                           suffixIconColor: Theme.of(
                             context,
@@ -247,7 +247,7 @@ class AddSchedule extends StatelessWidget {
                         decoration: InputDecoration(
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 24.0),
-                            child: Icon(Ionicons.time_outline),
+                            child: Icon(Ionicons.timeOutline),
                           ),
                           suffixIconColor: Theme.of(
                             context,
@@ -331,7 +331,7 @@ class AddSchedule extends StatelessWidget {
                         decoration: InputDecoration(
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 24.0),
-                            child: Icon(Ionicons.time_outline),
+                            child: Icon(Ionicons.timeOutline),
                           ),
                           suffixIconColor: Theme.of(
                             context,

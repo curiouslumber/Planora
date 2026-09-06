@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         size: 24,
                         _currentIndex == 0
                               ? Ionicons.home
-                              : Ionicons.home_outline,
+                              : Ionicons.homeOutline,
                         color:
                             _currentIndex == 0
                                 ? Theme.of(
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         size: 24,
                         _currentIndex == 1
                             ? Ionicons.today
-                            : Ionicons.today_outline,
+                            : Ionicons.todayOutline,
                         color:
                             _currentIndex == 1
                                 ? Theme.of(
@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         size: 24,
                         _currentIndex == 2
                             ? Ionicons.grid
-                            : Ionicons.grid_outline,
+                            : Ionicons.gridOutline,
                         color:
                             _currentIndex == 2
                                 ? Theme.of(
@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         size: 24,
                         _currentIndex == 3
                             ? Ionicons.person
-                            : Ionicons.person_outline,
+                            : Ionicons.personOutline,
                         color:
                             _currentIndex == 3
                                 ? Theme.of(

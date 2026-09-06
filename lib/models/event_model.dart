@@ -120,7 +120,7 @@ class EventModel {
     );
   }
 
-  static fromJson(Map<String, dynamic> map) {
+  static EventModel fromJson(Map<String, dynamic> map) {
     return EventModel(
       id: map['id'],
       userId: map['userId'],

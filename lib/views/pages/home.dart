@@ -302,7 +302,7 @@ class HomeState extends State<Home> {
                           ),
                         ),
                         Icon(
-                          Ionicons.notifications_outline,
+                          Ionicons.notificationsOutline,
                           color: Theme.of(
                             context,
                           ).colorScheme.onSurface.withValues(alpha: 0.8),
@@ -367,7 +367,7 @@ class HomeState extends State<Home> {
                   prefixIcon: Container(
                     margin: EdgeInsets.only(left: 16.0, right: 8.0),
                     child: Icon(
-                      Ionicons.search_outline,
+                      Ionicons.searchOutline,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
@@ -390,7 +390,7 @@ class HomeState extends State<Home> {
                         ),
                         IconButton(
                           icon: Icon(
-                            Ionicons.mic_outline,
+                            Ionicons.micOutline,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: () {},
@@ -446,7 +446,7 @@ class HomeState extends State<Home> {
                             ),
                             Spacer(),
                             Icon(
-                              Ionicons.chevron_forward,
+                              Ionicons.chevronForward,
                               color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ],

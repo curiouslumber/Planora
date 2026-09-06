@@ -8,7 +8,7 @@ class FirebaseAuthService {
 
   FirebaseAuthService({FirebaseAuth? firebaseAuth, GoogleSignIn? googleSignIn})
     : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-      _googleSignIn = googleSignIn ?? GoogleSignIn();
+      _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   // Returns the currently signed-in [User] or null if not signed-in
   User? get currentUser => _firebaseAuth.currentUser;
@@ -51,17 +51,16 @@ class FirebaseAuthService {
   // Triggers Google Sign-In flow and returns the signed-in [User].
   Future<User?> signInWithGoogle() async {
     try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        throw Exception('Sign In aborted by user');
-      }
+      final googleUser = await _googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
 
       // Obtain the auth details from the request
       final googleAuth = await googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
+        accessToken: googleAuth.idToken,
         idToken: googleAuth.idToken,
       );
 
